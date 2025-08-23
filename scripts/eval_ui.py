@@ -558,6 +558,17 @@ def action_export_finetune() -> None:
     out: Dict[str, Any] = asyncio.run(export_fn(chosen, format=fmt, include_failures=inc))
     if out.get("ok"):
         print(f"Export erfolgreich: {out['out']} ({out['count']} Einträge)")
+        if input("Train/Val-Paket aus Export erstellen? (y/N): ").strip().lower() == "y":
+            try:
+                import importlib
+                packer = importlib.import_module("scripts.prepare_finetune_pack")
+                pack_res: Dict[str, Any] = packer.prepare_pack(out["out"], format=fmt)
+                if pack_res.get("ok"):
+                    print("Train:", pack_res["train"], "Val:", pack_res["val"], "Counts:", pack_res["counts"])
+                else:
+                    print("Pack-Fehler:", pack_res.get("error"))
+            except Exception as e:
+                print("Pack-Tool nicht verfügbar:", e)
     else:
         print("Fehler:", out.get("error"))
     input("Weiter mit Enter …")
