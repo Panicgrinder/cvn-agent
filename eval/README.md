@@ -1,13 +1,14 @@
 # Evaluierungswerkzeug für CVN Agent
 
-Dieses Verzeichnis enthält Tools zur Evaluierung des CVN Agents.
+Dieses Verzeichnis enthält Tools und Daten zur Evaluierung des CVN Agents.
 
-## Dateien
+Struktur:
 
-- `prompts.jsonl`: Eine JSONL-Datei mit Testfällen für die Evaluierung
-- Jeder Eintrag enthält eine ID, eine Liste von Nachrichten und Prüfbedingungen
+- `datasets/`: Eingabedateien für die Evaluierung (Prompts), z. B. `eval-*.json` oder `.jsonl`
+- `config/`: Konfiguration (z. B. `synonyms.json` für Keyword-Prüfungen)
+- `results/`: Ausgabedateien der Evaluierung (generiert, `results_*.jsonl`)
 
-## Format der prompts.jsonl
+## Format der Datasets (JSON/JSONL)
 
 ```json
 {

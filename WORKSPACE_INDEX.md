@@ -36,7 +36,7 @@
 - [`app/core/content_rules.json`](app/core/content_rules.json) - Benutzerdefinierte Inhaltsregeln
 
 ### data/:
-- [`data/system.txt`](data/system.txt) - System-Prompt-Datei
+ - [`data/logs/`](data/logs/) - Laufzeitprotokolle
 
 #### data/logs/:
 - [`data/logs/*.jsonl`](data/logs/) - Chat-Protokolle (generiert, gitignored)
@@ -117,7 +117,7 @@
 ### **Beispiele:**
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Prompt-Beispiele
 
-Hinweis: Router unter `app/routers/*` wurden entfernt bzw. nach `examples/rpg/` verschoben und sind nicht mehr Teil der produktiven App.
+Hinweis: Legacy-Router unter `app/routers/*` wurden entfernt. Produktive Endpunkte befinden sich in `app/main.py` und `app/api/*`.
 
 ### **Git-Verwaltung:**
 - [`.gitignore`](.gitignore) - Haupt-Git-Ignorier-Regeln

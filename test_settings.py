@@ -17,11 +17,6 @@ def main():
     print("CORS-Einstellungen:")
     print(f"  BACKEND_CORS_ORIGINS: {settings.BACKEND_CORS_ORIGINS}")
     
-    # Prüfe, ob ALLOW_ORIGIN_REGEX existiert, bevor darauf zugegriffen wird
-    if hasattr(settings, 'ALLOW_ORIGIN_REGEX'):
-        print(f"  ALLOW_ORIGIN_REGEX: {settings.ALLOW_ORIGIN_REGEX}")
-    else:
-        print("  ALLOW_ORIGIN_REGEX: Nicht definiert")
     print()
     
     print("Ollama-Einstellungen:")
@@ -31,6 +26,9 @@ def main():
     
     print("Evaluierungseinstellungen:")
     print(f"  EVAL_DIRECTORY: {settings.EVAL_DIRECTORY}")
+    print(f"  EVAL_DATASET_DIR: {settings.EVAL_DATASET_DIR}")
+    print(f"  EVAL_RESULTS_DIR: {settings.EVAL_RESULTS_DIR}")
+    print(f"  EVAL_CONFIG_DIR: {settings.EVAL_CONFIG_DIR}")
     print(f"  EVAL_FILE_PATTERN: {settings.EVAL_FILE_PATTERN}")
     print()
 

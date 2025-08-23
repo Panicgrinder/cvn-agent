@@ -63,4 +63,15 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/chat" -Method Post -Body '{"messag
 Zugriff auf die API-Dokumentation unter:
 ```
 http://127.0.0.1:8000/docs
+
+## Einstellungen/Umgebung
+
+Konfiguration per `.env` (siehe Beispiele in `app/core/settings.py`). Wichtige Felder:
+
+- OLLAMA_HOST, MODEL_NAME, TEMPERATURE
+- BACKEND_CORS_ORIGINS: JSON- oder Komma-Liste
+- REQUEST_TIMEOUT (Sek.), REQUEST_MAX_INPUT_CHARS, REQUEST_MAX_TOKENS
+- RATE_LIMIT_ENABLED (bool), RATE_LIMIT_REQUESTS_PER_MINUTE, RATE_LIMIT_BURST
+
+Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters begrenzt (in-memory, best-effort).
 ```

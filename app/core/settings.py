@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 import os
-from typing import List, Dict, Any
-from dotenv import load_dotenv
-from pydantic import BaseModel
+from typing import List, Any, cast
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
-# Lade Umgebungsvariablen aus .env-Datei
-load_dotenv()
 
-class Settings(BaseModel):
+class Settings(BaseSettings):
     """Anwendungseinstellungen"""
+    # Pydantic Settings v2 Konfiguration (.env wird automatisch berücksichtigt)
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",
+    )
     
     # API-Einstellungen
     API_V1_STR: str = "/api/v1"
@@ -24,45 +30,65 @@ class Settings(BaseModel):
     
     # Evaluierungseinstellungen
     EVAL_DIRECTORY: str = "eval"
+    # Unterordner für bessere Übersicht
+    EVAL_DATASET_DIR: str = os.path.join("eval", "datasets")
+    EVAL_RESULTS_DIR: str = os.path.join("eval", "results")
+    EVAL_CONFIG_DIR: str = os.path.join("eval", "config")
     EVAL_FILE_PATTERN: str = "eval-*.json"
     
     # CORS-Einstellungen
     BACKEND_CORS_ORIGINS: List[str] = []
-    
-    class Config:
-        case_sensitive = True
-    
-    @classmethod
-    def from_env(cls) -> "Settings":
-        """
-        Erstellt eine Settings-Instanz aus Umgebungsvariablen.
-        Verarbeitet BACKEND_CORS_ORIGINS und andere spezielle Felder.
-        """
-        # Standard-Werte für Settings
-        values: Dict[str, Any] = {
-            "API_V1_STR": os.getenv("API_V1_STR", "/api/v1"),
-            "PROJECT_NAME": os.getenv("PROJECT_NAME", "CVN Agent"),
-            "PROJECT_DESCRIPTION": os.getenv("PROJECT_DESCRIPTION", "Conversational Agent mit Ollama"),
-            "PROJECT_VERSION": os.getenv("PROJECT_VERSION", "0.1.0"),
-            "OLLAMA_HOST": os.getenv("OLLAMA_HOST", "http://localhost:11434"),
-            "MODEL_NAME": os.getenv("MODEL_NAME", "llama3.1:8b"),
-            "TEMPERATURE": float(os.getenv("TEMPERATURE", "0.7")),
-            "EVAL_DIRECTORY": os.getenv("EVAL_DIRECTORY", "eval"),
-            "EVAL_FILE_PATTERN": os.getenv("EVAL_FILE_PATTERN", "eval-*.json"),
-        }
-        
-        # Verarbeite BACKEND_CORS_ORIGINS als kommagetrennte Liste
-        cors_origins = os.getenv("BACKEND_CORS_ORIGINS", "")
-        if cors_origins:
-            # Splitte die Liste und entferne Leerzeichen
-            origins = [origin.strip() for origin in cors_origins.split(",")]
-            # Filtere leere Strings
-            values["BACKEND_CORS_ORIGINS"] = [origin for origin in origins if origin]
-        
-        return cls(**values)
 
-# Exportiere die Settings-Instanz
-settings = Settings.from_env()
+    # Sicherheits-/Request-Limits
+    REQUEST_TIMEOUT: float = 60.0
+    REQUEST_MAX_INPUT_CHARS: int = 16000
+    REQUEST_MAX_TOKENS: int = 512
+
+    # Rate Limiting (optional)
+    RATE_LIMIT_ENABLED: bool = False
+    RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
+    RATE_LIMIT_BURST: int = 30
+
+    @staticmethod
+    def _to_nonempty_str(obj: Any) -> Optional[str]:
+        s = str(obj).strip()
+        return s if s else None
+
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def _coerce_cors(cls, v: Any) -> List[str]:
+        """Erlaubt Komma-separierte Liste oder JSON-Liste in der ENV."""
+        if v is None or v == "":
+            return []
+        if isinstance(v, list):
+            seq: List[Any] = list(cast(List[Any], v))
+            result: List[str] = []
+            for x in seq:
+                s = cls._to_nonempty_str(x)
+                if s is not None:
+                    result.append(s)
+            return result
+        if isinstance(v, str):
+            # Versuche JSON-Liste
+            try:
+                import json
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    seq2: List[Any] = list(cast(List[Any], parsed))
+                    result2: List[str] = []
+                    for x in seq2:
+                        s = cls._to_nonempty_str(x)
+                        if s is not None:
+                            result2.append(s)
+                    return result2
+            except Exception:
+                pass
+            # Fallback: Komma-separiert
+            return [s.strip() for s in v.split(',') if s.strip()]
+        return []
+
+# Exportiere die Settings-Instanz (lädt automatisch aus ENV/.env)
+settings = Settings()
 
 # Definiere, welche Symbole exportiert werden
 __all__ = ["settings", "Settings"]

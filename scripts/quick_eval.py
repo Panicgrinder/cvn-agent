@@ -7,7 +7,7 @@ Einfach in VS Code ausführen (Run-Button). Läuft automatisch:
 - mit Eval-Modus (RPG-Systemprompt deaktiviert)
 - mit optionalem Limit über Umgebungsvariable QUICK_EVAL_LIMIT (Standard: 10)
 
-Ergebnisse werden wie gewohnt unter eval/results_YYYYMMDD_HHMM.jsonl gespeichert
+Ergebnisse werden im eval/results/-Ordner als results_YYYYMMDD_HHMM.jsonl gespeichert
 und in der Konsole zusammengefasst.
 """
 

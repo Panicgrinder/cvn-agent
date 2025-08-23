@@ -159,9 +159,9 @@ def main() -> int:
     hp = os.path.join(PROJECT_ROOT, "app", "routers", "health.py")
     if os.path.exists(hp):
         print(" - app/routers/health.py: Separater Health-Router; in app/main.py existiert bereits /health. Prüfen ob eingebunden.")
-    ap_prompt = os.path.join(PROJECT_ROOT, "app", "prompt", "system.txt")
+    ap_prompt = os.path.join(PROJECT_ROOT, "app", "core", "prompts.py")
     if os.path.exists(ap_prompt):
-        print(" - app/prompt/system.txt: Prüfen, ob noch genutzt oder durch app/core/prompts.py ersetzt.")
+        print(" - app/core/prompts.py: zentrale Prompt-Quelle (keine system.txt mehr).")
     cm = os.path.join(PROJECT_ROOT, "app", "core", "content_management.py")
     if os.path.exists(cm):
         print(" - app/core/content_management.py: Nur nötig, wenn Inhaltsfilter aktiv genutzt wird.")

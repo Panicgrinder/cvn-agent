@@ -33,18 +33,18 @@ logs/
 data/logs/
 
 ########################################
-# App data (keep system prompt tracked)
+# App data
 ########################################
 data/*.jsonl
 data/*.sqlite3
-!data/system.txt
 
 ########################################
 # Evaluation outputs (keep datasets tracked)
 ########################################
-eval/results_*.jsonl
-!eval/*.json
-!eval/synonyms.json
+eval/results/
+!eval/datasets/*.json
+!eval/datasets/*.jsonl
+!eval/config/*.json
 !eval/README.md
 
 ########################################

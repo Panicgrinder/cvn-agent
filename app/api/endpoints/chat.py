@@ -13,7 +13,7 @@ Diese Datei wird in einer zukünftigen Version entfernt werden.
 from fastapi import APIRouter, HTTPException
 from typing import List
 
-from ...schemas import ChatMessage, ChatResponse
+from ..models import ChatMessage, ChatResponse
 from ...services.llm import generate_reply
 
 router = APIRouter()

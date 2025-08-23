@@ -4,6 +4,9 @@
   "venvPath": ".",
   "venv": ".venv",
   "include": ["app"],
+  "extraPaths": [
+    ".venv/Lib/site-packages"
+  ],
   "exclude": [
     ".venv",
     "build",
@@ -28,7 +31,9 @@
   "executionEnvironments": [
     {
       "root": "app",
-      "extraPaths": [],
+      "extraPaths": [
+        "../.venv/Lib/site-packages"
+      ],
       "pythonVersion": "3.12",
       "venv": ".venv"
     }

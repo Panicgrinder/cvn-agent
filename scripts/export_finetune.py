@@ -75,7 +75,7 @@ async def export_from_results(
     patterns: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     if out_dir is None:
-        out_dir_str: str = str(run_eval.DEFAULT_EVAL_DIR)
+        out_dir_str: str = str(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR))
     else:
         out_dir_str = str(out_dir)
     os.makedirs(out_dir_str, exist_ok=True)

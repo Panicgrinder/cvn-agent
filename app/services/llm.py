@@ -1,11 +1,10 @@
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import httpx
 import os
-from typing import Dict, Any
 
 from ..core.settings import settings
-from ..schemas import ChatMessage, ChatResponse
+from ..api.models import ChatMessage, ChatResponse
 
 async def generate_reply(messages: List[ChatMessage]) -> ChatResponse:
     """
@@ -20,15 +19,15 @@ async def generate_reply(messages: List[ChatMessage]) -> ChatResponse:
     url = f"{settings.OLLAMA_HOST}/api/chat"
     
     # Konvertiere unsere Messages in Ollama-Format
-    ollama_msgs = [{"role": m.role, "content": m.content} for m in messages]
-    
-    payload = {
+    ollama_msgs: List[Dict[str, str]] = [{"role": m.role, "content": m.content} for m in messages]
+
+    payload: Dict[str, Any] = {
         "model": settings.MODEL_NAME,
         "messages": ollama_msgs,
         "stream": False,
     }
     
-    headers = {"Content-Type": "application/json"}
+    headers: Dict[str, str] = {"Content-Type": "application/json"}
     
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(30.0)) as client:
@@ -71,7 +70,7 @@ def get_llm_options() -> Dict[str, Any]:
     Returns:
         Dictionary mit Einstellungen für das LLM
     """
-    options = {}
+    options: Dict[str, Any] = {}
     
     # Kontextgröße
     if "LLM_NUM_CTX" in os.environ:
@@ -105,7 +104,7 @@ async def generate_completion(prompt: str, options: Optional[Dict[str, Any]] = N
     url = f"{settings.OLLAMA_HOST}/api/generate"
     
     # Merge default options mit den übergebenen Optionen
-    payload = {
+    payload: Dict[str, Any] = {
         "model": settings.MODEL_NAME,
         "prompt": prompt,
         "stream": False
@@ -116,7 +115,7 @@ async def generate_completion(prompt: str, options: Optional[Dict[str, Any]] = N
     
     try:
         async with httpx.AsyncClient() as client:
-            headers = {"Content-Type": "application/json"}
+            headers: Dict[str, str] = {"Content-Type": "application/json"}
             response = await client.post(url, json=payload, headers=headers)
             response.raise_for_status()
             

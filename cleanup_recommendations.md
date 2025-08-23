@@ -2,16 +2,16 @@
 
 ## Abgeschlossene Maßnahmen
 1. ✅ System-Prompt-Dateien synchronisiert und Code-Referenzen aktualisiert
-   - `app/prompt/system.txt` und `data/system.txt` haben nun identischen Inhalt
-   - Code-Pfade wurden in `app/api/chat_helpers.py` aktualisiert, um den Pfad in `app/prompt/system.txt` zu priorisieren
+   - `app/prompt/system.txt` und `data/system.txt` wurden entfernt; zentrale Quelle ist `app/core/prompts.py`.
+   - `app/api/chat_helpers.py` ist entfallen.
 
 2. ✅ Chat-Router verbessert
-   - Fehlerbehandlung aus `app/api/endpoints/chat.py` in `app/routers/chat.py` integriert
+   - Veraltete Router und Endpunkte entfernt; aktuelle Chat-Logik liegt unter `app/api/chat.py`
    - Robustere Fehlerbehandlung für leere Nachrichten und LLM-Fehler
 
 3. ✅ Entfernen von redundanten Chat-Implementierungen
    - `app/api/endpoints/chat.py` wurde als veraltet markiert
-   - `app/main.py` wurde aktualisiert, um nur den Router aus `app/routers/chat.py` zu verwenden
+   - `app/main.py` verwendet direkt `process_chat_request` aus `app/api/chat.py`
    - Der direkte Chat-Endpunkt in `app/main.py` wurde entfernt
    - Logging und Zusammenfassung wurden in den Chat-Router integriert
 
@@ -32,7 +32,7 @@
 
 ## Langfristige Überlegungen
 1. Klare Trennung zwischen API-Endpunkten und Routers
-   - Entscheidung, ob die Endpunkte unter `app/api/` oder `app/routers/` organisiert werden sollen
+   - Endpunkte sind konsolidiert unter `app/api/`; `app/routers/` wurde entfernt
    - Einheitliche Struktur für alle Endpunkte
 
 2. Konsolidierung der eval-utils

@@ -1,7 +1,7 @@
 import json
 import re
 import os
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any
 
 def truncate(text: str, n: int = 200) -> str:
     """
@@ -72,7 +72,7 @@ def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
             pass
             
     # Versuche als JSONL zu parsen (eine JSON-Zeile pro Zeile)
-    results = []
+    results: List[Dict[str, Any]] = []
     errors = 0
     
     for line in text.strip().split('\n'):
@@ -102,7 +102,7 @@ def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
         return json.loads(fixed_text)
     except json.JSONDecodeError:
         # Letzer Versuch: Jede Zeile einzeln parsen und zu Liste hinzufügen
-        results = []
+        results = []  # type: List[Dict[str, Any]]
         for line in text.strip().split('\n'):
             line = line.strip()
             if not line:
@@ -131,7 +131,7 @@ def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
     
     return results
 
-def load_synonyms(path: str = "eval/synonyms.json") -> Dict[str, List[str]]:
+def load_synonyms(path: str = "eval/config/synonyms.json") -> Dict[str, List[str]]:
     """
     Lädt Synonyme aus einer JSON-Datei.
     

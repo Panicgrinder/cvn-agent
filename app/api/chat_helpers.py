@@ -6,7 +6,7 @@ import os
 import functools
 from typing import List
 
-from ..schemas import ChatMessage
+from .models import ChatMessage
 
 # Cache für den System-Prompt
 _SYSTEM_PROMPT: str | None = None

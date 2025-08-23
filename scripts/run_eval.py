@@ -22,6 +22,7 @@ import httpx
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
+import warnings
 
 # Füge das Hauptverzeichnis zum Python-Pfad hinzu
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,13 +37,18 @@ try:
     # Importiere die Einstellungen
     from app.core.settings import settings
     
-    # Verwende die Einstellungen für Standardwerte
-    DEFAULT_EVAL_DIR = os.path.join(project_root, settings.EVAL_DIRECTORY)
+    # Verwende die Einstellungen für Standardwerte (neue Unterordner-Struktur)
+    DEFAULT_EVAL_DIR = os.path.join(project_root, settings.EVAL_DATASET_DIR)
+    DEFAULT_RESULTS_DIR = os.path.join(project_root, settings.EVAL_RESULTS_DIR)
+    DEFAULT_CONFIG_DIR = os.path.join(project_root, settings.EVAL_CONFIG_DIR)
     DEFAULT_FILE_PATTERN = settings.EVAL_FILE_PATTERN
     DEFAULT_API_URL = f"http://localhost:8000/chat"
 except ImportError:
     # Fallback-Werte, wenn die Anwendungseinstellungen nicht verfügbar sind
-    DEFAULT_EVAL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
+    base_eval = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
+    DEFAULT_EVAL_DIR = os.path.join(base_eval, "datasets")
+    DEFAULT_RESULTS_DIR = os.path.join(base_eval, "results")
+    DEFAULT_CONFIG_DIR = os.path.join(base_eval, "config")
     DEFAULT_FILE_PATTERN = "eval-*.json"
     DEFAULT_API_URL = "http://localhost:8000/chat"
 
@@ -204,7 +210,8 @@ def get_synonyms(term: str) -> List[str]:
     
     # Lazy-Loading der Synonyme
     if _synonyms_cache is None:
-        synonyms_path = os.path.join(DEFAULT_EVAL_DIR, "synonyms.json")
+        # Synonyme liegen nun in config/
+        synonyms_path = os.path.join(DEFAULT_CONFIG_DIR, "synonyms.json")
         logging.info(f"Lade Synonyme aus: {synonyms_path}")
         _synonyms_cache = load_synonyms(synonyms_path)
         logging.info(f"Anzahl der Synonym-Einträge: {len(_synonyms_cache)}")
@@ -737,9 +744,10 @@ async def run_evaluation(
     if eval_mode:
         logging.info("Evaluierung wird im Eval-Modus durchgeführt (RPG-Modus deaktiviert)")
     
-    # Aktuelle Zeit für Ergebnis-Dateiname
+    # Aktuelle Zeit für Ergebnis-Dateiname (in results/ ablegen)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    results_file = os.path.join(DEFAULT_EVAL_DIR, f"results_{timestamp}.jsonl")
+    os.makedirs(DEFAULT_RESULTS_DIR, exist_ok=True)
+    results_file = os.path.join(DEFAULT_RESULTS_DIR, f"results_{timestamp}.jsonl")
     
     # Optional: ASGI-Client vorbereiten
     asgi_client: Optional[httpx.AsyncClient] = None
@@ -760,10 +768,21 @@ async def run_evaluation(
         "eval_loader",
         "eval",
         "preflight",
+        "asyncio",
     ]
     try:
+        root_debug = logging.getLogger().isEnabledFor(logging.DEBUG)
+
+        # Immer: asyncio drosseln, außer im Debug-Modus
+        asyncio_logger = logging.getLogger("asyncio")
+        prev_levels["asyncio"] = asyncio_logger.level
+        if not root_debug:
+            asyncio_logger.setLevel(logging.ERROR if quiet else logging.WARNING)
+
         if quiet:
             for name in noisy_loggers:
+                if name == "asyncio":
+                    continue  # bereits oben gesetzt
                 lg = logging.getLogger(name)
                 prev_levels[name] = lg.level
                 lg.setLevel(logging.WARNING)
@@ -1042,8 +1061,11 @@ def create_example_eval_file(file_path: str, start_id: int = 21, count: int = 20
 
 
 if __name__ == "__main__":
-    # Standardpfade
-    eval_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
+    # Standardpfade (Datasets/Results/Config)
+    base_eval = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
+    eval_dir = DEFAULT_EVAL_DIR  # datasets
+    results_dir = DEFAULT_RESULTS_DIR
+    config_dir = DEFAULT_CONFIG_DIR
     default_pattern = os.path.join(eval_dir, DEFAULT_FILE_PATTERN)
     api_url = DEFAULT_API_URL
     
@@ -1074,17 +1096,23 @@ if __name__ == "__main__":
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%H:%M:%S"
     )
+    if not args.debug:
+        # Unterdrücke gewöhnliche Deprecation/Resource-Warnungen im CLI-Betrieb
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=ResourceWarning)
     
     # Verarbeite Kommandos
     if args.create_example:
         # Erstelle ein Beispiel-Eval-Paket
+        os.makedirs(eval_dir, exist_ok=True)
         example_file = os.path.join(eval_dir, "eval-21-40_demo_v1.0.jsonl")
         create_example_eval_file(example_file, 21, 20)
         sys.exit(0)
     
     if args.create_synonyms:
         # Erstelle eine leere Synonymdatei als Vorlage
-        synonyms_file = os.path.join(eval_dir, "synonyms.json")
+        os.makedirs(config_dir, exist_ok=True)
+        synonyms_file = os.path.join(config_dir, "synonyms.json")
         if not os.path.exists(synonyms_file):
             with open(synonyms_file, "w", encoding="utf-8") as f:
                 # Erstelle ein leeres Dictionary als Vorlage
@@ -1102,8 +1130,10 @@ if __name__ == "__main__":
     if args.api_url:
         api_url = args.api_url
     
-    # Stelle sicher, dass das eval-Verzeichnis existiert
+    # Stelle sicher, dass die Verzeichnisse existieren
     os.makedirs(eval_dir, exist_ok=True)
+    os.makedirs(results_dir, exist_ok=True)
+    os.makedirs(config_dir, exist_ok=True)
     
     # Bestimme die zu ladenden Dateien
     patterns = args.packages if args.packages else [default_pattern]

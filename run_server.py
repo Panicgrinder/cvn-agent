@@ -8,8 +8,15 @@ normalerweise eingeschränkten Themen dargestellt werden können.
 
 import uvicorn
 from app.core.settings import settings
+import logging
+import warnings
 
 if __name__ == "__main__":
+    # Basis-Logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%H:%M:%S")
+    logging.getLogger("asyncio").setLevel(logging.WARNING)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    warnings.filterwarnings("ignore", category=ResourceWarning)
     print(f"Starte CVN Agent Server auf http://localhost:8000")
     print(f"API Dokumentation: http://localhost:8000/docs")
     print(f"Verwende Modell: {settings.MODEL_NAME}")
