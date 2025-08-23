@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 class ChatMessage(BaseModel):
     """
@@ -13,6 +13,8 @@ class ChatRequest(BaseModel):
     Modell für eine Chat-Anfrage.
     """
     messages: List[Dict[str, str]]
+    model: Optional[str] = None
+    options: Optional[Dict[str, Any]] = None
     
 class ChatResponse(BaseModel):
     """

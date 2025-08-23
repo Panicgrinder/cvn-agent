@@ -20,6 +20,7 @@ class Settings(BaseModel):
     # Ollama-Einstellungen
     OLLAMA_HOST: str = "http://localhost:11434"
     MODEL_NAME: str = "llama3.1:8b"
+    TEMPERATURE: float = 0.7
     
     # Evaluierungseinstellungen
     EVAL_DIRECTORY: str = "eval"
@@ -45,6 +46,7 @@ class Settings(BaseModel):
             "PROJECT_VERSION": os.getenv("PROJECT_VERSION", "0.1.0"),
             "OLLAMA_HOST": os.getenv("OLLAMA_HOST", "http://localhost:11434"),
             "MODEL_NAME": os.getenv("MODEL_NAME", "llama3.1:8b"),
+            "TEMPERATURE": float(os.getenv("TEMPERATURE", "0.7")),
             "EVAL_DIRECTORY": os.getenv("EVAL_DIRECTORY", "eval"),
             "EVAL_FILE_PATTERN": os.getenv("EVAL_FILE_PATTERN", "eval-*.json"),
         }

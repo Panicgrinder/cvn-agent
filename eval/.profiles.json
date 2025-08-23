@@ -1,0 +1,14 @@
+{
+  "default": {
+    "model": null,
+    "host": null,
+    "temperature": null,
+    "checks": null
+  },
+  "test": {
+    "model": null,
+    "host": null,
+    "temperature": null,
+    "checks": null
+  }
+}

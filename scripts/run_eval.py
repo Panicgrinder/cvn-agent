@@ -487,6 +487,10 @@ async def evaluate_item(
     api_url: str = "http://localhost:8000/chat",
     eval_mode: bool = False,
     client: Optional[httpx.AsyncClient] = None,
+    enabled_checks: Optional[List[str]] = None,
+    model_override: Optional[str] = None,
+    temperature_override: Optional[float] = None,
+    host_override: Optional[str] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -510,6 +514,16 @@ async def evaluate_item(
             "messages": messages,
             "eval_mode": eval_mode  # Signal für die API, den RPG-Modus zu deaktivieren
         }
+        if model_override:
+            payload["model"] = model_override
+        # Merge option overrides
+        options: Dict[str, Any] = {}
+        if temperature_override is not None:
+            options["temperature"] = float(temperature_override)
+        if host_override is not None:
+            options["host"] = host_override
+        if options:
+            payload["options"] = options
         
         logger = logging.getLogger("eval")
         logger.debug(f"Evaluiere Item {item.id}")
@@ -539,8 +553,11 @@ async def evaluate_item(
         if is_rpg_mode and not any(rpg_term in (item.source_package or "").lower() for rpg_term in ["rpg", "novapolis", "szene"]):
             failed_checks.append("Antwort im RPG-Modus, aber Test erwartet allgemeine Antwort")
 
+        # Wenn nicht gesetzt, sind alle Checks aktiv
+        enabled = set(enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex"])
+
         # 1. must_include: Alle Begriffe müssen enthalten sein
-        if item.checks.get("must_include"):
+        if "must_include" in enabled and item.checks.get("must_include"):
             for term in item.checks["must_include"]:
                 check_passed = check_term_inclusion(content, term)
                 checks_passed[f"include:{term}"] = check_passed
@@ -548,7 +565,7 @@ async def evaluate_item(
                     failed_checks.append(f"Erforderlicher Begriff nicht gefunden: '{term}'")
 
         # 2. keywords_any: Mindestens ein Begriff muss enthalten sein
-        if item.checks.get("keywords_any"):
+        if "keywords_any" in enabled and item.checks.get("keywords_any"):
             any_found = False
             for term in item.checks["keywords_any"]:
                 if check_term_inclusion(content, term):
@@ -560,7 +577,7 @@ async def evaluate_item(
 
         # 3. keywords_at_least: Mindestens N Begriffe müssen enthalten sein
         keywords_at_least = item.checks.get("keywords_at_least")
-        if keywords_at_least:
+        if "keywords_at_least" in enabled and keywords_at_least:
             try:
                 required_count = 0
                 items_list = []
@@ -584,7 +601,7 @@ async def evaluate_item(
                 failed_checks.append("Ungültiges keywords_at_least Format")
 
         # 4. not_include: Begriffe dürfen nicht enthalten sein
-        if item.checks.get("not_include"):
+        if "not_include" in enabled and item.checks.get("not_include"):
             for term in item.checks["not_include"]:
                 term_not_included = not check_term_inclusion(content, term)
                 checks_passed[f"not_include:{term}"] = term_not_included
@@ -592,7 +609,7 @@ async def evaluate_item(
                     failed_checks.append(f"Unerwünschter Begriff gefunden: '{term}'")
 
         # 5. regex: Reguläre Ausdrücke müssen matchen
-        if item.checks.get("regex"):
+        if "regex" in enabled and item.checks.get("regex"):
             for pattern in item.checks["regex"]:
                 try:
                     pattern_str: str = str(pattern)
@@ -678,6 +695,11 @@ async def run_evaluation(
     eval_mode: bool = False,
     skip_preflight: bool = False,
     asgi: bool = False,
+    enabled_checks: Optional[List[str]] = None,
+    model_override: Optional[str] = None,
+    temperature_override: Optional[float] = None,
+    host_override: Optional[str] = None,
+    quiet: bool = False,
 ) -> List[EvaluationResult]:
     """
     Führt die Evaluierung für alle Einträge durch.
@@ -729,12 +751,54 @@ async def run_evaluation(
         # Im ASGI-Modus gegen Pfad arbeiten
         api_url = "/chat"
 
+    # Optional: Logger temporär drosseln, um Progress sauber zu halten
+    prev_levels: Dict[str, int] = {}
+    noisy_loggers = [
+        "app.main",
+        "app.api.chat",
+        "httpx",
+        "eval_loader",
+        "eval",
+        "preflight",
+    ]
     try:
-        with Progress() as progress:
+        if quiet:
+            for name in noisy_loggers:
+                lg = logging.getLogger(name)
+                prev_levels[name] = lg.level
+                lg.setLevel(logging.WARNING)
+
+        with Progress(transient=True) as progress:
             task = progress.add_task("[cyan]Evaluiere...", total=len(items))
             
+            # Meta-Header als erste Zeile schreiben
+            meta_header: Dict[str, Any] = {
+                "_meta": True,
+                "timestamp": timestamp,
+                "patterns": patterns,
+                "api_url": api_url,
+                "eval_mode": eval_mode,
+                "asgi": asgi,
+                "enabled_checks": enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex"],
+                "model": __import__('app.core.settings', fromlist=['settings']).settings.MODEL_NAME,
+                "temperature": __import__('app.core.settings', fromlist=['settings']).settings.TEMPERATURE,
+                "host": __import__('app.core.settings', fromlist=['settings']).settings.OLLAMA_HOST,
+                "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override},
+            }
+            with open(results_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(meta_header, ensure_ascii=False) + "\n")
+
             for item in items:
-                result = await evaluate_item(item, api_url, eval_mode=eval_mode, client=asgi_client)
+                result = await evaluate_item(
+                    item,
+                    api_url,
+                    eval_mode=eval_mode,
+                    client=asgi_client,
+                    enabled_checks=enabled_checks,
+                    model_override=model_override,
+                    temperature_override=temperature_override,
+                    host_override=host_override,
+                )
                 results.append(result)
                 
                 # Speichere Ergebnis sofort in JSONL-Datei
@@ -748,6 +812,9 @@ async def run_evaluation(
     finally:
         if asgi_client is not None:
             await asgi_client.aclose()
+        if quiet:
+            for name, lvl in prev_levels.items():
+                logging.getLogger(name).setLevel(lvl)
     
     logging.info(f"Ergebnisse wurden in {results_file} gespeichert.")
     return results
@@ -989,6 +1056,9 @@ if __name__ == "__main__":
     parser.add_argument("--eval-mode", "-e", action="store_true", help="Deaktiviert den RPG-Modus für die Evaluierung")
     parser.add_argument("--skip-preflight", "-s", action="store_true", help="Überspringt den Preflight-Check (nützlich, wenn der Server nicht läuft)")
     parser.add_argument("--asgi", action="store_true", help="ASGI-In-Process: Evaluierung direkt gegen FastAPI-App ohne laufenden Server-Port")
+    parser.add_argument("--checks", nargs="*", help="Aktiviere nur diese Check-Typen (must_include, keywords_any, keywords_at_least, not_include, regex)")
+    parser.add_argument("--quiet", action="store_true", help="Unterdrückt Logausgaben lauter Logger während der Progress-Anzeige")
+    parser.add_argument("--no-quiet", action="store_true", help="Quiet-Mode deaktivieren (setzt sich gegen --quiet durch)")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1072,7 +1142,9 @@ if __name__ == "__main__":
             console.print("[bold red]Keine Prompts gefunden.[/bold red]")
         sys.exit(0)
     
-    results = asyncio.run(run_evaluation(patterns, api_url, args.limit, args.eval_mode, args.skip_preflight, args.asgi))
+    # Quiet-Default: true, außer im Debug-Modus oder wenn --no-quiet gesetzt
+    quiet_final = (not args.no_quiet) and (args.quiet or (not args.debug))
+    results = asyncio.run(run_evaluation(patterns, api_url, args.limit, args.eval_mode, args.skip_preflight, args.asgi, args.checks, None, None, None, quiet_final))
     
     if results:
         print_results(results)

@@ -57,16 +57,24 @@ async def process_chat_request(request: ChatRequest, eval_mode: bool = False, un
                     "role": "system",
                     "content": DEFAULT_SYSTEM_PROMPT
                 })
-        
-        # Bereite die Payload für Ollama vor
+        # Bereite die Payload für Ollama vor (Overrides aus Request berücksichtigen)
+        from typing import Dict as _Dict, Any as _Any
+        req_model = getattr(request, "model", None)
+        req_options: _Dict[str, _Any] = getattr(request, "options", None) or {}
+        temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
+        base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
+
         ollama_payload: Dict[str, Any] = {
-            "model": settings.MODEL_NAME,
+            "model": req_model or settings.MODEL_NAME,
             "messages": messages,
             "stream": False,
+            "options": {
+                "temperature": temperature,
+            },
         }
-        
-        # API-Endpunkt für Ollama Chat
-        ollama_url = f"{settings.OLLAMA_HOST}/api/chat"
+
+        # API-Endpunkt für Ollama Chat (Host ggf. überschrieben)
+        ollama_url = f"{base_host}/api/chat"
         
         # Anfrage an Ollama senden
         async with httpx.AsyncClient(timeout=60.0) as client:
