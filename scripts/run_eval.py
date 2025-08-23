@@ -210,11 +210,13 @@ def get_synonyms(term: str) -> List[str]:
     
     # Lazy-Loading der Synonyme
     if _synonyms_cache is None:
-        # Synonyme liegen nun in config/
-        synonyms_path = os.path.join(DEFAULT_CONFIG_DIR, "synonyms.json")
-        logging.info(f"Lade Synonyme aus: {synonyms_path}")
-        _synonyms_cache = load_synonyms(synonyms_path)
-        logging.info(f"Anzahl der Synonym-Einträge: {len(_synonyms_cache)}")
+        # Synonyme liegen nun in config/; optionales Overlay aus synonyms.local.json wird gemerged
+        base_path = os.path.join(DEFAULT_CONFIG_DIR, "synonyms.json")
+        local_overlay = os.path.join(DEFAULT_CONFIG_DIR, "synonyms.local.json")
+        paths = [base_path, local_overlay]
+        logging.info(f"Lade Synonyme aus: {', '.join([p for p in paths if os.path.exists(p)])}")
+        _synonyms_cache = load_synonyms(paths)
+        logging.info(f"Anzahl der Synonym-Einträge (gemerged): {len(_synonyms_cache)}")
     
     # Suche nach dem Begriff und seinen Varianten
     synonyms: List[str] = []

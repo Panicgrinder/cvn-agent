@@ -2,13 +2,24 @@
   "default": {
     "model": null,
     "host": null,
-    "temperature": null,
-    "checks": null
+    "temperature": 0.7,
+    "checks": null,
+    "quiet": true,
+    "asgi": true,
+    "eval_mode": true,
+    "skip_preflight": true
   },
-  "test": {
+  "fast": {
     "model": null,
     "host": null,
-    "temperature": null,
-    "checks": null
+    "temperature": 0.5,
+    "checks": [
+      "must_include",
+      "keywords_any"
+    ],
+    "quiet": true,
+    "asgi": true,
+    "eval_mode": true,
+    "skip_preflight": true
   }
 }

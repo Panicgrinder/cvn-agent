@@ -1,0 +1,5 @@
+{
+  "unternehmen": ["firma", "betrieb", "gesellschaft"],
+  "nachhaltigkeit": ["umweltfreundlichkeit", "klimaschutz", "ressourcenschonung"],
+  "cloud": ["wolke", "cloud-computing", "saas"]
+}

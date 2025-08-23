@@ -129,13 +129,18 @@ def load_profiles() -> Dict[str, Dict[str, Any]]:
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
+    # Defaults, falls keine Datei existiert
     return {
         "default": {
             "model": None,
             "host": None,
             "temperature": None,
             "checks": None,
-            "quiet": None,
+            # Laufparameter
+            "quiet": True,            # reduzierte Logs standardmäßig
+            "asgi": True,             # In-Process-Client
+            "eval_mode": True,        # RPG deaktiviert für Evals
+            "skip_preflight": True,   # Preflight sparen im ASGI-Modus
         }
     }
 
@@ -164,7 +169,7 @@ def action_edit_profiles() -> None:
     data = load_profiles()
     print("Profile bearbeiten/anlegen\n")
     name = input("Profilname (leer = default): ").strip() or "default"
-    prof = data.get(name, {"model": None, "host": None, "temperature": None, "checks": None, "quiet": None})
+    prof = data.get(name, {"model": None, "host": None, "temperature": None, "checks": None, "quiet": True, "asgi": True, "eval_mode": True, "skip_preflight": True})
     prof["model"] = input(f"Model [{prof.get('model') or '-'}]: ").strip() or prof.get("model")
     prof["host"] = input(f"Host [{prof.get('host') or '-'}]: ").strip() or prof.get("host")
     t = input(f"Temperature [{prof.get('temperature') if prof.get('temperature') is not None else '-'}]: ").strip()
@@ -181,6 +186,22 @@ def action_edit_profiles() -> None:
         prof["quiet"] = True
     elif q in ("n", "no"):
         prof["quiet"] = False
+    # Laufparameter toggles
+    a = input(f"ASGI (In-Process) verwenden? (y/n, leer = unverändert [{prof.get('asgi')}]): ").strip().lower()
+    if a in ("y", "yes"):
+        prof["asgi"] = True
+    elif a in ("n", "no"):
+        prof["asgi"] = False
+    e = input(f"Eval-Modus aktivieren (RPG aus)? (y/n, leer = unverändert [{prof.get('eval_mode')}]): ").strip().lower()
+    if e in ("y", "yes"):
+        prof["eval_mode"] = True
+    elif e in ("n", "no"):
+        prof["eval_mode"] = False
+    s = input(f"Preflight-Check überspringen? (y/n, leer = unverändert [{prof.get('skip_preflight')}]): ").strip().lower()
+    if s in ("y", "yes"):
+        prof["skip_preflight"] = True
+    elif s in ("n", "no"):
+        prof["skip_preflight"] = False
     data[name] = prof
     save_profiles(data)
     print("Gespeichert.")
@@ -239,8 +260,12 @@ def action_start_run() -> None:
     dbg = input("Debug-Modus aktivieren? (y/N): ").strip().lower() == "y"
     prof_quiet = profile.get("quiet")
     quiet_mode = (True if prof_quiet is None else bool(prof_quiet)) and (not dbg)
+    # Profillaufparameter
+    prof_asgi = bool(profile.get("asgi", True))
+    prof_eval = bool(profile.get("eval_mode", True))
+    prof_skip = bool(profile.get("skip_preflight", True))
 
-    print(f"\nStarte Evaluierung (Profil: {profile_name}, Debug: {dbg}, Quiet: {quiet_mode}) …\n")
+    print(f"\nStarte Evaluierung (Profil: {profile_name}, Debug: {dbg}, Quiet: {quiet_mode}, ASGI: {prof_asgi}, Eval: {prof_eval}) …\n")
 
     # Optional: temporär Logger-Level für Debug erhöhen
     prev_levels: Dict[str, int] = {}
@@ -258,9 +283,9 @@ def action_start_run() -> None:
                 patterns=patterns,
                 api_url=run_eval.DEFAULT_API_URL,
                 limit=(None if limit == 0 else limit),
-                eval_mode=True,
-                skip_preflight=True,
-                asgi=True,
+                eval_mode=prof_eval,
+                skip_preflight=prof_skip,
+                asgi=prof_asgi,
                 enabled_checks=enabled_checks,
                 model_override=model_override,
                 temperature_override=temperature_override,

@@ -43,6 +43,7 @@
 
 ### docs/:
 - [`docs/customization.md`](docs/customization.md) - Anpassungs-Dokumentation für private Nutzung
+- [`docs/TODO.md`](docs/TODO.md) - ToDo & Roadmap für lokale Entwicklungsarbeit
 
 ### eval/:
 - [`eval/.gitignore`](eval/.gitignore) - Eval-spezifische Git-Ignorier-Regeln

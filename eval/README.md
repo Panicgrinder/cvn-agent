@@ -8,6 +8,8 @@ Struktur:
 - `config/`: Konfiguration (z. B. `synonyms.json` für Keyword-Prüfungen)
 - `results/`: Ausgabedateien der Evaluierung (generiert, `results_*.jsonl`)
 
+Hinweis: Private, lokale Synonyme können in `config/synonyms.local.json` gepflegt werden (git-ignoriert). Diese werden automatisch mit `config/synonyms.json` gemerged. Eine Vorlage liegt als `config/synonyms.local.sample.json` bei.
+
 ## Format der Datasets (JSON/JSONL)
 
 ```json

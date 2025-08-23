@@ -75,3 +75,11 @@ Konfiguration per `.env` (siehe Beispiele in `app/core/settings.py`). Wichtige F
 
 Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters begrenzt (in-memory, best-effort).
 ```
+
+## Eval: Synonyme mit privatem Overlay
+
+Für die Keyword-Checks in der Evaluierung können Synonyme aus `eval/config/synonyms.json` geladen werden.
+Zusätzlich können lokale, private Ergänzungen in `eval/config/synonyms.local.json` abgelegt werden. Diese Datei ist git-ignoriert und wird automatisch mit der Basisdatei gemerged.
+
+- Beispiel: `eval/config/synonyms.local.sample.json` kopieren zu `synonyms.local.json` und anpassen.
+- Fehlende Overlay-Datei wird stillschweigend ignoriert.

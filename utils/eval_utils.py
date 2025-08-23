@@ -1,7 +1,7 @@
 import json
 import re
 import os
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 def truncate(text: str, n: int = 200) -> str:
     """
@@ -131,23 +131,41 @@ def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
     
     return results
 
-def load_synonyms(path: str = "eval/config/synonyms.json") -> Dict[str, List[str]]:
+def load_synonyms(path: Union[str, List[str]] = "eval/config/synonyms.json") -> Dict[str, List[str]]:
     """
-    Lädt Synonyme aus einer JSON-Datei.
-    
+    Lädt Synonyme aus einer oder mehreren JSON-Dateien und merged sie.
+
     Args:
-        path: Pfad zur JSON-Datei mit Synonymen
-        
+        path: Pfad oder Liste von Pfaden zu JSON-Dateien mit Synonymen
+
     Returns:
-        Dictionary mit Schlüsselwörtern und deren Synonymen
+        Zusammengeführtes Dictionary mit Schlüsselwörtern und deren Synonymen
     """
-    if not os.path.exists(path):
-        print(f"Warnung: Synonymdatei {path} nicht gefunden. Verwende leere Synonym-Map.")
-        return {}
-        
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Fehler beim Laden der Synonymdatei: {str(e)}")
-        return {}
+    paths: List[str] = [path] if isinstance(path, str) else list(path)
+
+    merged: Dict[str, List[str]] = {}
+
+    for p in paths:
+        if not os.path.exists(p):
+            # Still und leise überspringen, wenn eine optionale Datei fehlt
+            continue
+        try:
+            with open(p, 'r', encoding='utf-8') as f:
+                raw = json.load(f)
+                if isinstance(raw, dict):
+                    from typing import cast as _cast, List as _List
+                    data = _cast(Dict[str, Any], raw)
+                    for key, values in data.items():
+                        if not isinstance(key, str):
+                            continue
+                        if isinstance(values, list):
+                            values_list = _cast(_List[Any], values)
+                            acc = merged.setdefault(key, [])
+                            # Anhängen mit Duplikatentfernung bei Beibehaltung der Reihenfolge
+                            for v in values_list:
+                                if isinstance(v, str) and v not in acc:
+                                    acc.append(v)
+        except Exception as e:
+            print(f"Fehler beim Laden der Synonymdatei '{p}': {str(e)}")
+
+    return merged
