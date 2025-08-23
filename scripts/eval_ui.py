@@ -20,7 +20,7 @@ import asyncio
 import logging
 from dataclasses import asdict
 from datetime import datetime
-from typing import List, Any, Optional, Set, Dict
+from typing import List, Any, Optional, Set, Dict, cast
 
 
 def _load_run_eval_module():
@@ -284,7 +284,13 @@ def load_results_from_file(path: str) -> List[EvalResult]:  # lockerer Typ
             line = line.strip()
             if not line:
                 continue
-            data = json.loads(line)
+            raw = json.loads(line)
+            if not isinstance(raw, dict):
+                continue
+            data: Dict[str, Any] = cast(Dict[str, Any], raw)
+            # Meta-Header-Zeilen überspringen
+            if data.get("_meta") is True:
+                continue
             # Felder an Dataclass übergeben (fehlende Felder mit Defaults)
             res: EvalResult = run_eval.EvaluationResult(
                 item_id=data.get("item_id", ""),
@@ -299,6 +305,117 @@ def load_results_from_file(path: str) -> List[EvalResult]:  # lockerer Typ
             )
             results.append(res)
     return results
+
+
+def load_run_meta(path: str) -> Optional[Dict[str, Any]]:
+    """Lädt die Meta-Header-Zeile einer results_*.jsonl-Datei (falls vorhanden)."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            first = f.readline().strip()
+            if not first:
+                return None
+            raw = json.loads(first)
+            if not isinstance(raw, dict):
+                return None
+            data: Dict[str, Any] = cast(Dict[str, Any], raw)
+            if data.get("_meta") is True:
+                return data
+    except Exception:
+        return None
+    return None
+
+
+def action_trends() -> None:
+    clear_screen()
+    files = list_result_files()
+    if not files:
+        print("Keine Ergebnisdateien gefunden.")
+        input("Weiter mit Enter …")
+        return
+    print("Analysiere Läufe …\n")
+    summaries: List[Dict[str, Any]] = []
+    for path in files:
+        meta = load_run_meta(path) or {}
+        results = load_results_from_file(path)
+        if not results:
+            continue
+        total = len(results)
+        success = sum(1 for r in results if r.success)
+        rate = (success / total) * 100.0
+        avg_ms = int(sum(r.duration_ms for r in results) / total)
+        rpg = sum(1 for r in results if run_eval.check_rpg_mode(r.response))
+        summaries.append({
+            "file": os.path.basename(path),
+            "timestamp": meta.get("timestamp") or "-",
+            "model": (meta.get("overrides", {}).get("model") or meta.get("model") or "-"),
+            "host": (meta.get("overrides", {}).get("host") or meta.get("host") or "-"),
+            "temp": (meta.get("overrides", {}).get("temperature") or meta.get("temperature") or "-"),
+            "checks": ",".join(meta.get("enabled_checks") or []),
+            "total": total,
+            "success": success,
+            "rate": rate,
+            "avg_ms": avg_ms,
+            "rpg": rpg,
+        })
+
+    if not summaries:
+        print("Keine auswertbaren Läufe gefunden.")
+        input("Weiter mit Enter …")
+        return
+
+    # Übersichts-Tabelle (letzte 10)
+    print("Letzte Läufe:\n")
+    header = f"{'Zeit':<13}  {'Model':<18}  {'OK':>6}/{ 'Tot':<4}  {'Rate':>6}  {'Øms':>6}  {'RPG':>4}  Datei"
+    print(header)
+    print("-" * len(header))
+    for s in summaries[:10]:
+        zeit = s["timestamp"][-5:] if isinstance(s["timestamp"], str) and len(s["timestamp"])>=13 else s["timestamp"]
+        model = str(s["model"])[:18]
+        print(f"{zeit:<13}  {model:<18}  {s['success']:>6}/{s['total']:<4}  {s['rate']:>5.1f}%  {s['avg_ms']:>6}  {s['rpg']:>4}  {s['file']}")
+
+    # Gesamtübersicht
+    grand_total = sum(s["total"] for s in summaries)
+    grand_success = sum(s["success"] for s in summaries)
+    grand_rate = (grand_success / grand_total) * 100.0 if grand_total else 0.0
+    print(f"\nGesamt: {grand_success}/{grand_total} ({grand_rate:.1f}%)\n")
+
+    # CSV-Export
+    if input("Runs als CSV exportieren? (y/N): ").strip().lower() == "y":
+        out_csv = os.path.join(run_eval.DEFAULT_EVAL_DIR, "runs_summary.csv")
+        import csv
+        with open(out_csv, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["file","timestamp","model","host","temperature","checks","total","success","rate","avg_ms","rpg"]) 
+            for s in summaries:
+                w.writerow([s["file"], s["timestamp"], s["model"], s["host"], s["temp"], s["checks"], s["total"], s["success"], f"{s['rate']:.1f}", s["avg_ms"], s["rpg"]])
+        print(f"CSV exportiert: {out_csv}")
+
+    # Detail: Paket-Statistik für einen Lauf
+    if input("Paket-Statistik eines Laufs ansehen? (y/N): ").strip().lower() == "y":
+        fname = choose_from_list([s["file"] for s in summaries], "Wähle Lauf:")
+        if fname:
+            path = os.path.join(run_eval.DEFAULT_EVAL_DIR, fname)
+            results = load_results_from_file(path)
+            if not results:
+                print("Keine Ergebnisse in dieser Datei.")
+            else:
+                stats: Dict[str, Dict[str, int]] = {}
+                for r in results:
+                    pkg = r.source_package or "unbekannt"
+                    d = stats.setdefault(pkg, {"tot":0, "ok":0, "dur":0})
+                    d["tot"] += 1
+                    d["dur"] += r.duration_ms
+                    if r.success:
+                        d["ok"] += 1
+                print("\nPaket-Statistik:\n")
+                ph = f"{'Paket':<30}  {'OK':>6}/{ 'Tot':<4}  {'Rate':>6}  {'Øms':>6}"
+                print(ph)
+                print("-" * len(ph))
+                for pkg, d in sorted(stats.items()):
+                    rate = (d["ok"] / d["tot"]) * 100.0 if d["tot"] else 0.0
+                    avg = int(d["dur"] / d["tot"]) if d["tot"] else 0
+                    print(f"{pkg:<30}  {d['ok']:>6}/{d['tot']:<4}  {rate:>5.1f}%  {avg:>6}")
+    input("Weiter mit Enter …")
 
 
 def action_view_results() -> None:
@@ -429,8 +546,9 @@ def main() -> None:
         print("1) Lauf starten (Pakete & Limit)")
         print("2) Ergebnisse ansehen")
         print("3) Fehlgeschlagene erneut ausführen")
-        print("4) Profile verwalten")
-        print("5) Beenden")
+        print("4) Trends / Aggregation")
+        print("5) Profile verwalten")
+        print("6) Beenden")
         choice = input("\nAuswahl: ").strip()
         if choice == "1":
             action_start_run()
@@ -439,8 +557,10 @@ def main() -> None:
         elif choice == "3":
             action_rerun_failed()
         elif choice == "4":
-            action_edit_profiles()
+            action_trends()
         elif choice == "5":
+            action_edit_profiles()
+        elif choice == "6":
             break
 
 
