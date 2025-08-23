@@ -1,37 +1,58 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.pdb
-*.egg
-*.egg-info/
-.eggs/
-dist/
-build/
+########################################
+# Environment
+########################################
+.env
 
-# Virtualenv
+########################################
+# Virtual Environments
+########################################
 .venv/
 venv/
-env/
+ENV/
 
-# Tools und Caches
+########################################
+# Python caches and build artifacts
+########################################
+__pycache__/
+*.py[cod]
+*$py.class
 .pytest_cache/
 .mypy_cache/
-.ruff_cache/
 .coverage
-.coverage.*
-coverage.xml
 htmlcov/
+build/
+dist/
+.eggs/
+*.egg-info/
 
-# IDE und System
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+########################################
+# Logs
+########################################
+*.log
+logs/
+data/logs/
 
-# Daten und Secrets
-*.sqlite3
+########################################
+# App data (keep system prompt tracked)
+########################################
+data/*.jsonl
 data/*.sqlite3
-.env
-.env.*
+!data/system.txt
+
+########################################
+# Evaluation outputs (keep datasets tracked)
+########################################
+eval/results_*.jsonl
+!eval/*.json
+!eval/synonyms.json
+!eval/README.md
+
+########################################
+# Editors / OS
+########################################
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

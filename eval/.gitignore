@@ -1,0 +1,9 @@
+## Eval-spezifische Ignore-Regeln
+# Nur generierte Ergebnisse ignorieren, Datasets und Synonyms bleiben getrackt
+results_*.jsonl
+results_*/
+
+# Sicherstellen, dass Datasets/Skripte/README nicht ignoriert werden
+!*.json
+!*.py
+!README.md
