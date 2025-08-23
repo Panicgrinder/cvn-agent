@@ -483,9 +483,10 @@ def check_rpg_mode(text: str) -> bool:
 
 
 async def evaluate_item(
-    item: EvaluationItem, 
+    item: EvaluationItem,
     api_url: str = "http://localhost:8000/chat",
-    eval_mode: bool = False
+    eval_mode: bool = False,
+    client: Optional[httpx.AsyncClient] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -513,120 +514,112 @@ async def evaluate_item(
         logger = logging.getLogger("eval")
         logger.debug(f"Evaluiere Item {item.id}")
         
-        async with httpx.AsyncClient(timeout=60.0) as client:  # Erhöhtes Timeout für komplexere Anfragen
-            # Führe Anfrage aus
+        # Entweder übergebenen Client verwenden (ASGI-Modus) oder einen temporären erstellen (HTTP-Modus)
+        if client is None:
+            async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
+                response = await temp_client.post(api_url, json=payload)
+        else:
             response = await client.post(api_url, json=payload)
-            response.raise_for_status()
-            
-            data = response.json()
-            content = data.get("content", "")
-            
-            # Normalisiere den Text für die Überprüfung
-            # normalized_content wird für zukünftige Erweiterungen bereitgehalten
-            # normalized_content = normalize_text(content)
-            
-            # Prüfe, ob die Antwort im RPG-Modus erfolgt ist
-            is_rpg_mode = check_rpg_mode(content)
-            
-            # Prüfe alle Bedingungen
-            checks_passed: Dict[str, bool] = {}
-            failed_checks: List[str] = []
-            
-            # Wenn im RPG-Modus und es sich nicht um einen RPG-spezifischen Test handelt,
-            # füge einen Hinweis hinzu
-            if is_rpg_mode and not any(rpg_term in (item.source_package or "").lower() for rpg_term in ["rpg", "novapolis", "szene"]):
-                failed_checks.append("Antwort im RPG-Modus, aber Test erwartet allgemeine Antwort")
-            
-            # 1. must_include: Alle Begriffe müssen enthalten sein
-            if item.checks.get("must_include"):
-                for term in item.checks["must_include"]:
-                    # Flexiblere Überprüfung mit Synonymen und Flexionsformen
-                    check_passed = check_term_inclusion(content, term)
-                    checks_passed[f"include:{term}"] = check_passed
-                    if not check_passed:
-                        failed_checks.append(f"Erforderlicher Begriff nicht gefunden: '{term}'")
-            
-            # 2. keywords_any: Mindestens ein Begriff muss enthalten sein
-            if item.checks.get("keywords_any"):
-                any_found = False
-                for term in item.checks["keywords_any"]:
-                    if check_term_inclusion(content, term):
-                        any_found = True
-                        break
-                
-                checks_passed["keywords_any"] = any_found
-                if not any_found:
-                    failed_checks.append(f"Keine der alternativen Begriffe gefunden: {', '.join(item.checks['keywords_any'])}")
-            
-            # 3. keywords_at_least: Mindestens N Begriffe müssen enthalten sein
-            keywords_at_least = item.checks.get("keywords_at_least")
-            if keywords_at_least:
+
+        response.raise_for_status()
+        data = response.json()
+        content = data.get("content", "")
+
+        # Normalisiere den Text für die Überprüfung (Platzhalter für künftige Nutzung)
+        # normalized_content = normalize_text(content)
+
+        # Prüfe, ob die Antwort im RPG-Modus erfolgt ist
+        is_rpg_mode = check_rpg_mode(content)
+
+        # Prüfe alle Bedingungen
+        checks_passed: Dict[str, bool] = {}
+        failed_checks: List[str] = []
+
+        # Wenn im RPG-Modus und es sich nicht um einen RPG-spezifischen Test handelt, Hinweis
+        if is_rpg_mode and not any(rpg_term in (item.source_package or "").lower() for rpg_term in ["rpg", "novapolis", "szene"]):
+            failed_checks.append("Antwort im RPG-Modus, aber Test erwartet allgemeine Antwort")
+
+        # 1. must_include: Alle Begriffe müssen enthalten sein
+        if item.checks.get("must_include"):
+            for term in item.checks["must_include"]:
+                check_passed = check_term_inclusion(content, term)
+                checks_passed[f"include:{term}"] = check_passed
+                if not check_passed:
+                    failed_checks.append(f"Erforderlicher Begriff nicht gefunden: '{term}'")
+
+        # 2. keywords_any: Mindestens ein Begriff muss enthalten sein
+        if item.checks.get("keywords_any"):
+            any_found = False
+            for term in item.checks["keywords_any"]:
+                if check_term_inclusion(content, term):
+                    any_found = True
+                    break
+            checks_passed["keywords_any"] = any_found
+            if not any_found:
+                failed_checks.append(f"Keine der alternativen Begriffe gefunden: {', '.join(item.checks['keywords_any'])}")
+
+        # 3. keywords_at_least: Mindestens N Begriffe müssen enthalten sein
+        keywords_at_least = item.checks.get("keywords_at_least")
+        if keywords_at_least:
+            try:
+                required_count = 0
+                items_list = []
+                if hasattr(keywords_at_least, 'get'):
+                    count_val = keywords_at_least.get("count")  # type: ignore
+                    items_val = keywords_at_least.get("items")  # type: ignore
+                    if count_val is not None:
+                        required_count = int(count_val)
+                    if items_val is not None:
+                        items_list = list(items_val)
+                found_count = 0
+                for term in items_list:
+                    if isinstance(term, str) and check_term_inclusion(content, term):
+                        found_count += 1
+                check_passed = found_count >= required_count
+                checks_passed["keywords_at_least"] = check_passed
+                if not check_passed:
+                    failed_checks.append(f"Zu wenige Begriffe gefunden: {found_count}/{required_count}")
+            except (AttributeError, ValueError, TypeError):
+                checks_passed["keywords_at_least"] = False
+                failed_checks.append("Ungültiges keywords_at_least Format")
+
+        # 4. not_include: Begriffe dürfen nicht enthalten sein
+        if item.checks.get("not_include"):
+            for term in item.checks["not_include"]:
+                term_not_included = not check_term_inclusion(content, term)
+                checks_passed[f"not_include:{term}"] = term_not_included
+                if not term_not_included:
+                    failed_checks.append(f"Unerwünschter Begriff gefunden: '{term}'")
+
+        # 5. regex: Reguläre Ausdrücke müssen matchen
+        if item.checks.get("regex"):
+            for pattern in item.checks["regex"]:
                 try:
-                    required_count = 0
-                    items_list = []
-                    
-                    # Sichere Extraktion der Werte
-                    if hasattr(keywords_at_least, 'get'):
-                        count_val = keywords_at_least.get("count")  # type: ignore
-                        items_val = keywords_at_least.get("items")  # type: ignore
-                        
-                        if count_val is not None:
-                            required_count = int(count_val)
-                        if items_val is not None:
-                            items_list = list(items_val)
-                    
-                    found_count = 0
-                    for term in items_list:
-                        if isinstance(term, str) and check_term_inclusion(content, term):
-                            found_count += 1
-                    
-                    check_passed = found_count >= required_count
-                    
-                    checks_passed["keywords_at_least"] = check_passed
-                    if not check_passed:
-                        failed_checks.append(f"Zu wenige Begriffe gefunden: {found_count}/{required_count}")
-                except (AttributeError, ValueError, TypeError):
-                    # Fallback bei ungültigen Daten
-                    checks_passed["keywords_at_least"] = False
-                    failed_checks.append("Ungültiges keywords_at_least Format")
-            
-            # 4. not_include: Begriffe dürfen nicht enthalten sein
-            if item.checks.get("not_include"):
-                for term in item.checks["not_include"]:
-                    term_not_included = not check_term_inclusion(content, term)
-                    checks_passed[f"not_include:{term}"] = term_not_included
-                    if not term_not_included:
-                        failed_checks.append(f"Unerwünschter Begriff gefunden: '{term}'")
-            
-            # 5. regex: Reguläre Ausdrücke müssen matchen
-            if item.checks.get("regex"):
-                for pattern in item.checks["regex"]:
-                    try:
-                        pattern_str: str = str(pattern)
-                        regex_match = bool(re.search(pattern_str, content))
-                        checks_passed[f"regex:{pattern}"] = regex_match
-                        if not regex_match:
-                            failed_checks.append(f"Regex nicht erfüllt: '{pattern}'")
-                    except re.error:
-                        checks_passed[f"regex:{pattern}"] = False
-                        failed_checks.append(f"Ungültiges Regex-Pattern: '{pattern}'")
-            
-            # Prüfe, ob alle Bedingungen erfüllt sind
-            success = all(checks_passed.values())
-            
-            # Berechne die Dauer in Millisekunden
-            duration_ms = int((time.time() - start_time) * 1000)
-            
-            return EvaluationResult(
-                item_id=item.id,
-                response=content,
-                checks_passed=checks_passed,
-                success=success,
-                failed_checks=failed_checks,
-                source_file=item.source_file,
-                source_package=item.source_package,
-                duration_ms=duration_ms
-            )
+                    pattern_str: str = str(pattern)
+                    regex_match = bool(re.search(pattern_str, content))
+                    checks_passed[f"regex:{pattern}"] = regex_match
+                    if not regex_match:
+                        failed_checks.append(f"Regex nicht erfüllt: '{pattern}'")
+                except re.error:
+                    checks_passed[f"regex:{pattern}"] = False
+                    failed_checks.append(f"Ungültiges Regex-Pattern: '{pattern}'")
+
+        # Prüfe, ob alle Bedingungen erfüllt sind
+        success = all(checks_passed.values())
+
+        # Berechne die Dauer in Millisekunden
+        duration_ms = int((time.time() - start_time) * 1000)
+
+        return EvaluationResult(
+            item_id=item.id,
+            response=content,
+            checks_passed=checks_passed,
+            success=success,
+            failed_checks=failed_checks,
+            source_file=item.source_file,
+            source_package=item.source_package,
+            duration_ms=duration_ms
+        )
             
     except Exception as e:
         # Berechne die Dauer in Millisekunden
@@ -683,7 +676,8 @@ async def run_evaluation(
     api_url: str = "http://localhost:8000/chat",
     limit: Optional[int] = None,
     eval_mode: bool = False,
-    skip_preflight: bool = False
+    skip_preflight: bool = False,
+    asgi: bool = False,
 ) -> List[EvaluationResult]:
     """
     Führt die Evaluierung für alle Einträge durch.
@@ -698,8 +692,8 @@ async def run_evaluation(
     Returns:
         Liste von Evaluierungsergebnissen
     """
-    # Führe Preflight-Check durch, außer wenn übersprungen
-    if not skip_preflight and not await preflight_check(api_url):
+    # Führe Preflight-Check durch, außer wenn übersprungen (im ASGI-Modus nicht nötig)
+    if not asgi and not skip_preflight and not await preflight_check(api_url):
         logging.error(f"API-Endpunkt {api_url} ist nicht erreichbar. Evaluierung abgebrochen.")
         logging.info("Verwenden Sie --skip-preflight, um den Preflight-Check zu überspringen.")
         return []
@@ -725,21 +719,35 @@ async def run_evaluation(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
     results_file = os.path.join(DEFAULT_EVAL_DIR, f"results_{timestamp}.jsonl")
     
-    with Progress() as progress:
-        task = progress.add_task("[cyan]Evaluiere...", total=len(items))
-        
-        for item in items:
-            result = await evaluate_item(item, api_url, eval_mode=eval_mode)
-            results.append(result)
+    # Optional: ASGI-Client vorbereiten
+    asgi_client: Optional[httpx.AsyncClient] = None
+    if asgi:
+        # FastAPI-App importieren und In-Process-Client erstellen
+        from app.main import app as fastapi_app  # type: ignore
+        transport = httpx.ASGITransport(app=fastapi_app)
+        asgi_client = httpx.AsyncClient(transport=transport, base_url="http://asgi")
+        # Im ASGI-Modus gegen Pfad arbeiten
+        api_url = "/chat"
+
+    try:
+        with Progress() as progress:
+            task = progress.add_task("[cyan]Evaluiere...", total=len(items))
             
-            # Speichere Ergebnis sofort in JSONL-Datei
-            with open(results_file, "a", encoding="utf-8") as f:
-                # Konvertiere Result in Dictionary und kürze die Antwort
-                result_dict = asdict(result)
-                result_dict["response"] = truncate(result_dict["response"], 500)
-                f.write(json.dumps(result_dict, ensure_ascii=False) + "\n")
-            
-            progress.update(task, advance=1)
+            for item in items:
+                result = await evaluate_item(item, api_url, eval_mode=eval_mode, client=asgi_client)
+                results.append(result)
+                
+                # Speichere Ergebnis sofort in JSONL-Datei
+                with open(results_file, "a", encoding="utf-8") as f:
+                    # Konvertiere Result in Dictionary und kürze die Antwort
+                    result_dict = asdict(result)
+                    result_dict["response"] = truncate(result_dict["response"], 500)
+                    f.write(json.dumps(result_dict, ensure_ascii=False) + "\n")
+                
+                progress.update(task, advance=1)
+    finally:
+        if asgi_client is not None:
+            await asgi_client.aclose()
     
     logging.info(f"Ergebnisse wurden in {results_file} gespeichert.")
     return results
@@ -980,6 +988,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", "-d", action="store_true", help="Debug-Modus aktivieren")
     parser.add_argument("--eval-mode", "-e", action="store_true", help="Deaktiviert den RPG-Modus für die Evaluierung")
     parser.add_argument("--skip-preflight", "-s", action="store_true", help="Überspringt den Preflight-Check (nützlich, wenn der Server nicht läuft)")
+    parser.add_argument("--asgi", action="store_true", help="ASGI-In-Process: Evaluierung direkt gegen FastAPI-App ohne laufenden Server-Port")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1047,6 +1056,8 @@ if __name__ == "__main__":
         console.print(f"[bold yellow]Eval-Modus aktiviert:[/bold yellow] RPG-Systemprompt wird temporär überschrieben")
     if args.skip_preflight:
         console.print(f"[bold red]Preflight-Check übersprungen:[/bold red] API-Verfügbarkeit wird nicht geprüft")
+    if args.asgi:
+        console.print(f"[bold green]ASGI-Modus:[/bold green] In-Process gegen FastAPI-App (kein HTTP-Port erforderlich)")
     console.print("")
     
     # Verarbeite "show-prompts" Kommando
@@ -1061,7 +1072,7 @@ if __name__ == "__main__":
             console.print("[bold red]Keine Prompts gefunden.[/bold red]")
         sys.exit(0)
     
-    results = asyncio.run(run_evaluation(patterns, api_url, args.limit, args.eval_mode, args.skip_preflight))
+    results = asyncio.run(run_evaluation(patterns, api_url, args.limit, args.eval_mode, args.skip_preflight, args.asgi))
     
     if results:
         print_results(results)

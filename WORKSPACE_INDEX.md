@@ -21,7 +21,7 @@
 ### app/:
 - [`app/__init__.py`](app/__init__.py) - App-Package-Initialisierung
 - [`app/main.py`](app/main.py) - FastAPI Hauptanwendung mit Chat-Endpunkt
-- [`app/schemas.py`](app/schemas.py) - Pydantic-Schemas
+- [ENTFERNT] `app/schemas.py` - ersetzt durch `app/api/models.py`
 - [`app/__pycache__/`](app/__pycache__/) - Python-Bytecode-Cache
 
 #### app/api/:
@@ -29,10 +29,9 @@
 - [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing
 - [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (ChatRequest, ChatResponse)
 
-#### app/core/:
+#### app/core:
 - [`app/core/__init__.py`](app/core/__init__.py) - Core-Package-Initialisierung
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
-- [`app/core/content_management.py`](app/core/content_management.py) - Content-Filter-Management
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates
 - [`app/core/content_rules.json`](app/core/content_rules.json) - Benutzerdefinierte Inhaltsregeln
 
@@ -56,6 +55,9 @@
 
 ### examples/:
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel für uneingeschränkten Prompt
+- [`examples/rpg/models.py`](examples/rpg/models.py) - RPG-Modelle (geparkte Features)
+- [`examples/rpg/state.py`](examples/rpg/state.py) - RPG-State-Router (geparkt)
+- [`examples/rpg/roll.py`](examples/rpg/roll.py) - RPG-Roll-Router (geparkt)
 
 ### scripts/:
 - [`scripts/run_eval.py`](scripts/run_eval.py) - Hauptevaluierungsskript
@@ -109,6 +111,8 @@
 
 ### **Beispiele:**
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Prompt-Beispiele
+
+Hinweis: Router unter `app/routers/*` wurden entfernt bzw. nach `examples/rpg/` verschoben und sind nicht mehr Teil der produktiven App.
 
 ### **Git-Verwaltung:**
 - [`.gitignore`](.gitignore) - Haupt-Git-Ignorier-Regeln

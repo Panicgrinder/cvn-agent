@@ -4,7 +4,6 @@ from typing import Dict, Any
 
 from ..core.settings import settings
 from ..core.prompts import EVAL_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT, UNRESTRICTED_SYSTEM_PROMPT
-from ..core.content_management import check_content_allowed
 from .models import ChatRequest, ChatResponse
 
 # Logger konfigurieren
