@@ -2,6 +2,10 @@
 
 Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwendet.
 
+## Repository-Info
+
+- Standard-Branch: `main`
+
 ## Einrichtung
 
 1. Python 3.12 installieren

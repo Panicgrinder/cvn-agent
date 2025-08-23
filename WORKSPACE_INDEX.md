@@ -138,3 +138,5 @@ f:\cvn-agent\
 **Letzte Aktualisierung:** 2025-08-23
 **Projekt:** CVN Agent - Postapokalyptischer Rollenspiel-Chat-Agent
 **Zweck:** Vollständiger Überblick über alle Dateien im Workspace
+
+Repository-Hinweis: Standard-Branch ist `main`.
