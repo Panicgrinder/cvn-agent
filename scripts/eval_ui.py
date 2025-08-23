@@ -537,6 +537,32 @@ def action_rerun_failed() -> None:
     input("Weiter mit Enter …")
 
 
+def action_export_finetune() -> None:
+    clear_screen()
+    files = list_result_files()
+    chosen = choose_from_list(files, "Ergebnisdatei für Finetuning-Export wählen:")
+    if not chosen:
+        return
+    fmt = input("Format wählen: 1) alpaca  2) openai_chat [1]: ").strip()
+    fmt = "openai_chat" if fmt == "2" else "alpaca"
+    inc = input("Auch Fehlschläge exportieren? (y/N): ").strip().lower() == "y"
+    # Export ausführen
+    try:
+        import importlib
+        exporter = importlib.import_module("scripts.export_finetune")
+        export_fn = getattr(exporter, "export_from_results")
+    except Exception as e:
+        print("Exporter nicht verfügbar:", e)
+        input("Weiter mit Enter …")
+        return
+    out: Dict[str, Any] = asyncio.run(export_fn(chosen, format=fmt, include_failures=inc))
+    if out.get("ok"):
+        print(f"Export erfolgreich: {out['out']} ({out['count']} Einträge)")
+    else:
+        print("Fehler:", out.get("error"))
+    input("Weiter mit Enter …")
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%H:%M:%S")
     while True:
@@ -547,8 +573,9 @@ def main() -> None:
         print("2) Ergebnisse ansehen")
         print("3) Fehlgeschlagene erneut ausführen")
         print("4) Trends / Aggregation")
-        print("5) Profile verwalten")
-        print("6) Beenden")
+        print("5) Finetuning-Export aus Ergebnissen")
+        print("6) Profile verwalten")
+        print("7) Beenden")
         choice = input("\nAuswahl: ").strip()
         if choice == "1":
             action_start_run()
@@ -559,8 +586,10 @@ def main() -> None:
         elif choice == "4":
             action_trends()
         elif choice == "5":
-            action_edit_profiles()
+            action_export_finetune()
         elif choice == "6":
+            action_edit_profiles()
+        elif choice == "7":
             break
 
 
