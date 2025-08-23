@@ -18,10 +18,10 @@
 ### .vscode/:
 - [`.vscode/extensions.json`](.vscode/extensions.json) - VSCode-Erweiterungsempfehlungen
 
-### app/:
+#### app/:
 - [`app/__init__.py`](app/__init__.py) - App-Package-Initialisierung
 - [`app/main.py`](app/main.py) - FastAPI Hauptanwendung mit Chat-Endpunkt
-- [ENTFERNT] `app/schemas.py` - ersetzt durch `app/api/models.py`
+- [`app/schemas.py`](app/schemas.py) - Legacy/kompatibel (API nutzt primär `app/api/models.py`)
 - [`app/__pycache__/`](app/__pycache__/) - Python-Bytecode-Cache
 
 #### app/api/:
@@ -46,12 +46,19 @@
 
 ### eval/:
 - [`eval/.gitignore`](eval/.gitignore) - Eval-spezifische Git-Ignorier-Regeln
-- [`eval/eval-01-20_prompts_v1.0.json`](eval/eval-01-20_prompts_v1.0.json) - Sachliche Prompts (eval-001 bis eval-020)
-- [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) - Demo-/Fantasy-Prompts (eval-021 bis eval-040)
-- [`eval/eval-41-60_dialog_prompts_v1.0.json`](eval/eval-41-60_dialog_prompts_v1.0.json) - Dialog-Prompts (eval-041 bis eval-060)
-- [`eval/eval-81-100_technik_erklaerungen_v1.0.json`](eval/eval-81-100_technik_erklaerungen_v1.0.json) - Technische Erklärungen (eval-081 bis eval-100)
-- [`eval/synonyms.json`](eval/synonyms.json) - Synonym-Mappings für Evaluierung
-- [`eval/results_*.jsonl`](eval/) - Evaluierungsergebnisse (generiert, gitignored)
+
+#### eval/datasets/:
+- [`eval/datasets/eval-01-20_prompts_v1.0.json`](eval/datasets/eval-01-20_prompts_v1.0.json) - Sachliche Prompts (eval-001 bis eval-020)
+- [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) - Demo-/Fantasy-Prompts (eval-021 bis eval-040)
+- [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json) - Dialog-Prompts (eval-041 bis eval-060)
+- [`eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json`](eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json) - Technische Erklärungen (eval-081 bis eval-100)
+
+#### eval/config/:
+- [`eval/config/synonyms.json`](eval/config/synonyms.json) - Synonym-Mappings für Evaluierung
+- [`eval/config/profiles.json`](eval/config/profiles.json) - Profile/Overrides für Evaluierung
+
+#### eval/results/:
+- [`eval/results/results_*.jsonl`](eval/results/) - Evaluierungsergebnisse (generiert, gitignored)
 
 ### examples/:
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel für uneingeschränkten Prompt
@@ -95,11 +102,9 @@
 - [`run_server.py`](run_server.py) - Server-Starter
 
 ### **Evaluierungssystem:**
-- [`scripts/run_eval.py`](scripts/run_eval.py) - Evaluierungs-Engine
-- [`utils/eval_utils.py`](utils/eval_utils.py) - Evaluierungs-Utilities
-- [`eval/eval-*.json`](eval/) - Evaluierungs-Datasets
-- [`eval/synonyms.json`](eval/synonyms.json) - Synonym-Datenbank
-- [`eval/results_*.jsonl`](eval/) - Evaluierungsergebnisse
+- [`eval/datasets/eval-*.json`](eval/datasets/) - Evaluierungs-Datasets
+- [`eval/config/synonyms.json`](eval/config/synonyms.json) - Synonym-Datenbank
+- [`eval/results/results_*.jsonl`](eval/results/) - Evaluierungsergebnisse
 
 ### **Tools & Scripts:**
 - [`scripts/customize_prompts.py`](scripts/customize_prompts.py) - Prompt-Anpassungstool
@@ -131,6 +136,9 @@ f:\cvn-agent\
 │   └── logs/              # Chat-Protokolle
 ├── docs/                  # Dokumentation
 ├── eval/                  # Evaluierungssystem und Testdaten
+│   ├── datasets/          # Eingabedaten (Prompts)
+│   ├── results/           # Ergebnisse (generiert)
+│   └── config/            # Konfiguration (z. B. Synonyme)
 ├── examples/              # Beispiele und Templates
 ├── scripts/               # Utility-Scripts und Tools
 ├── utils/                 # Allgemeine Hilfsfunktionen

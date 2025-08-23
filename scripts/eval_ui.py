@@ -21,6 +21,7 @@ import logging
 from dataclasses import asdict
 from datetime import datetime
 from typing import List, Any, Optional, Set, Dict, cast
+import warnings
 
 
 def _load_run_eval_module():
@@ -51,7 +52,7 @@ def clear_screen() -> None:
 
 def list_eval_packages() -> List[str]:
     """Listet verfügbare Eval-Pakete (Dateien) auf."""
-    eval_dir: str = run_eval.DEFAULT_EVAL_DIR
+    eval_dir: str = getattr(run_eval, "DEFAULT_EVAL_DIR", getattr(run_eval, "DEFAULT_DATASET_DIR", "eval/datasets"))
     pattern: str = run_eval.DEFAULT_FILE_PATTERN
     files = sorted(glob.glob(os.path.join(eval_dir, pattern)))
     return files
@@ -86,8 +87,8 @@ def prompt_int(prompt: str, default: int) -> int:
 
 
 def list_result_files() -> List[str]:
-    eval_dir: str = run_eval.DEFAULT_EVAL_DIR
-    files = sorted(glob.glob(os.path.join(eval_dir, "results_*.jsonl")), reverse=True)
+    results_dir: str = getattr(run_eval, "DEFAULT_RESULTS_DIR", getattr(run_eval, "DEFAULT_EVAL_DIR", "eval/results"))
+    files = sorted(glob.glob(os.path.join(results_dir, "results_*.jsonl")), reverse=True)
     return files
 
 
@@ -109,7 +110,7 @@ def choose_from_list(options: List[str], title: str) -> Optional[str]:
 
 
 def ensure_eval_files_exist() -> None:
-    eval_dir: str = run_eval.DEFAULT_EVAL_DIR
+    eval_dir: str = getattr(run_eval, "DEFAULT_EVAL_DIR", getattr(run_eval, "DEFAULT_DATASET_DIR", "eval/datasets"))
     os.makedirs(eval_dir, exist_ok=True)
     pattern: str = run_eval.DEFAULT_FILE_PATTERN
     if not any(glob.glob(os.path.join(eval_dir, pattern))):
@@ -119,7 +120,8 @@ def ensure_eval_files_exist() -> None:
 
 
 def profiles_path() -> str:
-    return os.path.join(run_eval.DEFAULT_EVAL_DIR, ".profiles.json")
+    cfg_dir: str = getattr(run_eval, "DEFAULT_CONFIG_DIR", getattr(run_eval, "DEFAULT_EVAL_DIR", "eval/config"))
+    return os.path.join(cfg_dir, "profiles.json")
 
 
 def load_profiles() -> Dict[str, Dict[str, Any]]:
@@ -139,7 +141,7 @@ def load_profiles() -> Dict[str, Dict[str, Any]]:
 
 
 def save_profiles(data: Dict[str, Dict[str, Any]]) -> None:
-    os.makedirs(run_eval.DEFAULT_EVAL_DIR, exist_ok=True)
+    os.makedirs(getattr(run_eval, "DEFAULT_CONFIG_DIR", run_eval.DEFAULT_EVAL_DIR), exist_ok=True)
     with open(profiles_path(), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -242,12 +244,13 @@ def action_start_run() -> None:
 
     # Optional: temporär Logger-Level für Debug erhöhen
     prev_levels: Dict[str, int] = {}
-    noisy_loggers = ["app", "app.api.chat", "httpx", "uvicorn"]
+    noisy_loggers = ["app", "app.api.chat", "httpx", "uvicorn", "asyncio"]
     try:
         if dbg:
             for name in noisy_loggers:
                 lg = logging.getLogger(name)
                 prev_levels[name] = lg.level
+                # asyncio im Debug nicht drosseln, alles andere auf DEBUG
                 lg.setLevel(logging.DEBUG)
 
         results: List[EvalResult] = asyncio.run(
@@ -381,7 +384,7 @@ def action_trends() -> None:
 
     # CSV-Export
     if input("Runs als CSV exportieren? (y/N): ").strip().lower() == "y":
-        out_csv = os.path.join(run_eval.DEFAULT_EVAL_DIR, "runs_summary.csv")
+        out_csv = os.path.join(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR), "runs_summary.csv")
         import csv
         with open(out_csv, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
@@ -394,7 +397,7 @@ def action_trends() -> None:
     if input("Paket-Statistik eines Laufs ansehen? (y/N): ").strip().lower() == "y":
         fname = choose_from_list([s["file"] for s in summaries], "Wähle Lauf:")
         if fname:
-            path = os.path.join(run_eval.DEFAULT_EVAL_DIR, fname)
+            path = os.path.join(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR), fname)
             results = load_results_from_file(path)
             if not results:
                 print("Keine Ergebnisse in dieser Datei.")
@@ -469,10 +472,11 @@ def action_view_results() -> None:
 
 async def _evaluate_specific_items(items: List[EvalItem]) -> List[EvalResult]:
     """Evaluiert die übergebenen Items (ASGI, Eval-Modus) und schreibt eine neue results_*.jsonl-Datei."""
-    # Ergebnis-Dateiname
-    eval_dir: str = run_eval.DEFAULT_EVAL_DIR
+    # Ergebnis-Dateiname (results-Verzeichnis)
+    results_dir: str = getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-    out_path = os.path.join(eval_dir, f"results_{timestamp}.jsonl")
+    os.makedirs(results_dir, exist_ok=True)
+    out_path = os.path.join(results_dir, f"results_{timestamp}.jsonl")
 
     # ASGI-Client vorbereiten
     from app.main import app as fastapi_app  # type: ignore
@@ -576,6 +580,11 @@ def action_export_finetune() -> None:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%H:%M:%S")
+    # Generelle Reduktion von asyncio-Noise außerhalb von DEBUG
+    if not logging.getLogger().isEnabledFor(logging.DEBUG):
+        logging.getLogger("asyncio").setLevel(logging.WARNING)
+        warnings.filterwarnings("ignore", category=DeprecationWarning)
+        warnings.filterwarnings("ignore", category=ResourceWarning)
     while True:
         clear_screen()
         print("CVN Agent – Evaluierungsmenü")

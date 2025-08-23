@@ -1,6 +1,6 @@
 import httpx
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from ..core.settings import settings
 from ..core.prompts import EVAL_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT, UNRESTRICTED_SYSTEM_PROMPT
@@ -23,7 +23,16 @@ async def process_chat_request(request: ChatRequest, eval_mode: bool = False, un
     """
     try:
         # Systemprompt je nach Modus ersetzen
-        messages = list(request.messages)
+        # Normalisiere eingehende Nachrichten zu einfachen Dicts, damit .get sicher ist
+        messages: List[Dict[str, str]] = []
+        for m in request.messages:
+            if isinstance(m, dict):
+                role = m.get("role", "user")
+                content = m.get("content", "")
+            else:
+                role = getattr(m, "role", "user")
+                content = getattr(m, "content", "")
+            messages.append({"role": role, "content": content})
         
         if eval_mode:
             logger.info("Eval-Modus aktiv: Ersetze Systemprompt")
@@ -64,12 +73,24 @@ async def process_chat_request(request: ChatRequest, eval_mode: bool = False, un
         temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
         base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
 
+        # Erzwinge sicheres Token-Limit (num_predict) – clamp auf Maximalwert
+        try:
+            requested_tokens = int(req_options.get("num_predict", settings.REQUEST_MAX_TOKENS))
+        except Exception:
+            requested_tokens = settings.REQUEST_MAX_TOKENS
+        num_predict = max(1, min(requested_tokens, settings.REQUEST_MAX_TOKENS))
+
+        # In Eval-Modus: neutralere Einstellungen
+        if eval_mode:
+            temperature = min(temperature, 0.25)
+
         ollama_payload: Dict[str, Any] = {
             "model": req_model or settings.MODEL_NAME,
             "messages": messages,
             "stream": False,
             "options": {
                 "temperature": temperature,
+                "num_predict": num_predict,
             },
         }
 
@@ -77,7 +98,7 @@ async def process_chat_request(request: ChatRequest, eval_mode: bool = False, un
         ollama_url = f"{base_host}/api/chat"
         
         # Anfrage an Ollama senden
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=settings.REQUEST_TIMEOUT) as client:
             logger.info(f"Sende Anfrage an Ollama: {ollama_url}")
             
             response = await client.post(
