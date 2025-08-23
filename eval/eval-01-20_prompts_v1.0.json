@@ -1,0 +1,20 @@
+{"id":"eval-001","messages":[{"role":"user","content":"Stelle dich kurz vor."}], "checks":{"must_include":["Assistent","helfen","Fragen"]}}
+{"id":"eval-002","messages":[{"role":"user","content":"Was ist die Hauptstadt von Deutschland?"}], "checks":{"must_include":["Berlin","Hauptstadt","Deutschland"]}}
+{"id":"eval-003","messages":[{"role":"user","content":"Erkläre mir den Unterschied zwischen Machine Learning und Deep Learning."}], "checks":{"must_include":["Algorithmen","neuronale","Netzwerke","Daten"]}}
+{"id":"eval-004","messages":[{"role":"user","content":"Was ist der Satz des Pythagoras?"}], "checks":{"must_include":["a²","b²","c²","rechtwinklig"]}}
+{"id":"eval-005","messages":[{"role":"user","content":"Schreibe ein kurzes Gedicht über den Frühling."}], "checks":{"must_include":["Blumen","Frühling","neu"]}}
+{"id":"eval-006","messages":[{"role":"user","content":"Erkläre mir, wie man eine Carbonara zubereitet."}], "checks":{"must_include":["Pasta","Ei","Speck","Parmesan"]}}
+{"id":"eval-007","messages":[{"role":"user","content":"Was versteht man unter dem Begriff 'Nachhaltigkeit'?"}], "checks":{"must_include":["Ressourcen","Umwelt","zukünftige","Generationen"]}}
+{"id":"eval-008","messages":[{"role":"user","content":"Welche Programmiersprache sollte ich als Anfänger lernen?"}], "checks":{"must_include":["Python","einfach","beliebt","lernen"]}}
+{"id":"eval-009","messages":[{"role":"user","content":"Nenne drei Tipps für effektives Zeitmanagement."}], "checks":{"must_include":["Prioritäten","planen","Zeit"]}}
+{"id":"eval-010","messages":[{"role":"user","content":"Was sind die Hauptfunktionen eines Betriebssystems?"}], "checks":{"must_include":["Ressourcen","Speicher","Prozesse","Hardware"]}}
+{"id":"eval-011","messages":[{"role":"user","content":"Erkläre das Konzept der künstlichen Intelligenz."}], "checks":{"must_include":["Maschinen","lernen","menschlich","Intelligenz"]}}
+{"id":"eval-012","messages":[{"role":"user","content":"Wie funktioniert ein Elektromotor?"}], "checks":{"must_include":["Strom","Magnetfeld","Rotation","Energie"]}}
+{"id":"eval-013","messages":[{"role":"user","content":"Was bedeutet 'agiles Arbeiten'?"}], "checks":{"must_include":["flexibel","iterativ","Scrum","Projekte"]}}
+{"id":"eval-014","messages":[{"role":"user","content":"Erkläre den Unterschied zwischen Prokaryoten und Eukaryoten."}], "checks":{"must_include":["Zellkern","Zellen","Bakterien","Organellen"]}}
+{"id":"eval-015","messages":[{"role":"user","content":"Wie kann ich meine Präsentationsfähigkeiten verbessern?"}], "checks":{"must_include":["üben","vorbereiten","Publikum","klar"]}}
+{"id":"eval-016","messages":[{"role":"user","content":"Was ist der Unterschied zwischen HTTP und HTTPS?"}], "checks":{"must_include":["Protokoll","verschlüsselt","Sicherheit","SSL"]}}
+{"id":"eval-017","messages":[{"role":"user","content":"Erkläre das Konzept der Blockchain."}], "checks":{"must_include":["dezentral","Transaktionen","Kryptographie","Blöcke"]}}
+{"id":"eval-018","messages":[{"role":"user","content":"Welche Faktoren beeinflussen das Klima der Erde?"}], "checks":{"must_include":["Sonne","Treibhausgase","Ozeane","Atmosphäre"]}}
+{"id":"eval-019","messages":[{"role":"user","content":"Wie funktioniert der menschliche Blutkreislauf?"}], "checks":{"must_include":["Herz","Venen","Arterien","Blut"]}}
+{"id":"eval-020","messages":[{"role":"user","content":"Was sind die Grundprinzipien des Projektmanagements?"}], "checks":{"must_include":["Planung","Ressourcen","Zeit","Ziele"]}}

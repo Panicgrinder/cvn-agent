@@ -1,0 +1,20 @@
+{"id": "eval-081", "messages": [{"role": "user", "content": "Erkläre den Dijkstra-Algorithmus in fünf Sätzen für Fortgeschrittene."}], "checks": {"must_include": ["Graph", "Prioritätswarteschlange", "Laufzeit"]}}
+{"id": "eval-082", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen TCP und UDP prägnant."}], "checks": {"must_include": ["Verbindung", "Zuverlässigkeit", "Pakete"]}}
+{"id": "eval-083", "messages": [{"role": "user", "content": "Erkläre den Begriff Big-O-Notation und gib ein Beispiel."}], "checks": {"must_include": ["Komplexität", "Worst Case", "Beispiel"]}}
+{"id": "eval-084", "messages": [{"role": "user", "content": "Erkläre wie Hash-Tabellen Kollisionen behandeln."}], "checks": {"must_include": ["Hashfunktion", "Kollision", "Verkettung"]}}
+{"id": "eval-085", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen Prozess und Thread."}], "checks": {"must_include": ["Ressourcen", "Parallelität", "Scheduling"]}}
+{"id": "eval-086", "messages": [{"role": "user", "content": "Erkläre wie Garbage Collection in Java funktioniert."}], "checks": {"must_include": ["Heap", "Mark and Sweep", "Automatisierung"]}}
+{"id": "eval-087", "messages": [{"role": "user", "content": "Erkläre was eine REST-API ausmacht."}], "checks": {"must_include": ["HTTP", "Ressource", "Stateless"]}}
+{"id": "eval-088", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen symmetrischer und asymmetrischer Verschlüsselung."}], "checks": {"must_include": ["Schlüssel", "Vertraulichkeit", "Öffentlich"]}}
+{"id": "eval-089", "messages": [{"role": "user", "content": "Erkläre wie Quicksort funktioniert."}], "checks": {"must_include": ["Pivot", "Teilen", "Rekursion"]}}
+{"id": "eval-090", "messages": [{"role": "user", "content": "Erkläre was eine virtuelle Maschine ist und wozu man sie nutzt."}], "checks": {"must_include": ["Abstraktion", "Isolation", "Hardware"]}}
+{"id": "eval-091", "messages": [{"role": "user", "content": "Erkläre wie Blockchains Transaktionen absichern."}], "checks": {"must_include": ["Konsens", "Kryptografie", "Verkettung"]}}
+{"id": "eval-092", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen SQL und NoSQL Datenbanken."}], "checks": {"must_include": ["Tabellen", "Dokumente", "Schema"]}}
+{"id": "eval-093", "messages": [{"role": "user", "content": "Erkläre wie DNS funktioniert."}], "checks": {"must_include": ["Domain", "Auflösung", "Server"]}}
+{"id": "eval-094", "messages": [{"role": "user", "content": "Erkläre wie TLS eine Verbindung absichert."}], "checks": {"must_include": ["Handshake", "Zertifikat", "Verschlüsselung"]}}
+{"id": "eval-095", "messages": [{"role": "user", "content": "Erkläre wie neuronale Netze lernen."}], "checks": {"must_include": ["Gewichte", "Backpropagation", "Daten"]}}
+{"id": "eval-096", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen kompilierten und interpretierten Sprachen."}], "checks": {"must_include": ["Compiler", "Interpreter", "Ausführung"]}}
+{"id": "eval-097", "messages": [{"role": "user", "content": "Erkläre was Containerisierung bedeutet."}], "checks": {"must_include": ["Docker", "Isolation", "Portabilität"]}}
+{"id": "eval-098", "messages": [{"role": "user", "content": "Erkläre wie RAID Datensicherheit erhöht."}], "checks": {"must_include": ["Spiegelung", "Parität", "Festplatten"]}}
+{"id": "eval-099", "messages": [{"role": "user", "content": "Erkläre den Unterschied zwischen IPv4 und IPv6."}], "checks": {"must_include": ["Adresse", "Länge", "Kompatibilität"]}}
+{"id": "eval-100", "messages": [{"role": "user", "content": "Erkläre was CAP-Theorem aussagt."}], "checks": {"must_include": ["Konsistenz", "Verfügbarkeit", "Partitionstoleranz"]}}

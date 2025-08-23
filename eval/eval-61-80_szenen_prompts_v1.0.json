@@ -1,0 +1,20 @@
+{"id": "eval-061", "messages": [{"role": "user", "content": "Schreibe eine Szene mit klarer Zielsetzung der Hauptfigur und sichtbarem Hindernis in höchstens 120 Wörtern."}], "checks": {"must_include": ["Ziel", "Hindernis", "Konflikt"]}}
+{"id": "eval-062", "messages": [{"role": "user", "content": "Schreibe eine Szene, die mit einer überraschenden Wendung endet. Keine Cliffhanger."}], "checks": {"must_include": ["Wendepunkt", "Auflösung", "Konsequenz"]}}
+{"id": "eval-063", "messages": [{"role": "user", "content": "Zeige eine leise, spannungsvolle Szene nur über Körpersprache und Subtext."}], "checks": {"must_include": ["Körpersprache", "Subtext", "Spannung"]}}
+{"id": "eval-064", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der Ort und Wetter die Stimmung prägen."}], "checks": {"must_include": ["Setting", "Atmosphäre", "Wetter"]}}
+{"id": "eval-065", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der die Figur zwischen zwei Übeln wählen muss."}], "checks": {"must_include": ["Dilemma", "Entscheidung", "Folgen"]}}
+{"id": "eval-066", "messages": [{"role": "user", "content": "Schreibe eine Szene, die eine Fehlinformation offenlegt und den Plan anpasst."}], "checks": {"must_include": ["Irrtum", "Planänderung", "Einsicht"]}}
+{"id": "eval-067", "messages": [{"role": "user", "content": "Schreibe eine actionarme, aber dichte Szene über innere Zerrissenheit."}], "checks": {"must_include": ["Innere Stimme", "Zweifel", "Motiv"]}}
+{"id": "eval-068", "messages": [{"role": "user", "content": "Schreibe eine Szene, die mit einer konkreten Sinneswahrnehmung beginnt."}], "checks": {"must_include": ["Sinneseindruck", "Detail", "Fokus"]}}
+{"id": "eval-069", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der zwei Figuren dasselbe Ziel mit gegensätzlichen Mitteln verfolgen."}], "checks": {"must_include": ["Zielkonflikt", "Mittel", "Kompromiss"]}}
+{"id": "eval-070", "messages": [{"role": "user", "content": "Schreibe eine Szene, die einen Nebencharakter unerwartet profiliert."}], "checks": {"must_include": ["Nebenfigur", "Charakterisierung", "Relevanz"]}}
+{"id": "eval-071", "messages": [{"role": "user", "content": "Schreibe eine Szene, die durch knappen Dialog vorangetrieben wird."}], "checks": {"must_include": ["Dialog", "Taktik", "Zwischenruf"]}}
+{"id": "eval-072", "messages": [{"role": "user", "content": "Schreibe eine Szene, die eine drohende Gefahr spürbar macht, ohne sie zu zeigen."}], "checks": {"must_include": ["Foreshadowing", "Risiko", "Andeutung"]}}
+{"id": "eval-073", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der Humor die Spannung kurz auflockert."}], "checks": {"must_include": ["Humor", "Kontrast", "Timing"]}}
+{"id": "eval-074", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der die Figur eine Regel bricht und den Preis zahlt."}], "checks": {"must_include": ["Regelbruch", "Konsequenz", "Lektion"]}}
+{"id": "eval-075", "messages": [{"role": "user", "content": "Schreibe eine Szene, die mit einem klaren Ortswechsel arbeitet."}], "checks": {"must_include": ["Ortswechsel", "Übergang", "Orientierung"]}}
+{"id": "eval-076", "messages": [{"role": "user", "content": "Schreibe eine Szene mit einem unsympathischen, aber faszinierenden Antagonisten."}], "checks": {"must_include": ["Antagonist", "Motivation", "Spannung"]}}
+{"id": "eval-077", "messages": [{"role": "user", "content": "Schreibe eine Szene, die Tempo durch kurze Sätze erhöht."}], "checks": {"must_include": ["Tempo", "Rhythmus", "Druck"]}}
+{"id": "eval-078", "messages": [{"role": "user", "content": "Schreibe eine Szene, die einen moralischen Zwiespalt ohne Urteil zeigt."}], "checks": {"must_include": ["Ambivalenz", "Werte", "Konflikt"]}}
+{"id": "eval-079", "messages": [{"role": "user", "content": "Schreibe eine Szene, in der ein simples Objekt symbolische Bedeutung erhält."}], "checks": {"must_include": ["Symbol", "Bedeutung", "Detail"]}}
+{"id": "eval-080", "messages": [{"role": "user", "content": "Schreibe eine Szene, die sauber zu einem runden Abschluss führt."}], "checks": {"must_include": ["Auflösung", "Roter Faden", "Schlussbild"]}}

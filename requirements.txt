@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+httpx
+python-dotenv
+sqlalchemy
+sqlmodel
+rich
+
+# Für Evaluierung
+dataclasses
+
+# Optional für RAG (Retrieval Augmented Generation)
+# qdrant-client
+# sentence-transformers
