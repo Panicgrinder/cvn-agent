@@ -8,5 +8,9 @@ results/
 !datasets/*.jsonl
 !config/
 !config/*.json
+!config/*.md
 config/synonyms.local.json
+config/context.local.md
+config/context.local.json
+config/context.local.jsonl
 !README.md

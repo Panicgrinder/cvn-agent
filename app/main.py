@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from typing import cast as _cast
+import json as _json
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import time
@@ -6,7 +8,7 @@ from typing import Dict, Any
 
 from .core.settings import settings
 from .api.models import ChatRequest, ChatResponse
-from .api.chat import process_chat_request
+from .api.chat import process_chat_request, stream_chat_request
 
 # Logger-Konfiguration
 logging.basicConfig(level=logging.INFO)
@@ -29,15 +31,21 @@ if settings.RATE_LIMIT_ENABLED:
         def __init__(self, app):
             super().__init__(app)  # type: ignore[arg-type]
             self.lock = threading.Lock()
-            self.window = 60.0
+            self.window = float(settings.RATE_LIMIT_WINDOW_SEC)
             self.capacity = max(1, int(settings.RATE_LIMIT_REQUESTS_PER_MINUTE))
             self.burst = max(0, int(settings.RATE_LIMIT_BURST))
             from typing import Deque
             self.buckets: Dict[str, Deque[float]] = defaultdict(deque)
 
         async def dispatch(self, request: Request, call_next):
+            # Exempt Pfade (z. B. Health)
+            if request.url.path in set(settings.RATE_LIMIT_EXEMPT_PATHS):
+                return await call_next(request)
+
             # Bestimme den Client-Key
             client_host = request.client.host if request.client else "unknown"
+            if client_host in set(settings.RATE_LIMIT_TRUSTED_IPS):
+                return await call_next(request)
             now = time.time()
             allow = True
 
@@ -56,12 +64,28 @@ if settings.RATE_LIMIT_ENABLED:
                     q.append(now)
 
             if not allow:
+                headers = {
+                    "Retry-After": str(int(self.window)),
+                    "X-RateLimit-Limit": str(self.capacity + self.burst),
+                    "X-RateLimit-Window": str(int(self.window)),
+                }
                 raise HTTPException(
                     status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                     detail="Rate limit exceeded. Bitte später erneut versuchen.",
+                    headers=headers,
                 )
-
-            return await call_next(request)
+            response = await call_next(request)
+            try:
+                # Informative Header setzen
+                from typing import Deque
+                q2: Deque[float] = self.buckets[client_host]
+                remaining = max(0, (self.capacity + self.burst) - len(q2))
+                response.headers["X-RateLimit-Limit"] = str(self.capacity + self.burst)  # type: ignore[assignment]
+                response.headers["X-RateLimit-Remaining"] = str(remaining)  # type: ignore[assignment]
+                response.headers["X-RateLimit-Window"] = str(int(self.window))  # type: ignore[assignment]
+            except Exception:
+                pass
+            return response
 
     app.add_middleware(_RateLimiter)
 
@@ -79,6 +103,46 @@ if settings.BACKEND_CORS_ORIGINS:
 async def health_check() -> Dict[str, Any]:
     """Gesundheitscheck für den API-Server."""
     return {"status": "ok", "time": time.time()}
+
+
+# Einfache Middleware für Request-ID und JSON-Logs
+@app.middleware("http")
+async def request_context_mw(request: Request, call_next):
+    rid = request.headers.get(settings.REQUEST_ID_HEADER) or request.headers.get("X-Request-Id")
+    if not rid:
+        # einfache, lokale ID (Zeit-basiert)
+        rid = f"req-{int(time.time()*1000)}"
+    start = time.time()
+    try:
+        # request-id in state für spätere Nutzung (z. B. im Handler)
+        try:
+            setattr(request.state, "request_id", rid)
+        except Exception:
+            pass
+        response = _cast(Response, await call_next(request))
+        duration_ms = int((time.time() - start) * 1000)
+        if settings.LOG_JSON:
+            logger.info(
+                _json.dumps({
+                    "event": "request",
+                    "path": request.url.path,
+                    "method": request.method,
+                    "status": int(response.status_code),
+                    "duration_ms": duration_ms,
+                    "request_id": rid,
+                }, ensure_ascii=False)
+            )
+        else:
+            logger.info(f"{request.method} {request.url.path} -> {int(response.status_code)} [{duration_ms} ms] rid={rid}")
+        response.headers[settings.REQUEST_ID_HEADER] = rid  # type: ignore[assignment]
+        return response
+    except Exception as exc:
+        duration_ms = int((time.time() - start) * 1000)
+        if settings.LOG_JSON:
+            logger.exception(_json.dumps({"event": "error", "path": request.url.path, "request_id": rid, "duration_ms": duration_ms, "error": str(exc)}, ensure_ascii=False))
+        else:
+            logger.exception(f"Fehler bei {request.url.path} rid={rid}: {exc}")
+        raise
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, req: Request):
@@ -106,18 +170,48 @@ async def chat(request: ChatRequest, req: Request):
                 detail=f"Input zu lang: {total_chars} Zeichen (Limit {settings.REQUEST_MAX_INPUT_CHARS}).",
             )
 
+        rid = getattr(req.state, "request_id", None)
         logger.info(
-            f"Chat-Anfrage erhalten mit {len(request.messages)} Nachrichten, Eval-Modus: {eval_mode}, Uneingeschränkter Modus: {unrestricted_mode}"
+            f"Chat-Anfrage erhalten mit {len(request.messages)} Nachrichten, Eval-Modus: {eval_mode}, Uneingeschränkter Modus: {unrestricted_mode}, rid={rid}"
         )
 
         # Verarbeite die Anfrage
         response = await process_chat_request(
-            request, eval_mode=eval_mode, unrestricted_mode=unrestricted_mode
+            request,
+            eval_mode=eval_mode,
+            unrestricted_mode=unrestricted_mode,
+            client=None,
+            request_id=rid,
         )
         return response
 
     except Exception as e:
         logger.exception(f"Fehler bei der Verarbeitung der Chat-Anfrage: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Interner Serverfehler: {str(e)}",
+        )
+
+from fastapi.responses import StreamingResponse
+
+@app.post("/chat/stream")
+async def chat_stream(request: ChatRequest, req: Request):
+    """Streaming-Variante des Chat-Endpunkts (SSE-ähnliches Format)."""
+    try:
+        request_data = await req.json()
+        eval_mode = request_data.get("eval_mode", False)
+        unrestricted_mode = request_data.get("unrestricted_mode", False)
+        rid = getattr(req.state, "request_id", None)
+        gen = await stream_chat_request(
+            request,
+            eval_mode=eval_mode,
+            unrestricted_mode=unrestricted_mode,
+            client=None,
+            request_id=rid,
+        )
+        return StreamingResponse(gen, media_type="text/event-stream")
+    except Exception as e:
+        logger.exception(f"Fehler bei der Streaming-Chat-Anfrage: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Interner Serverfehler: {str(e)}",

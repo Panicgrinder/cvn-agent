@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "CVN Agent"
     PROJECT_DESCRIPTION: str = "Conversational Agent mit Ollama"
-    PROJECT_VERSION: str = "0.1.0"
+    PROJECT_VERSION: str = "0.1.1"
     
     # Ollama-Einstellungen
     OLLAMA_HOST: str = "http://localhost:11434"
@@ -48,6 +48,25 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = False
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 60
     RATE_LIMIT_BURST: int = 30
+    RATE_LIMIT_WINDOW_SEC: float = 60.0
+    RATE_LIMIT_TRUSTED_IPS: List[str] = ["127.0.0.1", "::1"]
+    RATE_LIMIT_EXEMPT_PATHS: List[str] = ["/health", "/docs", "/openapi.json"]
+
+    # Logging / Observability
+    LOG_JSON: bool = False
+    LOG_TRUNCATE_CHARS: int = 200
+    REQUEST_ID_HEADER: str = "X-Request-ID"
+
+    # Kontext-Notizen (lokal, optional)
+    CONTEXT_NOTES_ENABLED: bool = False
+    # Mehrere mögliche Standardpfade; erster vorhandener wird verwendet, oder Inhalte werden zusammengeführt
+    CONTEXT_NOTES_PATHS: List[str] = [
+        os.path.join("eval", "config", "context.local.md"),
+        os.path.join("eval", "config", "context.local.jsonl"),
+        os.path.join("eval", "config", "context.local.json"),
+        os.path.join("data", "context.local.md"),
+    ]
+    CONTEXT_NOTES_MAX_CHARS: int = 4000
 
     @staticmethod
     def _to_nonempty_str(obj: Any) -> Optional[str]:

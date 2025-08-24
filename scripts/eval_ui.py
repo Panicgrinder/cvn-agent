@@ -232,7 +232,7 @@ def action_start_run() -> None:
         profile = prof_data.get(profile_name, {})
 
     # Optionale Check-Auswahl
-    check_types = ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex"]
+    check_types = ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex", "rpg_style"]
     print("\nWelche Checks sollen aktiv sein? (leer = alle)")
     for i, c in enumerate(check_types, start=1):
         print(f"  {i}. {c}")
@@ -362,6 +362,7 @@ def action_trends() -> None:
         return
     print("Analysiere Läufe …\n")
     summaries: List[Dict[str, Any]] = []
+    sweep_summaries: Dict[str, List[Dict[str, Any]]] = {}
     for path in files:
         meta = load_run_meta(path) or {}
         results = load_results_from_file(path)
@@ -372,19 +373,35 @@ def action_trends() -> None:
         rate = (success / total) * 100.0
         avg_ms = int(sum(r.duration_ms for r in results) / total)
         rpg = sum(1 for r in results if run_eval.check_rpg_mode(r.response))
-        summaries.append({
+        top_p_val = None
+        try:
+            m = cast(Dict[str, Any], meta)
+            ov = cast(Dict[str, Any], (m.get("overrides") or {}))
+            top_p_val = ov.get("top_p")
+        except Exception:
+            top_p_val = None
+        row: Dict[str, Any] = {
             "file": os.path.basename(path),
             "timestamp": meta.get("timestamp") or "-",
             "model": (meta.get("overrides", {}).get("model") or meta.get("model") or "-"),
             "host": (meta.get("overrides", {}).get("host") or meta.get("host") or "-"),
             "temp": (meta.get("overrides", {}).get("temperature") or meta.get("temperature") or "-"),
+            "top_p": top_p_val if top_p_val is not None else "-",
             "checks": ",".join(meta.get("enabled_checks") or []),
             "total": total,
             "success": success,
             "rate": rate,
             "avg_ms": avg_ms,
             "rpg": rpg,
-        })
+        }
+        summaries.append(row)
+        # Sweep-Gruppierung, falls Tag- bzw. Suffix-Pattern erkannt
+        # Erwartete Namen: results_YYYYmmdd_HHMM[_tag]_tX[_pY][_nZ].jsonl
+        base: str = str(row.get("file", ""))
+        import re as _re
+        m = _re.match(r"results_\d{8}_\d{4}(?:_[^_]+)?(?:_.+)?\.jsonl$", base)
+        if m:
+            sweep_summaries.setdefault("all", []).append(row)
 
     if not summaries:
         print("Keine auswertbaren Läufe gefunden.")
@@ -407,15 +424,22 @@ def action_trends() -> None:
     grand_rate = (grand_success / grand_total) * 100.0 if grand_total else 0.0
     print(f"\nGesamt: {grand_success}/{grand_total} ({grand_rate:.1f}%)\n")
 
+    # Optional: Sweep-Aggregation anzeigen (letzte 12 Einträge mit temp/top_p/Øms/Rate)
+    if sweep_summaries:
+        print("\nSweep-Aggregation (letzte 12):\n")
+        print(f"{'Datei':<28}  {'temp':>6}  {'top_p':>6}  {'OK':>6}/{ 'Tot':<4}  {'Rate':>6}  {'Øms':>6}")
+        for s in sweep_summaries.get("all", [])[:12]:
+            print(f"{s['file']:<28}  {str(s['temp']):>6}  {str(s['top_p']):>6}  {s['success']:>6}/{s['total']:<4}  {s['rate']:>5.1f}%  {s['avg_ms']:>6}")
+
     # CSV-Export
     if input("Runs als CSV exportieren? (y/N): ").strip().lower() == "y":
         out_csv = os.path.join(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR), "runs_summary.csv")
         import csv
         with open(out_csv, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
-            w.writerow(["file","timestamp","model","host","temperature","checks","total","success","rate","avg_ms","rpg"]) 
+            w.writerow(["file","timestamp","model","host","temperature","top_p","checks","total","success","rate","avg_ms","rpg"]) 
             for s in summaries:
-                w.writerow([s["file"], s["timestamp"], s["model"], s["host"], s["temp"], s["checks"], s["total"], s["success"], f"{s['rate']:.1f}", s["avg_ms"], s["rpg"]])
+                w.writerow([s["file"], s["timestamp"], s["model"], s["host"], s["temp"], s["top_p"], s["checks"], s["total"], s["success"], f"{s['rate']:.1f}", s["avg_ms"], s["rpg"]])
         print(f"CSV exportiert: {out_csv}")
 
     # Detail: Paket-Statistik für einen Lauf

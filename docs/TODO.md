@@ -27,14 +27,20 @@ Kurzfristige Ziele (Heute)
   - Status: Done (zwei Tests hinzugefügt, beide grün).
 
 1–2 Tage
-- Streaming-Antworten (optional)
-- Qualitäts-Heuristiken fürs RPG (stilistische Checks)
-- Parameter-Sweeps (temperature, top_p, max_tokens)
-- Beobachtbarkeit (Korrelation-ID, JSON-Logs, Trunkierung)
-- Rate-Limits/Schutzschalter Feintuning
+- [x] Qualitäts-Heuristiken fürs RPG (stilistische Checks)
+  - Status: Done (rpg_style-Score + Check; Unit-Tests hinzugefügt; per Checks-Liste aktivierbar)
+- [x] Parameter-Sweeps (temperature, top_p, max_tokens)
+  - Status: Done (Runner unterstützt Sweeps + Overrides; Tagging/Meta; Trends zeigt kompakte Aggregation; top_p end-to-end sichtbar)
+- [x] Beobachtbarkeit (Korrelation-ID, JSON-Logs, Trunkierung)
+  - Status: Done (Request-ID-Middleware; JSON-Logs für Requests/Errors; Trunkierung in Chat-Logs; RID-Weitergabe an Modell; strukturierte Model-Logs)
+- [x] Rate-Limits/Schutzschalter Feintuning
+  - Status: Done (Fenster/Limit/Burst konfigurierbar; Exempt Paths & Trusted IPs; informative Rate-Limit-Header; Tests grün)
+- [x] Streaming-Antworten (optional)
+  - Status: Done (POST /chat/stream liefert text/event-stream; serverseitige Chunk-Ausgabe via Ollama-Stream; Logs & Fehler-Ereignisse; kompatibel zu bestehender /chat API)
 
 3–7 Tage
 - Datensatzkurierung aus Logs (Train/Val-Pack)
+  - Status: In Arbeit / Done (Teil 1): Skript `scripts/curate_dataset_from_latest.py` erstellt; Export (openai_chat/alpaca), Dedupe & Train/Val-Split; VS Code Task "Curate dataset (latest)" hinzugefügt.
 - Fine-Tuning/LoRA Mini-Pipeline
 - Caching/Memoization für Eval-Reruns
 - Rerun-Failed mit Profil/Meta-Rekonstruktion

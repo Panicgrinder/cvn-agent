@@ -45,7 +45,15 @@ eval/results/
 !eval/datasets/*.json
 !eval/datasets/*.jsonl
 !eval/config/*.json
+!eval/config/*.md
 !eval/README.md
+
+########################################
+# Private lokale Kontext-Notizen
+########################################
+eval/config/context.local.md
+eval/config/context.local.json
+eval/config/context.local.jsonl
 
 ########################################
 # Editors / OS

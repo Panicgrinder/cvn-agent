@@ -1,0 +1,13 @@
+# Zusätzliche Trainings-Abhängigkeiten (optional)
+# Installationshinweise: Wähle eine passende PyTorch-Version für deine CUDA/CPU Umgebung
+# https://pytorch.org/get-started/locally/
+
+transformers>=4.42.0
+datasets>=2.19.0
+peft>=0.12.0
+trl>=0.9.4
+accelerate>=0.30.0
+bitsandbytes>=0.43.0 ; platform_system != 'Windows'
+
+# Optional Logging
+wandb>=0.16.0

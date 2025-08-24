@@ -38,15 +38,17 @@ try:
     from app.core.settings import settings
     
     # Verwende die Einstellungen für Standardwerte (neue Unterordner-Struktur)
-    DEFAULT_EVAL_DIR = os.path.join(project_root, settings.EVAL_DATASET_DIR)
+    DEFAULT_EVAL_DIR = os.path.join(project_root, settings.EVAL_DIRECTORY)
+    DEFAULT_DATASET_DIR = os.path.join(project_root, settings.EVAL_DATASET_DIR)
     DEFAULT_RESULTS_DIR = os.path.join(project_root, settings.EVAL_RESULTS_DIR)
     DEFAULT_CONFIG_DIR = os.path.join(project_root, settings.EVAL_CONFIG_DIR)
     DEFAULT_FILE_PATTERN = settings.EVAL_FILE_PATTERN
     DEFAULT_API_URL = f"http://localhost:8000/chat"
 except ImportError:
     # Fallback-Werte, wenn die Anwendungseinstellungen nicht verfügbar sind
-    base_eval = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
-    DEFAULT_EVAL_DIR = os.path.join(base_eval, "datasets")
+    base_eval = os.path.join(project_root, "eval")
+    DEFAULT_EVAL_DIR = base_eval
+    DEFAULT_DATASET_DIR = os.path.join(base_eval, "datasets")
     DEFAULT_RESULTS_DIR = os.path.join(base_eval, "results")
     DEFAULT_CONFIG_DIR = os.path.join(base_eval, "config")
     DEFAULT_FILE_PATTERN = "eval-*.json"
@@ -244,7 +246,7 @@ async def load_prompts(patterns: Optional[List[str]] = None) -> List[Dict[str, A
         Liste von Evaluierungseinträgen (Dicts)
     """
     if patterns is None:
-        patterns = [os.path.join(DEFAULT_EVAL_DIR, DEFAULT_FILE_PATTERN)]
+        patterns = [os.path.join(DEFAULT_DATASET_DIR, DEFAULT_FILE_PATTERN)]
     
     # Dictionary zur Verwaltung von Datensatz-IDs und deren Quellen
     # Schlüssel: ID des Prompts, Wert: (Prompt-Daten, Zeitstempel der Datei)
@@ -491,6 +493,24 @@ def check_rpg_mode(text: str) -> bool:
     return False
 
 
+def rpg_style_score(text: str) -> float:
+    """Einfache Heuristik für RPG-Stil: Score 0..1 basierend auf Indikatoren und Struktur."""
+    t = text.lower()
+    score = 0.0
+    indicators = [
+        "novapolis", "chronistin", "postapokalypse",
+        "szene", "konsequenz", "optionen",
+        "world_state", "state_patches"
+    ]
+    hits = sum(1 for k in indicators if k in t)
+    score += min(1.0, hits / 6.0)
+    # Struktur: Aufzählungen/Listen erhöhen Score leicht
+    if re.search(r"\n\s*[-*] ", t):
+        score += 0.1
+    # Begrenzen
+    return max(0.0, min(1.0, score))
+
+
 async def evaluate_item(
     item: EvaluationItem,
     api_url: str = "http://localhost:8000/chat",
@@ -500,6 +520,9 @@ async def evaluate_item(
     model_override: Optional[str] = None,
     temperature_override: Optional[float] = None,
     host_override: Optional[str] = None,
+    top_p_override: Optional[float] = None,
+    num_predict_override: Optional[int] = None,
+    request_id: Optional[str] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -531,6 +554,13 @@ async def evaluate_item(
             options["temperature"] = float(temperature_override)
         if host_override is not None:
             options["host"] = host_override
+        if top_p_override is not None:
+            options["top_p"] = float(top_p_override)
+        if num_predict_override is not None:
+            try:
+                options["num_predict"] = int(num_predict_override)
+            except Exception:
+                pass
         if options:
             payload["options"] = options
         
@@ -538,11 +568,14 @@ async def evaluate_item(
         logger.debug(f"Evaluiere Item {item.id}")
         
         # Entweder übergebenen Client verwenden (ASGI-Modus) oder einen temporären erstellen (HTTP-Modus)
+        headers: Dict[str, str] = {}
+        if request_id:
+            headers["X-Request-ID"] = request_id
         if client is None:
             async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
-                response = await temp_client.post(api_url, json=payload)
+                response = await temp_client.post(api_url, json=payload, headers=headers)
         else:
-            response = await client.post(api_url, json=payload)
+            response = await client.post(api_url, json=payload, headers=headers)
 
         response.raise_for_status()
         data = response.json()
@@ -563,7 +596,7 @@ async def evaluate_item(
             failed_checks.append("Antwort im RPG-Modus, aber Test erwartet allgemeine Antwort")
 
         # Wenn nicht gesetzt, sind alle Checks aktiv
-        enabled = set(enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex"])
+        enabled = set(enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex", "rpg_style"])
 
         # 1. must_include: Alle Begriffe müssen enthalten sein
         if "must_include" in enabled and item.checks.get("must_include"):
@@ -629,6 +662,21 @@ async def evaluate_item(
                 except re.error:
                     checks_passed[f"regex:{pattern}"] = False
                     failed_checks.append(f"Ungültiges Regex-Pattern: '{pattern}'")
+
+        # 6. rpg_style: Stil-Score muss unter/über Schwelle liegen, je nach Testpaket-Kontext
+        if "rpg_style" in enabled:
+            score = rpg_style_score(content)
+            checks_passed["rpg_style"] = True  # Default true
+            pkg = (item.source_package or "").lower()
+            # Heuristik: In RPG-Paketen erwarten wir eher hohen Score, sonst niedrigen
+            if any(k in pkg for k in ["rpg", "novapolis", "szene"]):
+                if score < 0.4:
+                    checks_passed["rpg_style"] = False
+                    failed_checks.append(f"RPG-Stil zu schwach (Score {score:.2f})")
+            else:
+                if score > 0.2:
+                    checks_passed["rpg_style"] = False
+                    failed_checks.append(f"RPG-Stil zu präsent (Score {score:.2f})")
 
         # Prüfe, ob alle Bedingungen erfüllt sind
         success = all(checks_passed.values())
@@ -708,6 +756,9 @@ async def run_evaluation(
     model_override: Optional[str] = None,
     temperature_override: Optional[float] = None,
     host_override: Optional[str] = None,
+    top_p_override: Optional[float] = None,
+    sweep: Optional[Dict[str, List[Any]]] = None,
+    tag: Optional[str] = None,
     quiet: bool = False,
 ) -> List[EvaluationResult]:
     """
@@ -748,8 +799,15 @@ async def run_evaluation(
     
     # Aktuelle Zeit für Ergebnis-Dateiname (in results/ ablegen)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    # Run-ID für Korrelation/Logs
+    try:
+        import uuid as _uuid
+        run_id = f"run-{timestamp}-{str(_uuid.uuid4()).split('-')[0]}"
+    except Exception:
+        run_id = f"run-{timestamp}"
     os.makedirs(DEFAULT_RESULTS_DIR, exist_ok=True)
-    results_file = os.path.join(DEFAULT_RESULTS_DIR, f"results_{timestamp}.jsonl")
+    base_name = f"results_{timestamp}{('_' + tag) if tag else ''}.jsonl"
+    results_file = os.path.join(DEFAULT_RESULTS_DIR, base_name)
     
     # Optional: ASGI-Client vorbereiten
     asgi_client: Optional[httpx.AsyncClient] = None
@@ -796,40 +854,89 @@ async def run_evaluation(
             meta_header: Dict[str, Any] = {
                 "_meta": True,
                 "timestamp": timestamp,
+                "run_id": run_id,
                 "patterns": patterns,
                 "api_url": api_url,
                 "eval_mode": eval_mode,
                 "asgi": asgi,
-                "enabled_checks": enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex"],
+                "enabled_checks": enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex", "rpg_style"],
                 "model": __import__('app.core.settings', fromlist=['settings']).settings.MODEL_NAME,
                 "temperature": __import__('app.core.settings', fromlist=['settings']).settings.TEMPERATURE,
                 "host": __import__('app.core.settings', fromlist=['settings']).settings.OLLAMA_HOST,
-                "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override},
+                "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override, "top_p": top_p_override, "num_predict": None},
+                "sweep": sweep or None,
             }
             with open(results_file, "a", encoding="utf-8") as f:
                 f.write(json.dumps(meta_header, ensure_ascii=False) + "\n")
 
-            for item in items:
-                result = await evaluate_item(
-                    item,
-                    api_url,
-                    eval_mode=eval_mode,
-                    client=asgi_client,
-                    enabled_checks=enabled_checks,
-                    model_override=model_override,
-                    temperature_override=temperature_override,
-                    host_override=host_override,
-                )
-                results.append(result)
-                
-                # Speichere Ergebnis sofort in JSONL-Datei
-                with open(results_file, "a", encoding="utf-8") as f:
-                    # Konvertiere Result in Dictionary und kürze die Antwort
-                    result_dict = asdict(result)
-                    result_dict["response"] = truncate(result_dict["response"], 500)
-                    f.write(json.dumps(result_dict, ensure_ascii=False) + "\n")
-                
-                progress.update(task, advance=1)
+            # Hilfsfunktion zur Ausführung eines Durchlaufs mit gegebenen Overrides
+            async def _run_once(temp_override: Optional[float], top_p_ov: Optional[float], num: Optional[int], tag_suffix: Optional[str] = None) -> None:
+                nonlocal results_file
+                # Update Datei, falls Sweep-Tag
+                if tag_suffix:
+                    results_file = os.path.join(DEFAULT_RESULTS_DIR, f"results_{timestamp}{('_' + tag) if tag else ''}_{tag_suffix}.jsonl")
+                    with open(results_file, "w", encoding="utf-8") as f:
+                        pass  # neu anlegen
+                    # Meta-Header kopieren
+                    mh = dict(meta_header)
+                    mh["overrides"] = {"model": model_override, "temperature": temp_override if temp_override is not None else temperature_override, "host": host_override, "top_p": top_p_ov, "num_predict": num}
+                    with open(results_file, "a", encoding="utf-8") as f:
+                        f.write(json.dumps(mh, ensure_ascii=False) + "\n")
+                # Items iterieren
+                for item in items:
+                    rid = f"{run_id}-{item.id}"
+                    r = await evaluate_item(
+                        item,
+                        api_url,
+                        eval_mode=eval_mode,
+                        client=asgi_client,
+                        enabled_checks=enabled_checks,
+                        model_override=model_override,
+                        temperature_override=temp_override if temp_override is not None else temperature_override,
+                        host_override=host_override,
+                        top_p_override=top_p_ov,
+                        num_predict_override=num,
+                        request_id=rid,
+                    )
+                    results.append(r)
+                    with open(results_file, "a", encoding="utf-8") as f:
+                        rd = asdict(r)
+                        rd["response"] = truncate(rd.get("response", ""), 500)
+                        f.write(json.dumps(rd, ensure_ascii=False) + "\n")
+                    progress.update(task, advance=1)
+
+            # Falls kein Sweep definiert, einfacher Durchlauf
+            if not sweep:
+                await _run_once(temperature_override, top_p_override, None)
+            else:
+                temps = sweep.get("temperature") if sweep else None
+                tops = sweep.get("top_p") if sweep else None
+                nums = None
+                # unterstütze sowohl "max_tokens" als auch "num_predict" als Schlüssel
+                if sweep:
+                    nums = sweep.get("max_tokens") or sweep.get("num_predict")
+                # Anzahl Tasks im Progress anpassen (grob): pro Item * Kombis
+                combos = max(1, (len(temps) if temps else 1) * (len(tops) if tops else 1) * (len(nums) if nums else 1))
+                progress.update(task, total=len(items) * combos)
+                # Iteriere über Kombinationen
+                if temps or tops or nums:
+                    temps_list = temps or [None]
+                    tops_list = tops or [None]
+                    nums_list = nums or [None]
+                    for tval in temps_list:
+                        for pval in tops_list:
+                            for nval in nums_list:
+                                suffix_parts: List[str] = []
+                                if tval is not None:
+                                    suffix_parts.append(f"t{tval}")
+                                if pval is not None:
+                                    suffix_parts.append(f"p{pval}")
+                                if nval is not None:
+                                    suffix_parts.append(f"n{nval}")
+                                await _run_once(float(tval) if tval is not None else None,
+                                                float(pval) if pval is not None else None,
+                                                int(nval) if nval is not None else None,
+                                                tag_suffix=("_".join(suffix_parts) if suffix_parts else None))
     finally:
         if asgi_client is not None:
             await asgi_client.aclose()
@@ -1080,9 +1187,16 @@ if __name__ == "__main__":
     parser.add_argument("--eval-mode", "-e", action="store_true", help="Deaktiviert den RPG-Modus für die Evaluierung")
     parser.add_argument("--skip-preflight", "-s", action="store_true", help="Überspringt den Preflight-Check (nützlich, wenn der Server nicht läuft)")
     parser.add_argument("--asgi", action="store_true", help="ASGI-In-Process: Evaluierung direkt gegen FastAPI-App ohne laufenden Server-Port")
-    parser.add_argument("--checks", nargs="*", help="Aktiviere nur diese Check-Typen (must_include, keywords_any, keywords_at_least, not_include, regex)")
+    parser.add_argument("--checks", nargs="*", help="Aktiviere nur diese Check-Typen (must_include, keywords_any, keywords_at_least, not_include, regex, rpg_style)")
     parser.add_argument("--quiet", action="store_true", help="Unterdrückt Logausgaben lauter Logger während der Progress-Anzeige")
     parser.add_argument("--no-quiet", action="store_true", help="Quiet-Mode deaktivieren (setzt sich gegen --quiet durch)")
+    # Overrides & Sweeps
+    parser.add_argument("--top-p", type=float, dest="top_p", help="Override für top_p")
+    parser.add_argument("--max-tokens", type=int, dest="max_tokens", help="Override für num_predict/max_tokens")
+    parser.add_argument("--tag", type=str, help="Zusätzlicher Tag im Ergebnisdateinamen")
+    parser.add_argument("--sweep-temp", nargs="*", type=float, dest="sweep_temp", help="Parameter-Sweep über Temperaturen (z. B. 0.1 0.2 0.3)")
+    parser.add_argument("--sweep-top-p", nargs="*", type=float, dest="sweep_top_p", help="Parameter-Sweep über top_p-Werte (z. B. 0.7 0.9)")
+    parser.add_argument("--sweep-max-tokens", nargs="*", type=int, dest="sweep_max_tokens", help="Parameter-Sweep über max_tokens/num_predict (z. B. 128 256 512)")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1161,6 +1275,12 @@ if __name__ == "__main__":
     if args.asgi:
         console.print(f"[bold green]ASGI-Modus:[/bold green] In-Process gegen FastAPI-App (kein HTTP-Port erforderlich)")
     console.print("")
+    if args.top_p is not None:
+        console.print(f"top_p Override: {args.top_p}")
+    if args.max_tokens is not None:
+        console.print(f"num_predict Override: {args.max_tokens}")
+    if args.sweep_temp or args.sweep_top_p:
+        console.print(f"Sweep: temp={args.sweep_temp or '-'} top_p={args.sweep_top_p or '-'} max_tokens={args.sweep_max_tokens or '-'}")
     
     # Verarbeite "show-prompts" Kommando
     if args.show_prompts:
@@ -1176,7 +1296,31 @@ if __name__ == "__main__":
     
     # Quiet-Default: true, außer im Debug-Modus oder wenn --no-quiet gesetzt
     quiet_final = (not args.no_quiet) and (args.quiet or (not args.debug))
-    results = asyncio.run(run_evaluation(patterns, api_url, args.limit, args.eval_mode, args.skip_preflight, args.asgi, args.checks, None, None, None, quiet_final))
+    sweep_cfg: Optional[Dict[str, List[Any]]] = None
+    if (args.sweep_temp and len(args.sweep_temp) > 0) or (args.sweep_top_p and len(args.sweep_top_p) > 0) or (args.sweep_max_tokens and len(args.sweep_max_tokens) > 0):
+        sweep_cfg = {}
+        if args.sweep_temp:
+            sweep_cfg["temperature"] = [float(x) for x in args.sweep_temp]
+        if args.sweep_top_p:
+            sweep_cfg["top_p"] = [float(x) for x in args.sweep_top_p]
+        if args.sweep_max_tokens:
+            sweep_cfg["max_tokens"] = [int(x) for x in args.sweep_max_tokens]
+    results = asyncio.run(run_evaluation(
+        patterns=patterns,
+        api_url=api_url,
+        limit=args.limit,
+        eval_mode=args.eval_mode,
+        skip_preflight=args.skip_preflight,
+        asgi=args.asgi,
+        enabled_checks=args.checks,
+        model_override=None,
+        temperature_override=None,
+        host_override=None,
+    top_p_override=args.top_p,
+        sweep=sweep_cfg,
+        tag=args.tag,
+        quiet=quiet_final,
+    ))
     
     if results:
         print_results(results)

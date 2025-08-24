@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import json
 from typing import Any, Dict, List
+import torch
 
 from datasets import Dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -61,6 +62,7 @@ def main():
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--max-steps", type=int, default=-1)
     p.add_argument("--bf16", action="store_true")
+    p.add_argument("--load-in-4bit", action="store_true", help="4bit-Loading aktivieren (erfordert bitsandbytes; auf Windows evtl. nicht unterstützt)")
     args = p.parse_args()
 
     os.makedirs(args.output, exist_ok=True)
@@ -69,12 +71,20 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model,
-        torch_dtype=("bfloat16" if args.bf16 else None),
-        load_in_4bit=True,
-        device_map="auto",
-    )
+    dtype = torch.bfloat16 if args.bf16 else None
+    if args.load_in_4bit:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            torch_dtype=dtype,
+            load_in_4bit=True,
+            device_map="auto",
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model,
+            torch_dtype=dtype,
+            device_map="auto",
+        )
 
     ds = load_openai_chat_jsonl(args.data)
     ds = ds.map(lambda ex: format_with_chat_template(ex, tokenizer), batched=True)

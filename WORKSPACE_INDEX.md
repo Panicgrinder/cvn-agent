@@ -17,6 +17,8 @@
 
 ### .vscode/:
 - [`.vscode/extensions.json`](.vscode/extensions.json) - VSCode-Erweiterungsempfehlungen
+- [`.vscode/settings.json`](.vscode/settings.json) - Workspace-spezifische Einstellungen
+- [`.vscode/tasks.json`](.vscode/tasks.json) - VSCode-Tasks (z. B. Tests)
 
 #### app/:
 - [`app/__init__.py`](app/__init__.py) - App-Package-Initialisierung
@@ -28,12 +30,28 @@
 - [`app/api/__init__.py`](app/api/__init__.py) - API-Package-Initialisierung
 - [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing
 - [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (ChatRequest, ChatResponse)
+- [`app/api/api.py`](app/api/api.py) - (geparkt) alternative API-Struktur
+- [`app/api/chat_helpers.py`](app/api/chat_helpers.py) - (geparkt) Helper-Funktionen
+- [`app/api/endpoints/`](app/api/endpoints/) - (geparkt) Endpunktmodule
 
-#### app/core:
+#### app/core
 - [`app/core/__init__.py`](app/core/__init__.py) - Core-Package-Initialisierung
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates
-- [`app/core/content_rules.json`](app/core/content_rules.json) - Benutzerdefinierte Inhaltsregeln
+
+#### app/prompt
+- [`app/prompt/system.txt`](app/prompt/system.txt) - System-Prompt (historisch)
+
+#### app/routers (legacy/geparkt)
+- [`app/routers/`](app/routers/) - Ältere Router (chat, health, roll, state)
+
+#### app/services
+- [`app/services/llm.py`](app/services/llm.py) - LLM-Service (geparkt)
+
+#### app/utils
+- [`app/utils/convlog.py`](app/utils/convlog.py) - Konversations-Logging (geparkt)
+- [`app/utils/summarize.py`](app/utils/summarize.py) - Zusammenfassungs-Tools (geparkt)
+- [`app/utils/examples/`](app/utils/examples/) - Beispiele (geparkt)
 
 ### data/:
  - [`data/logs/`](data/logs/) - Laufzeitprotokolle
@@ -53,13 +71,19 @@
 - [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) - Demo-/Fantasy-Prompts (eval-021 bis eval-040)
 - [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json) - Dialog-Prompts (eval-041 bis eval-060)
 - [`eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json`](eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json) - Technische Erklärungen (eval-081 bis eval-100)
+- [`eval/datasets/eval-61-80_szenen_prompts_v1.0.json`](eval/datasets/eval-61-80_szenen_prompts_v1.0.json) - Szenen-Prompts (eval-061 bis eval-080)
 
 #### eval/config/:
 - [`eval/config/synonyms.json`](eval/config/synonyms.json) - Synonym-Mappings für Evaluierung
 - [`eval/config/profiles.json`](eval/config/profiles.json) - Profile/Overrides für Evaluierung
+- [`eval/config/synonyms.local.sample.json`](eval/config/synonyms.local.sample.json) - Beispiel für private Synonym-Overlays
 
 #### eval/results/:
 - [`eval/results/results_*.jsonl`](eval/results/) - Evaluierungsergebnisse (generiert, gitignored)
+
+#### eval (weitere Dateien):
+- [`eval/README.md`](eval/README.md) - Hinweise zu Eval
+- [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) - (historisch) Duplikat außerhalb von datasets/
 
 ### examples/:
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel für uneingeschränkten Prompt
@@ -70,10 +94,23 @@
 ### scripts/:
 - [`scripts/run_eval.py`](scripts/run_eval.py) - Hauptevaluierungsskript
 - [`scripts/customize_prompts.py`](scripts/customize_prompts.py) - Tool zur Prompt-Anpassung
+- [`scripts/eval_ui.py`](scripts/eval_ui.py) - Interaktive Eval-UI (Trends/Exports)
+- [`scripts/export_finetune.py`](scripts/export_finetune.py) - Export Trainingsdaten
+- [`scripts/openai_finetune.py`](scripts/openai_finetune.py) - OpenAI Fine-Tune Helper
+- [`scripts/openai_ft_status.py`](scripts/openai_ft_status.py) - OpenAI FT Status
+- [`scripts/prepare_finetune_pack.py`](scripts/prepare_finetune_pack.py) - Pack-Builder
+- [`scripts/quick_eval.py`](scripts/quick_eval.py) - Schnellstart-Eval
+- [`scripts/smoke_asgi.py`](scripts/smoke_asgi.py) - ASGI Smoke-Test
+- [`scripts/train_lora.py`](scripts/train_lora.py) - LoRA Training (geparkt)
+- [`scripts/open_latest_summary.py`](scripts/open_latest_summary.py) - Öffnet die neueste Merged-Zusammenfassung
+- [`scripts/open_context_notes.py`](scripts/open_context_notes.py) - Öffnet/legt lokale Kontext-Notizen an
+- [`scripts/README.md`](scripts/README.md) - Skriptübersicht
 
 ### utils/:
 - [`utils/__init__.py`](utils/__init__.py) - Utils-Package-Initialisierung
 - [`utils/eval_utils.py`](utils/eval_utils.py) - Evaluierungs-Hilfsfunktionen
+- [`utils/message_helpers.py`](utils/message_helpers.py) - Nachrichten-Helfer
+- [`utils/context_notes.py`](utils/context_notes.py) - Kontext-Notizen Loader
 
 ---
 
@@ -112,13 +149,13 @@
 - [`test_settings.py`](test_settings.py) - Einstellungstest
 
 ### **Daten & Logs:**
-- [`data/system.txt`](data/system.txt) - System-Prompt
+- [`data/system.txt`](data/system.txt) - System-Prompt (historisch)
 - [`data/logs/*.jsonl`](data/logs/) - Chat-Protokolle
 
 ### **Beispiele:**
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Prompt-Beispiele
 
-Hinweis: Legacy-Router unter `app/routers/*` wurden entfernt. Produktive Endpunkte befinden sich in `app/main.py` und `app/api/*`.
+Hinweis: Legacy-Router unter `app/routers/*` sind vorhanden, aktuell geparkt/nicht produktiv eingebunden.
 
 ### **Git-Verwaltung:**
 - [`.gitignore`](.gitignore) - Haupt-Git-Ignorier-Regeln
@@ -148,7 +185,7 @@ f:\cvn-agent\
 
 ---
 
-**Letzte Aktualisierung:** 2025-08-23
+**Letzte Aktualisierung:** 2025-08-24
 **Projekt:** CVN Agent - Postapokalyptischer Rollenspiel-Chat-Agent
 **Zweck:** Vollständiger Überblick über alle Dateien im Workspace
 
