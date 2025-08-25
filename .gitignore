@@ -15,15 +15,11 @@ ENV/
 ########################################
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+.venv/
 .pytest_cache/
 .mypy_cache/
-.coverage
-htmlcov/
-build/
-dist/
-.eggs/
-*.egg-info/
+.ruff_cache/
 
 ########################################
 # Logs
@@ -64,8 +60,13 @@ eval/config/context.local.jsonl
 # Editors / OS
 ########################################
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+
+# Historische/Duplikat-Dateien (Phase 2: zur Entfernung vorgesehen)
+eval/eval-21-40_demo_v1.0.json
+data/system.txt

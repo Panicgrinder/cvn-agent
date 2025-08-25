@@ -1,9 +1,3 @@
-"""
-Hauptpaket der Anwendung
-"""
-
-"""
-App-Package für die Anwendung
-"""
+"""CVN Agent App-Paket."""
 
 __all__ = []

@@ -1,10 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 import os
 import logging
-from ..schemas import ChatRequest, ChatResponse, ChatMessage
-from ..services.llm import generate_reply, system_message
-from ..utils.summarize import summarize_turn
-from ..utils.convlog import create_log_record, log_turn
+from app.schemas import ChatRequest, ChatResponse
+from app.services.llm import generate_reply, system_message
 
 router = APIRouter(prefix="/chat")
 
@@ -30,10 +28,6 @@ async def chat(request: ChatRequest) -> ChatResponse:
     Verarbeitet eine Chat-Anfrage und gibt eine Antwort vom LLM zurück.
     Fügt automatisch einen Systemprompt hinzu, wenn keiner vorhanden ist.
     """
-    # Überprüfe, ob Nachrichten vorhanden sind
-    if not request.messages:
-        raise HTTPException(status_code=400, detail="Keine Nachrichten erhalten")
-    
     messages = list(request.messages)  # Kopie erstellen, um die Originaldaten nicht zu verändern
     
     # Prüfe, ob bereits ein Systemprompt vorhanden ist
@@ -45,35 +39,5 @@ async def chat(request: ChatRequest) -> ChatResponse:
         if prompt_text:
             messages.insert(0, system_message(prompt_text))
     
-    try:
-        # Sende an LLM
-        response = await generate_reply(messages)
-        
-        # Erstelle Zusammenfassung für Logging (optional)
-        try:
-            summary = summarize_turn(
-                [{"role": msg.role, "content": msg.content} for msg in messages], 
-                response.content
-            )
-        except Exception as e:
-            logging.warning(f"Fehler bei der Zusammenfassung: {str(e)}")
-            summary = {"summary": "", "keyfacts": []}
-        
-        # Logge die Konversation (optional)
-        try:
-            log_entry = create_log_record(
-                messages=[{"role": msg.role, "content": msg.content} for msg in messages],
-                response=response.content,
-                summary=summary.get("summary", "")
-            )
-            log_turn(log_entry)
-        except Exception as e:
-            # Logge den Fehler, aber lass die Antwort trotzdem durch
-            logging.error(f"Fehler beim Loggen der Konversation: {str(e)}")
-        
-        return response
-    except Exception as e:
-        # Bei Fehlern gib eine benutzerfreundliche Fehlermeldung zurück
-        error_msg = f"Fehler bei der Verarbeitung: {str(e)}"
-        logging.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg)
+    # Sende an LLM
+    return await generate_reply(messages)

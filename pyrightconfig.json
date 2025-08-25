@@ -3,15 +3,14 @@
   "pythonVersion": "3.12",
   "venvPath": ".",
   "venv": ".venv",
-  "include": ["app", "scripts"],
-  "extraPaths": [
-    ".venv/Lib/site-packages"
-  ],
+  "include": ["app", "scripts", "utils", "tests"],
   "exclude": [
     ".venv",
     "build",
     "dist",
     "data",
+    "outputs",
+    "eval/results",
     "**/__pycache__",
     ".pytest_cache",
     ".mypy_cache",
@@ -30,18 +29,7 @@
   "reportUnusedVariable": "warning",
   "executionEnvironments": [
     {
-      "root": "app",
-      "extraPaths": [
-        "../.venv/Lib/site-packages"
-      ],
-      "pythonVersion": "3.12",
-      "venv": ".venv"
-    },
-    {
-      "root": "scripts",
-      "extraPaths": [
-        "../.venv/Lib/site-packages"
-      ],
+      "root": ".",
       "pythonVersion": "3.12",
       "venv": ".venv"
     }
