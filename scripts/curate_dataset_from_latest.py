@@ -44,8 +44,15 @@ def _latest_results(path: str) -> Optional[str]:
 
 
 def main() -> int:
+    # Dynamischer Default-Pfad über Settings
+    try:
+        from app.core.settings import settings
+        default_results = os.path.join(os.path.dirname(os.path.dirname(__file__)), getattr(settings, "EVAL_RESULTS_DIR", "eval/results"))
+    except Exception:
+        default_results = os.path.join("eval", "results")
+    
     p = argparse.ArgumentParser(description="Kuratiert Trainingspakete aus dem neuesten results_*.jsonl")
-    p.add_argument("--results-dir", default=os.path.join("eval", "results"), help="Verzeichnis mit results_*.jsonl (Default: eval/results)")
+    p.add_argument("--results-dir", default=default_results, help=f"Verzeichnis mit results_*.jsonl (Default: {default_results})")
     p.add_argument("--format", choices=["openai_chat", "alpaca"], default="openai_chat", help="Export-Format")
     p.add_argument("--train-ratio", type=float, default=0.9, help="Train-Anteil (0-1)")
     p.add_argument("--min-output-chars", type=int, default=20, help="Mindestlänge der Ausgabe-Zeichen für Filter")

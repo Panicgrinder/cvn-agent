@@ -75,7 +75,12 @@ async def export_from_results(
     patterns: Optional[List[str]] = None,
 ) -> Dict[str, Any]:
     if out_dir is None:
-        out_dir_str: str = str(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR))
+        # Nutze Settings statt hardcoded fallback
+        try:
+            from app.core.settings import settings
+            out_dir_str = os.path.join(os.path.dirname(os.path.dirname(__file__)), getattr(settings, "EVAL_RESULTS_DIR", "eval/results"))
+        except Exception:
+            out_dir_str = str(getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR))
     else:
         out_dir_str = str(out_dir)
     os.makedirs(out_dir_str, exist_ok=True)
