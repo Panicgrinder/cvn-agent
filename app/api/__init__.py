@@ -2,4 +2,6 @@
 API-Package für die Anwendung
 """
 
-__all__ = []
+from typing import List as _List, Any as _Any
+
+__all__: _List[_Any] = []

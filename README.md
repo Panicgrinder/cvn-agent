@@ -10,13 +10,15 @@ Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwende
 
 1. Python 3.12 installieren
 2. Virtuelle Umgebung erstellen und aktivieren:
-   ```
+
+   ```powershell
    python -m venv venv
    .\venv\Scripts\activate  # Windows
    source venv/bin/activate  # Linux/Mac
    ```
 3. Abhängigkeiten installieren:
-   ```
+
+   ```powershell
    pip install -r requirements.txt
    ```
    Oder manuell:
@@ -30,7 +32,8 @@ Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwende
    ollama serve
    ```
 5. LLM-Modell herunterladen:
-   ```
+
+   ```powershell
    ollama pull llama3.1:8b
    ```
 
@@ -61,8 +64,9 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/chat" -Method Post -Body '{"messag
 ## Swagger-Dokumentation
 
 Zugriff auf die API-Dokumentation unter:
-```
+```text
 http://127.0.0.1:8000/docs
+```
 
 ## Einstellungen/Umgebung
 
@@ -74,17 +78,17 @@ Konfiguration per `.env` (siehe Beispiele in `app/core/settings.py`). Wichtige F
 - RATE_LIMIT_ENABLED (bool), RATE_LIMIT_REQUESTS_PER_MINUTE, RATE_LIMIT_BURST
 
 Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters begrenzt (in-memory, best-effort).
-```
+
+## Datenmodelle (Quelle)
+
+Die zentralen Pydantic-Modelle für Requests/Responses liegen in `app/api/models.py`.
+Historische `app/schemas.py` wurde entfernt. Bitte nur `app/api/models.py` importieren.
+
 
 ## Workspace-Zusammenfassung
 
 - Neueste Gesamt-Zusammenfassung (LLM+Heuristik):
    - eval/results/summaries/summary_ALL_20250824_0306_MIXED.md
-
-Helfer zum Öffnen der neuesten Zusammenfassung:
-
-- Skript: `scripts/open_latest_summary.py`
-- Funktion: Findet die neueste Datei vom Muster `summary_ALL_*_MIXED.md` unter `eval/results/summaries` und öffnet sie mit dem Standardprogramm.
 
 ## Datensatz-Kurierung (3–7 Tage)
 

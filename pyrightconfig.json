@@ -3,7 +3,7 @@
   "pythonVersion": "3.12",
   "venvPath": ".",
   "venv": ".venv",
-  "include": ["app", "scripts", "utils", "tests"],
+  "include": ["app", "utils", "tests"],
   "exclude": [
     ".venv",
     "build",
@@ -11,6 +11,8 @@
     "data",
     "outputs",
     "eval/results",
+    "scripts",
+    "app/api/api.py",
     "**/__pycache__",
     ".pytest_cache",
     ".mypy_cache",

@@ -2,15 +2,19 @@
 
 ## Vollständiger Index aller Dateien im Workspace
 
-### Root-Verzeichnis:
+### Root-Verzeichnis
+
+- [`.coverage`](.coverage) - Coverage-Report (generiert)
 - [`.env`](.env) - Umgebungsvariablen (private Konfiguration)
 - [`.env.example`](.env.example) - Template für Umgebungsvariablen
 - [`.gitignore`](.gitignore) - Git-Ignorier-Regeln
 - [`analysis_chat_routers.md`](analysis_chat_routers.md) - Analyse der Chat-Router
 - [`cleanup_recommendations.md`](cleanup_recommendations.md) - Aufräum-Empfehlungen
 - [`pyrightconfig.json`](pyrightconfig.json) - Python-Typsystem-Konfiguration
+- [`mypy.ini`](mypy.ini) - mypy-Konfiguration
 - [`README.md`](README.md) - Projekt-Dokumentation
 - [`requirements.txt`](requirements.txt) - Python-Abhängigkeiten (Laufzeit)
+- [`requirements-dev.txt`](requirements-dev.txt) - Dev-Abhängigkeiten (Lint/Tests)
 - [`requirements-train.txt`](requirements-train.txt) - Zusatzabhängigkeiten (Training)
 - [`run_server.py`](run_server.py) - Server-Startskript
 - [`test_settings.py`](test_settings.py) - Einstellungen-Test
@@ -18,88 +22,111 @@
 - [`__pycache__/`](__pycache__/) - Python-Bytecode-Cache (generiert)
 - [`.pytest_cache/`](.pytest_cache/) - Pytest-Cache (generiert)
 
-### .vscode/:
+### .vscode
+
 - [`.vscode/extensions.json`](.vscode/extensions.json) - VSCode-Erweiterungsempfehlungen
 - [`.vscode/launch.json`](.vscode/launch.json) - Startkonfigurationen
 - [`.vscode/settings.json`](.vscode/settings.json) - Workspace-spezifische Einstellungen
 - [`.vscode/tasks.json`](.vscode/tasks.json) - VSCode-Tasks (z. B. Tests, Eval)
 
-### app/:
+### app
+
 - [`app/__init__.py`](app/__init__.py) - App-Package-Initialisierung
 - [`app/main.py`](app/main.py) - FastAPI Hauptanwendung mit Chat-/Stream-/Health-Endpunkten
-- [`app/schemas.py`](app/schemas.py) - Pydantic-Modelle (ggf. legacy/kompatibel)
+  
+Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
-#### app/api/:
+#### app/api
+
 - [`app/api/__init__.py`](app/api/__init__.py) - API-Package-Initialisierung
 - [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing (geparkt/optional)
-- [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (geparkt/optional)
+- [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (Quelle)
 - [`app/api/api.py`](app/api/api.py) - (geparkt) alternative API-Struktur
 - [`app/api/chat_helpers.py`](app/api/chat_helpers.py) - (geparkt) Helper-Funktionen
 - [`app/api/endpoints/`](app/api/endpoints/) - (geparkt) Endpunktmodule
 
-#### app/core:
+#### app/core
+
 - [`app/core/__init__.py`](app/core/__init__.py) - Core-Package-Initialisierung
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates (zentral genutzt)
 
-#### app/prompt:
+#### app/prompt
+
 - [`app/prompt/system.txt`](app/prompt/system.txt) - System-Prompt (Template/optional)
 
-#### app/routers (legacy/geparkt):
-- [`app/routers/`](app/routers/) - Ältere Router (chat, health, roll, state)
+#### app/routers (entfernt)
 
-#### app/services:
+- `app/routers/` wurde in Cleanup Phase 4 entfernt (Duplikate zu main/api).
+
+#### app/services
+
+
 - [`app/services/llm.py`](app/services/llm.py) - LLM-Service (geparkt)
 
-#### app/utils:
+#### app/utils
+
+
 - [`app/utils/convlog.py`](app/utils/convlog.py) - Konversations-Logging (geparkt)
 - [`app/utils/summarize.py`](app/utils/summarize.py) - Zusammenfassungs-Tools (geparkt)
 - [`app/utils/examples/`](app/utils/examples/) - Beispiele (geparkt)
 
-### utils/:
+### utils
+
+
 - [`utils/context_notes.py`](utils/context_notes.py) - Lokale Kontext-Notizen laden
 
-### data/:
+### data
+
 - [`data/logs/`](data/logs/) - Laufzeitprotokolle (generiert, gitignored)
   - [`data/logs/*.jsonl`](data/logs/) - Chat-Protokolle
 
-### docs/:
+### docs
+
 - [`docs/customization.md`](docs/customization.md) - Anpassungs-Dokumentation für private Nutzung
 - [`docs/TODO.md`](docs/TODO.md) - ToDo & Roadmap für lokale Entwicklungsarbeit
 
-### eval/:
+### eval
+
 - [`eval/.gitignore`](eval/.gitignore) - Eval-spezifische Git-Ignorier-Regeln
 - [`eval/README.md`](eval/README.md) - Hinweise zu Eval
 
-#### eval/datasets/:
+#### eval/datasets
+
 - [`eval/datasets/eval-01-20_prompts_v1.0.json`](eval/datasets/eval-01-20_prompts_v1.0.json) - Sachliche Prompts (eval-001 bis eval-020)
 - [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) - Demo-/Fantasy-Prompts (eval-021 bis eval-040)
 - [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json) - Dialog-Prompts (eval-041 bis eval-060)
 - [`eval/datasets/eval-61-80_szenen_prompts_v1.0.json`](eval/datasets/eval-61-80_szenen_prompts_v1.0.json) - Szenen-Prompts (eval-061 bis eval-080)
 - [`eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json`](eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json) - Technische Erklärungen (eval-081 bis eval-100)
 
-#### eval/config/:
+#### eval/config
+
 - [`eval/config/synonyms.json`](eval/config/synonyms.json) - Synonym-Mappings für Evaluierung
 - [`eval/config/profiles.json`](eval/config/profiles.json) - Profile/Overrides für Evaluierung
 - [`eval/config/synonyms.local.sample.json`](eval/config/synonyms.local.sample.json) - Beispiel für private Synonym-Overlays
 - [`eval/config/context.local.sample.md`](eval/config/context.local.sample.md) - Muster für lokale Kontext-Notizen
 
-#### eval/results/:
+#### eval/results
+
 - [`eval/results/results_*.jsonl`](eval/results/) - Evaluierungsergebnisse (generiert, gitignored)
 
-#### eval (weitere Dateien):
+#### eval (weitere Dateien)
+
 - [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) - Neutralisiertes Duplikat außerhalb von datasets/ (per .gitignore markiert)
 
-### examples/:
+### examples
+
 - [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel für uneingeschränkten Prompt
 - [`examples/rpg/models.py`](examples/rpg/models.py) - RPG-Modelle (geparkte Features)
 - [`examples/rpg/state.py`](examples/rpg/state.py) - RPG-State-Router (geparkt)
 - [`examples/rpg/roll.py`](examples/rpg/roll.py) - RPG-Roll-Router (geparkt)
 
-### outputs/:
+### outputs
+
 - [`outputs/`](outputs/) - Generierte Artefakte/Exports (gitignored)
 
-### scripts/:
+### scripts
+
 - [`scripts/README.md`](scripts/README.md) - Hinweise zu Skripten
 - [`scripts/run_eval.py`](scripts/run_eval.py) - Hauptevaluierungsskript
 - [`scripts/eval_ui.py`](scripts/eval_ui.py) - Konsolen-UI für Evaluierung
@@ -111,13 +138,15 @@
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata
 - [`scripts/customize_prompts.py`](scripts/customize_prompts.py) - Tool zur Prompt-Anpassung
 
-### tests/:
+### tests
+
 - [`tests/`](tests/) - Testsuite (Einheiten-/Integrations-Tests)
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-08-25
+Letzte Aktualisierung: 2025-08-26
 
 Hinweise:
+
 - Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py); [`app/prompt/system.txt`](app/prompt/system.txt) dient als optionales Template.
 - Eval-Duplikat: [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) ist neutralisiert; bitte [`eval/datasets/...`](eval/datasets/) verwenden.

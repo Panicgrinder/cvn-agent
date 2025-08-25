@@ -2,7 +2,7 @@
 
 ## Abgeschlossene Maßnahmen
 1. ✅ System-Prompt-Dateien synchronisiert und Code-Referenzen aktualisiert
-   - `app/prompt/system.txt` und `data/system.txt` wurden entfernt; zentrale Quelle ist `app/core/prompts.py`.
+   - Zentrale Quelle ist `app/core/prompts.py`. `app/prompt/system.txt` bleibt als optionales Template bestehen und wird nicht produktiv referenziert.
    - `app/api/chat_helpers.py` ist entfallen.
 
 2. ✅ Chat-Router verbessert
