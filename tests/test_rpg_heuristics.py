@@ -1,6 +1,24 @@
 import unittest
 from unittest.mock import patch
 from typing import Any, Dict, List, Optional
+import sys
+import os
+
+# Cache für importierte Module
+_run_eval_module = None
+
+def _get_run_eval():
+    """Cached import of run_eval module for better performance."""
+    global _run_eval_module
+    if _run_eval_module is None:
+        # Add project root to path if needed
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+        
+        from scripts import run_eval as _run_eval
+        _run_eval_module = _run_eval
+    return _run_eval_module
 
 
 class ResponseStub:
@@ -33,14 +51,7 @@ class FakeClient:
 
 class TestRPGHeuristics(unittest.IsolatedAsyncioTestCase):
     async def test_rpg_style_score_basic(self):
-        # Lazy import des Moduls, um Laufzeit-Kontext zu nutzen
-        import importlib.util, os
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        run_eval_path = os.path.join(project_root, "scripts", "run_eval.py")
-        spec = importlib.util.spec_from_file_location("run_eval", run_eval_path)
-        assert spec and spec.loader
-        run_eval = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(run_eval)  # type: ignore
+        run_eval = _get_run_eval()
 
         rpg_text = (
             "Chronistin von Novapolis\n"
@@ -58,14 +69,7 @@ class TestRPGHeuristics(unittest.IsolatedAsyncioTestCase):
         assert low <= 0.2
 
     async def _eval_with_content(self, pkg: str, content: str, checks: Optional[List[str]] = None) -> Any:
-        # Modul laden
-        import importlib.util, os
-        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        run_eval_path = os.path.join(project_root, "scripts", "run_eval.py")
-        spec = importlib.util.spec_from_file_location("run_eval", run_eval_path)
-        assert spec and spec.loader
-        run_eval = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(run_eval)  # type: ignore
+        run_eval = _get_run_eval()
 
         # Item aufbauen
         item = run_eval.EvaluationItem(

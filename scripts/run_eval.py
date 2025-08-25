@@ -1188,8 +1188,13 @@ def print_results(results: List[EvaluationResult]) -> None:
     
     console.print(f"\n[bold]Zusammenfassung:[/bold]")
     console.print(f"Erfolgreiche Tests: {successful}/{total} ({success_rate:.1f}%)")
-    console.print(f"Antworten im RPG-Modus: {rpg_mode_count}/{total} ({rpg_mode_count/total*100:.1f}%)")
-    console.print(f"Durchschnittliche Dauer: {sum(r.duration_ms for r in results) / total:.0f} ms")
+    
+    # Verhindere Division durch Null
+    rpg_percentage = (rpg_mode_count/total*100) if total > 0 else 0
+    avg_duration = (sum(r.duration_ms for r in results) / total) if total > 0 else 0
+    
+    console.print(f"Antworten im RPG-Modus: {rpg_mode_count}/{total} ({rpg_percentage:.1f}%)")
+    console.print(f"Durchschnittliche Dauer: {avg_duration:.0f} ms")
     
     # Ausgabe der fehlgeschlagenen IDs
     if successful < total:

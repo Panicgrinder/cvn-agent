@@ -9,35 +9,45 @@ from app.api.chat import process_chat_request
 
 class _ResponseStub:
     status_code = 200
+    
+    def __init__(self, content: str = "OK"):
+        self._content = content
+    
     def raise_for_status(self):
         return None
+    
     def json(self):
-        return {"message": {"content": "OK"}}
-
-
-class _CaptureClient:
-    def __init__(self, *args, **kwargs):
-        pass
-    async def __aenter__(self):
-        return self
-    async def __aexit__(self, exc_type, exc, tb):
-        return None
-    async def post(self, url, json, headers=None):
-        return _ResponseStub()
+        return {"message": {"content": self._content}}
 
 
 class TestContextNotes(unittest.IsolatedAsyncioTestCase):
     async def _capture_messages(self, req: ChatRequest) -> List[Dict[str, Any]]:
+        """Capture the exact messages sent to Ollama, including context notes injection."""
         sent_payload: Dict[str, Any] = {}
-
-        class Client(_CaptureClient):
-            async def post(self, url, json, headers=None):
+        
+        # Mock response for Ollama call
+        mock_response = _ResponseStub("Test response")
+        
+        # Comprehensive client mock that handles all httpx.AsyncClient constructor signatures
+        class MockAsyncClient:
+            def __init__(self, *args, **kwargs):
+                pass
+            
+            async def __aenter__(self):
+                return self
+                
+            async def __aexit__(self, exc_type, exc_val, exc_tb):
+                return None
+            
+            async def post(self, url, json=None, headers=None, **kwargs):
                 nonlocal sent_payload
-                sent_payload = cast(Dict[str, Any], json)
-                return _ResponseStub()
-
-        with patch("app.api.chat.httpx.AsyncClient", Client):
-            await process_chat_request(req, eval_mode=False, unrestricted_mode=False)
+                sent_payload = cast(Dict[str, Any], json or {})
+                return mock_response
+        
+        # Patch both the constructor and context manager usage
+        with patch("app.api.chat.httpx.AsyncClient", MockAsyncClient):
+            await process_chat_request(req, eval_mode=False, unrestricted_mode=False, client=None)
+        
         return cast(List[Dict[str, Any]], sent_payload.get("messages") or [])
 
     async def test_injects_notes_when_enabled(self):

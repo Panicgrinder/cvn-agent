@@ -5,20 +5,24 @@ import tempfile
 import importlib
 from typing import Any, cast
 
+# Cache für Module
+_run_eval_module = None
 
-def _reload_run_eval() -> Any:
-    # Sorgt dafür, dass Änderungen an Modul-Globals greifen
-    name = "scripts.run_eval"
-    importlib.invalidate_caches()
-    if name in sys.modules:
-        importlib.reload(sys.modules[name])
-    else:
-        importlib.import_module(name)
-    return cast(Any, sys.modules[name])
+def _get_run_eval() -> Any:
+    """Cached import with proper path setup."""
+    global _run_eval_module
+    if _run_eval_module is None:
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+        
+        from scripts import run_eval as _run_eval
+        _run_eval_module = _run_eval
+    return _run_eval_module
 
 
 def test_synonyms_overlay_merged_and_deduped():
-    run_eval = _reload_run_eval()
+    run_eval = _get_run_eval()
     old_cfg = getattr(run_eval, "DEFAULT_CONFIG_DIR")
     try:
         with tempfile.TemporaryDirectory() as tmp:
@@ -58,7 +62,7 @@ def test_synonyms_overlay_merged_and_deduped():
 
 
 def test_synonyms_overlay_missing_is_silent():
-    run_eval = _reload_run_eval()
+    run_eval = _get_run_eval()
     old_cfg = getattr(run_eval, "DEFAULT_CONFIG_DIR")
     try:
         with tempfile.TemporaryDirectory() as tmp:
