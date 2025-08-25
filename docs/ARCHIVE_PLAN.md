@@ -10,12 +10,12 @@ Vorgehen:
 1. Zunächst via .gitignore ausgeschlossen (bereits umgesetzt).
 2. Nach Review endgültig löschen (Phase 3) und Referenzen prüfen.
 
-## Phase 3 – Ausführung
+## Phase 4 – Ausführung
 
 - PowerShell (WhatIf/Dry-Run):
 
-  scripts\cleanup_phase3.ps1 -WhatIf
+  scripts\cleanup_phase4.ps1 -WhatIf:$true
 
 - Ausführen (löscht Dateien):
 
-  scripts\cleanup_phase3.ps1
+  scripts\cleanup_phase4.ps1 -WhatIf:$false -Confirm:$true

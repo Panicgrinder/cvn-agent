@@ -42,7 +42,6 @@ Um den CVN Agent ohne Einschränkungen zu verwenden, können Sie:
 ## Wichtige Dateien für die Anpassung
 
 - `app/core/prompts.py`: Enthält alle System-Prompts
-- `app/core/content_management.py`: Verwaltet Inhaltsfilter
 - `examples/unrestricted_prompt_example.txt`: Beispiel für einen uneingeschränkten Prompt
 
 ## Datenschutz und Verantwortung

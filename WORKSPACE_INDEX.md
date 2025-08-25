@@ -84,6 +84,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 ### docs
 
 - [`docs/customization.md`](docs/customization.md) - Anpassungs-Dokumentation für private Nutzung
+- [`docs/ARCHIVE_PLAN.md`](docs/ARCHIVE_PLAN.md) - Archiv-/Bereinigungs-Plan (Phasen)
 - [`docs/TODO.md`](docs/TODO.md) - ToDo & Roadmap für lokale Entwicklungsarbeit
 
 ### eval
@@ -137,6 +138,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/curate_dataset_from_latest.py`](scripts/curate_dataset_from_latest.py) - Kuratiert Trainingspakete aus der neuesten results_*.jsonl
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata
 - [`scripts/customize_prompts.py`](scripts/customize_prompts.py) - Tool zur Prompt-Anpassung
+- [`scripts/cleanup_phase4.ps1`](scripts/cleanup_phase4.ps1) - Phase‑4 Cleanup-Skript (WhatIf/Confirm)
 
 ### tests
 

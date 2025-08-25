@@ -1,10 +1,13 @@
 # CVN Agent
 
+[![CI](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml)
+
 Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwendet.
 
 ## Repository-Info
 
 - Standard-Branch: `main`
+- Optional: Zusätzliche Pyright-Konfig für Skripte: `pyrightconfig.scripts.json`
 
 ## Einrichtung
 
@@ -22,11 +25,13 @@ Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwende
    pip install -r requirements.txt
    ```
    Oder manuell:
-   ```
+   
+   ```bash
    pip install fastapi uvicorn httpx python-dotenv
    ```
 4. Ollama installieren und starten:
-   ```
+ 
+   ```bash
    # Windows-Installer von https://ollama.com/download/windows
    # Nach der Installation:
    ollama serve
@@ -39,7 +44,7 @@ Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwende
 
 ## Anwendung starten
 
-```
+```bash
 uvicorn app.main:app --reload
 ```
 
@@ -57,6 +62,7 @@ curl -X POST http://127.0.0.1:8000/chat \
 ```
 
 Oder mit PowerShell:
+
 ```powershell
 Invoke-RestMethod -Uri "http://127.0.0.1:8000/chat" -Method Post -Body '{"messages":[{"role":"user","content":"Du bist die Chronistin. Stell dich kurz vor."}]}' -ContentType "application/json"
 ```
@@ -64,6 +70,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8000/chat" -Method Post -Body '{"messag
 ## Swagger-Dokumentation
 
 Zugriff auf die API-Dokumentation unter:
+
 ```text
 http://127.0.0.1:8000/docs
 ```
