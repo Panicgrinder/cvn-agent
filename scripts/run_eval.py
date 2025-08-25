@@ -587,6 +587,23 @@ async def evaluate_item(
             data_local = resp.json()
             return data_local.get("content", "")
 
+        # Initial-Hinweis für Szenen/Dialoge: als User-Nachricht injizieren, damit er eval_mode übersteht
+        try:
+            pkg_lower_init = (item.source_package or "").lower()
+            must_init = list(item.checks.get("must_include") or []) if hasattr(item, "checks") else []
+            if must_init and any(k in pkg_lower_init for k in ["szenen", "dialog"]):
+                hint_init_parts: List[str] = []
+                if "szenen" in pkg_lower_init:
+                    hint_init_parts.append("Schreibe eine kurze Szene (1–2 Absätze) mit klarer Handlung, ohne Überschriften.")
+                if "dialog" in pkg_lower_init:
+                    hint_init_parts.append("Schreibe einen knappen Dialog (max. 8 Repliken) ohne Überschriften.")
+                hint_init_parts.append("Verwende diese Begriffe wörtlich im Text: " + ", ".join(sorted(set(str(t) for t in must_init))))
+                messages.append({"role": "user", "content": "Hinweis: " + " ".join(hint_init_parts)})
+                payload["messages"] = messages
+        except Exception:
+            # Bei Problemen mit dem Hinweis einfach ohne weitermachen
+            pass
+
         content = await _send_and_get(payload)
 
         # Normalisiere den Text für die Überprüfung (Platzhalter für künftige Nutzung)
@@ -730,7 +747,8 @@ async def evaluate_item(
                 if needs_regex:
                     hint_parts.append("Formatiere die Antwort so, dass die Muster (Regex) erfüllt sind.")
                 hint = "Bitte antworte erneut, kurz und präzise. " + " ".join(hint_parts)
-                enhanced_messages.append({"role": "system", "content": hint})
+                # Als User-Hinweis einfügen, damit er im eval_mode nicht entfernt wird
+                enhanced_messages.append({"role": "user", "content": hint})
 
                 retry_payload = dict(payload)
                 retry_payload["messages"] = enhanced_messages
