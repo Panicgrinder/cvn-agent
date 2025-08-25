@@ -84,8 +84,24 @@ async def export_from_results(
     if not rows:
         return {"ok": False, "error": "Keine Ergebnisse in Datei"}
 
-    # Map Items laden
-    id2item = await _load_items_map(patterns or [os.path.join(run_eval.DEFAULT_EVAL_DIR, run_eval.DEFAULT_FILE_PATTERN)])
+    # Map Items laden: Standardmäßig sowohl datasets- als auch eval-Verzeichnis berücksichtigen
+    if patterns is None:
+        cand: List[str] = []
+        if hasattr(run_eval, "DEFAULT_DATASET_DIR"):
+            try:
+                ddir = str(getattr(run_eval, "DEFAULT_DATASET_DIR"))
+                pat = str(getattr(run_eval, "DEFAULT_FILE_PATTERN"))
+                cand.append(os.path.join(ddir, pat))
+            except Exception:
+                pass
+        try:
+            edir = str(getattr(run_eval, "DEFAULT_EVAL_DIR"))
+            pat2 = str(getattr(run_eval, "DEFAULT_FILE_PATTERN"))
+            cand.append(os.path.join(edir, pat2))
+        except Exception:
+            pass
+        patterns = cand or None
+    id2item = await _load_items_map(patterns)
 
     # Filter
     if not include_failures:

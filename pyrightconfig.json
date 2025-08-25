@@ -3,7 +3,7 @@
   "pythonVersion": "3.12",
   "venvPath": ".",
   "venv": ".venv",
-  "include": ["app"],
+  "include": ["app", "scripts"],
   "extraPaths": [
     ".venv/Lib/site-packages"
   ],
@@ -31,6 +31,14 @@
   "executionEnvironments": [
     {
       "root": "app",
+      "extraPaths": [
+        "../.venv/Lib/site-packages"
+      ],
+      "pythonVersion": "3.12",
+      "venv": ".venv"
+    },
+    {
+      "root": "scripts",
       "extraPaths": [
         "../.venv/Lib/site-packages"
       ],

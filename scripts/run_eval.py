@@ -16,7 +16,7 @@ import time
 import argparse
 import logging
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple, Union
+from typing import Dict, List, Any, Optional, Tuple, Union, cast
 from dataclasses import dataclass, field, asdict
 import httpx
 from rich.console import Console
@@ -30,19 +30,21 @@ project_root = os.path.dirname(script_dir)
 sys.path.insert(0, project_root)
 
 # Importiere die Utility-Funktionen
-from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms
+from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms  # type: ignore
 
 # Versuche, die Anwendungseinstellungen zu importieren
 try:
     # Importiere die Einstellungen
-    from app.core.settings import settings
+    from app.core.settings import settings  # type: ignore
     
     # Verwende die Einstellungen für Standardwerte (neue Unterordner-Struktur)
-    DEFAULT_EVAL_DIR = os.path.join(project_root, settings.EVAL_DIRECTORY)
-    DEFAULT_DATASET_DIR = os.path.join(project_root, settings.EVAL_DATASET_DIR)
-    DEFAULT_RESULTS_DIR = os.path.join(project_root, settings.EVAL_RESULTS_DIR)
-    DEFAULT_CONFIG_DIR = os.path.join(project_root, settings.EVAL_CONFIG_DIR)
-    DEFAULT_FILE_PATTERN = settings.EVAL_FILE_PATTERN
+    _st_any: Any = cast(Any, settings)
+    DEFAULT_EVAL_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_DIRECTORY", "eval")))
+    DEFAULT_DATASET_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_DATASET_DIR", os.path.join("eval", "datasets"))))
+    DEFAULT_RESULTS_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_RESULTS_DIR", os.path.join("eval", "results"))))
+    DEFAULT_CONFIG_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_CONFIG_DIR", os.path.join("eval", "config"))))
+    # Bevorzuge JSONL als Default; Nutzer kann via Settings EVAL_FILE_PATTERN überschreiben
+    DEFAULT_FILE_PATTERN: str = cast(str, getattr(_st_any, "EVAL_FILE_PATTERN", "eval-*.jsonl"))
     DEFAULT_API_URL = f"http://localhost:8000/chat"
 except ImportError:
     # Fallback-Werte, wenn die Anwendungseinstellungen nicht verfügbar sind
@@ -51,7 +53,7 @@ except ImportError:
     DEFAULT_DATASET_DIR = os.path.join(base_eval, "datasets")
     DEFAULT_RESULTS_DIR = os.path.join(base_eval, "results")
     DEFAULT_CONFIG_DIR = os.path.join(base_eval, "config")
-    DEFAULT_FILE_PATTERN = "eval-*.json"
+    DEFAULT_FILE_PATTERN = "eval-*.jsonl"
     DEFAULT_API_URL = "http://localhost:8000/chat"
 
 # Globale Variablen
@@ -85,6 +87,7 @@ class EvaluationResult:
     source_file: Optional[str] = None
     source_package: Optional[str] = None
     duration_ms: int = 0
+    attempts: int = 1
 
 
 def check_term_inclusion(text: str, term: str) -> bool:
@@ -217,12 +220,14 @@ def get_synonyms(term: str) -> List[str]:
         local_overlay = os.path.join(DEFAULT_CONFIG_DIR, "synonyms.local.json")
         paths = [base_path, local_overlay]
         logging.info(f"Lade Synonyme aus: {', '.join([p for p in paths if os.path.exists(p)])}")
-        _synonyms_cache = load_synonyms(paths)
+        _synonyms_cache = cast(Dict[str, List[str]], load_synonyms(paths))
+        assert _synonyms_cache is not None
         logging.info(f"Anzahl der Synonym-Einträge (gemerged): {len(_synonyms_cache)}")
     
     # Suche nach dem Begriff und seinen Varianten
     synonyms: List[str] = []
     
+    assert _synonyms_cache is not None
     for key, values in _synonyms_cache.items():
         if term in key or key in term:
             synonyms.extend(values)
@@ -303,7 +308,7 @@ async def load_prompts(patterns: Optional[List[str]] = None) -> List[Dict[str, A
                 
                 # Konvertiere den Inhalt zu einer Liste von Dictionaries
                 try:
-                    data_array = coerce_json_to_jsonl(file_content)
+                    data_array: List[Dict[str, Any]] = cast(List[Dict[str, Any]], coerce_json_to_jsonl(file_content))
                     
                     if not data_array:
                         logger.warning(f"{basename}: Keine gültigen JSON-Objekte gefunden")
@@ -523,6 +528,7 @@ async def evaluate_item(
     top_p_override: Optional[float] = None,
     num_predict_override: Optional[int] = None,
     request_id: Optional[str] = None,
+    retries: int = 0,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -571,15 +577,17 @@ async def evaluate_item(
         headers: Dict[str, str] = {}
         if request_id:
             headers["X-Request-ID"] = request_id
-        if client is None:
-            async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
-                response = await temp_client.post(api_url, json=payload, headers=headers)
-        else:
-            response = await client.post(api_url, json=payload, headers=headers)
+        async def _send_and_get(_payload: Dict[str, Any]) -> str:
+            if client is None:
+                async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
+                    resp = await temp_client.post(api_url, json=_payload, headers=headers)
+            else:
+                resp = await client.post(api_url, json=_payload, headers=headers)
+            resp.raise_for_status()
+            data_local = resp.json()
+            return data_local.get("content", "")
 
-        response.raise_for_status()
-        data = response.json()
-        content = data.get("content", "")
+        content = await _send_and_get(payload)
 
         # Normalisiere den Text für die Überprüfung (Platzhalter für künftige Nutzung)
         # normalized_content = normalize_text(content)
@@ -681,6 +689,152 @@ async def evaluate_item(
         # Prüfe, ob alle Bedingungen erfüllt sind
         success = all(checks_passed.values())
 
+        attempts_used = 1
+
+        # Optional: bei inhaltlichem Fehlschlag mit präzisem Hinweis einmal wiederholen
+        def _extract_missing_terms(fails: List[str]) -> List[str]:
+            miss: List[str] = []
+            for msg in fails:
+                m = re.search(r"Erforderlicher Begriff nicht gefunden: '([^']+)'", msg)
+                if m:
+                    miss.append(m.group(1))
+            return miss
+
+        if (not success) and retries > 0:
+            missing = _extract_missing_terms(failed_checks)
+            need_any = any(s.startswith("Keine der alternativen Begriffe gefunden") for s in failed_checks)
+            need_atleast = any(s.startswith("Zu wenige Begriffe gefunden") for s in failed_checks)
+            needs_regex = any(s.startswith("Regex nicht erfüllt") for s in failed_checks)
+            # Nur für diese inhaltlichen Fälle erneut versuchen
+            if missing or need_any or need_atleast or needs_regex:
+                enhanced_messages: List[Dict[str, str]] = list(messages)
+                if content:
+                    enhanced_messages.append({"role": "assistant", "content": content})
+                hint_parts: List[str] = []
+                pkg_lower = (item.source_package or "").lower()
+                if missing:
+                    # Für Szenen/Dialoge explizit wörtliche Nutzung einfordern
+                    if any(k in pkg_lower for k in ["szenen", "dialog"]):
+                        hint_parts.append("Verwende diese Begriffe wörtlich im Text: " + ", ".join(sorted(set(missing))))
+                        # knapper Stilhinweis je nach Paket
+                        if "szenen" in pkg_lower:
+                            hint_parts.append("Schreibe eine kurze Szene (1–2 Absätze) mit klarer Handlung.")
+                        elif "dialog" in pkg_lower:
+                            hint_parts.append("Schreibe einen knappen Dialog (max. 8 Repliken) ohne Überschriften.")
+                    else:
+                        hint_parts.append("Stelle sicher, dass diese Begriffe im Text vorkommen: " + ", ".join(sorted(set(missing))))
+                if need_any:
+                    hint_parts.append("Verwende mindestens einen der geforderten Alternativbegriffe.")
+                if need_atleast:
+                    hint_parts.append("Erfülle die Mindestanzahl an geforderten Schlüsselbegriffen.")
+                if needs_regex:
+                    hint_parts.append("Formatiere die Antwort so, dass die Muster (Regex) erfüllt sind.")
+                hint = "Bitte antworte erneut, kurz und präzise. " + " ".join(hint_parts)
+                enhanced_messages.append({"role": "system", "content": hint})
+
+                retry_payload = dict(payload)
+                retry_payload["messages"] = enhanced_messages
+
+                try:
+                    content2 = await _send_and_get(retry_payload)
+                    attempts_used = 2
+                    # Erneut prüfen
+                    is_rpg_mode = check_rpg_mode(content2)
+                    checks_passed_retry: Dict[str, bool] = {}
+                    failed_checks_retry: List[str] = []
+
+                    if is_rpg_mode and not any(rpg_term in (item.source_package or "").lower() for rpg_term in ["rpg", "novapolis", "szene"]):
+                        failed_checks_retry.append("Antwort im RPG-Modus, aber Test erwartet allgemeine Antwort")
+
+                    if "must_include" in enabled and item.checks.get("must_include"):
+                        for term in item.checks["must_include"]:
+                            ok = check_term_inclusion(content2, term)
+                            checks_passed_retry[f"include:{term}"] = ok
+                            if not ok:
+                                failed_checks_retry.append(f"Erforderlicher Begriff nicht gefunden: '{term}'")
+
+                    if "keywords_any" in enabled and item.checks.get("keywords_any"):
+                        any_found2 = any(check_term_inclusion(content2, t) for t in item.checks["keywords_any"])
+                        checks_passed_retry["keywords_any"] = any_found2
+                        if not any_found2:
+                            failed_checks_retry.append(f"Keine der alternativen Begriffe gefunden: {', '.join(item.checks['keywords_any'])}")
+
+                    keywords_at_least2 = item.checks.get("keywords_at_least")
+                    if "keywords_at_least" in enabled and keywords_at_least2:
+                        try:
+                            required_count2 = int(keywords_at_least2.get("count", 0)) if hasattr(keywords_at_least2, 'get') else 0
+                            items_list2 = list(keywords_at_least2.get("items", [])) if hasattr(keywords_at_least2, 'get') else []
+                            found2 = sum(1 for t in items_list2 if isinstance(t, str) and check_term_inclusion(content2, t))
+                            ok2 = found2 >= required_count2
+                            checks_passed_retry["keywords_at_least"] = ok2
+                            if not ok2:
+                                failed_checks_retry.append(f"Zu wenige Begriffe gefunden: {found2}/{required_count2}")
+                        except Exception:
+                            checks_passed_retry["keywords_at_least"] = False
+                            failed_checks_retry.append("Ungültiges keywords_at_least Format")
+
+                    if "not_include" in enabled and item.checks.get("not_include"):
+                        for term in item.checks["not_include"]:
+                            not_included2 = not check_term_inclusion(content2, term)
+                            checks_passed_retry[f"not_include:{term}"] = not_included2
+                            if not not_included2:
+                                failed_checks_retry.append(f"Unerwünschter Begriff gefunden: '{term}'")
+
+                    if "regex" in enabled and item.checks.get("regex"):
+                        for pattern in item.checks["regex"]:
+                            try:
+                                pstr = str(pattern)
+                                match2 = bool(re.search(pstr, content2))
+                                checks_passed_retry[f"regex:{pattern}"] = match2
+                                if not match2:
+                                    failed_checks_retry.append(f"Regex nicht erfüllt: '{pattern}'")
+                            except re.error:
+                                checks_passed_retry[f"regex:{pattern}"] = False
+                                failed_checks_retry.append(f"Ungültiges Regex-Pattern: '{pattern}'")
+
+                    if "rpg_style" in enabled:
+                        score2 = rpg_style_score(content2)
+                        checks_passed_retry["rpg_style"] = True
+                        pkg2 = (item.source_package or "").lower()
+                        if any(k in pkg2 for k in ["rpg", "novapolis", "szene"]):
+                            if score2 < 0.4:
+                                checks_passed_retry["rpg_style"] = False
+                                failed_checks_retry.append(f"RPG-Stil zu schwach (Score {score2:.2f})")
+                        else:
+                            if score2 > 0.2:
+                                checks_passed_retry["rpg_style"] = False
+                                failed_checks_retry.append(f"RPG-Stil zu präsent (Score {score2:.2f})")
+
+                    if all(checks_passed_retry.values()):
+                        duration_ms = int((time.time() - start_time) * 1000)
+                        return EvaluationResult(
+                            item_id=item.id,
+                            response=content2,
+                            checks_passed=checks_passed_retry,
+                            success=True,
+                            failed_checks=failed_checks_retry,
+                            source_file=item.source_file,
+                            source_package=item.source_package,
+                            duration_ms=duration_ms,
+                            attempts=attempts_used,
+                        )
+                    else:
+                        duration_ms = int((time.time() - start_time) * 1000)
+                        return EvaluationResult(
+                            item_id=item.id,
+                            response=content2,
+                            checks_passed=checks_passed_retry,
+                            success=False,
+                            failed_checks=failed_checks_retry,
+                            source_file=item.source_file,
+                            source_package=item.source_package,
+                            duration_ms=duration_ms,
+                            attempts=attempts_used,
+                        )
+                except Exception:
+                    # Ignoriere Retry-Fehler und falle auf erstes Ergebnis zurück
+                    pass
+
         # Berechne die Dauer in Millisekunden
         duration_ms = int((time.time() - start_time) * 1000)
 
@@ -692,7 +846,8 @@ async def evaluate_item(
             failed_checks=failed_checks,
             source_file=item.source_file,
             source_package=item.source_package,
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
+            attempts=attempts_used
         )
             
     except Exception as e:
@@ -760,6 +915,7 @@ async def run_evaluation(
     sweep: Optional[Dict[str, List[Any]]] = None,
     tag: Optional[str] = None,
     quiet: bool = False,
+    retries: int = 0,
 ) -> List[EvaluationResult]:
     """
     Führt die Evaluierung für alle Einträge durch.
@@ -814,7 +970,7 @@ async def run_evaluation(
     if asgi:
         # FastAPI-App importieren und In-Process-Client erstellen
         from app.main import app as fastapi_app  # type: ignore
-        transport = httpx.ASGITransport(app=fastapi_app)
+        transport = httpx.ASGITransport(app=cast(Any, fastapi_app))
         asgi_client = httpx.AsyncClient(transport=transport, base_url="http://asgi")
         # Im ASGI-Modus gegen Pfad arbeiten
         api_url = "/chat"
@@ -851,6 +1007,20 @@ async def run_evaluation(
             task = progress.add_task("[cyan]Evaluiere...", total=len(items))
             
             # Meta-Header als erste Zeile schreiben
+            # Settings sicher ermitteln (falls Import oben fehlgeschlagen ist)
+            _model_name = None
+            _temperature = None
+            _host = None
+            try:
+                # Verwende das bereits importierte settings-Objekt, falls vorhanden
+                from app.core.settings import settings as _st  # type: ignore
+                _st_any: Any = cast(Any, _st)
+                _model_name = cast(Optional[str], getattr(_st_any, "MODEL_NAME", None))
+                _temperature = cast(Optional[float], getattr(_st_any, "TEMPERATURE", None))
+                _host = cast(Optional[str], getattr(_st_any, "OLLAMA_HOST", None))
+            except Exception:
+                pass
+
             meta_header: Dict[str, Any] = {
                 "_meta": True,
                 "timestamp": timestamp,
@@ -860,13 +1030,14 @@ async def run_evaluation(
                 "eval_mode": eval_mode,
                 "asgi": asgi,
                 "enabled_checks": enabled_checks or ["must_include", "keywords_any", "keywords_at_least", "not_include", "regex", "rpg_style"],
-                "model": __import__('app.core.settings', fromlist=['settings']).settings.MODEL_NAME,
-                "temperature": __import__('app.core.settings', fromlist=['settings']).settings.TEMPERATURE,
-                "host": __import__('app.core.settings', fromlist=['settings']).settings.OLLAMA_HOST,
+                "model": _model_name,
+                "temperature": _temperature,
+                "host": _host,
                 "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override, "top_p": top_p_override, "num_predict": None},
                 "sweep": sweep or None,
+                "retries": retries,
             }
-            with open(results_file, "a", encoding="utf-8") as f:
+            with open(results_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(meta_header, ensure_ascii=False) + "\n")
 
             # Hilfsfunktion zur Ausführung eines Durchlaufs mit gegebenen Overrides
@@ -897,6 +1068,7 @@ async def run_evaluation(
                         top_p_override=top_p_ov,
                         num_predict_override=num,
                         request_id=rid,
+                        retries=retries,
                     )
                     results.append(r)
                     with open(results_file, "a", encoding="utf-8") as f:
@@ -972,21 +1144,21 @@ def print_results(results: List[EvaluationResult]) -> None:
     
     for result in results:
         success = "✓" if result.success else "✗"
-        error = truncate(result.error or "", 40)
+        error: str = cast(str, truncate(result.error or "", 40))
         duration = str(result.duration_ms)
         package_name = result.source_package or "-"
-        
+
         # Prüfe, ob die Antwort im RPG-Modus erfolgt ist
         is_rpg_mode = check_rpg_mode(result.response)
         rpg_status = "✓" if is_rpg_mode else ""
         if is_rpg_mode:
             rpg_mode_count += 1
-        
+
         # Verwende die bereits berechneten fehlgeschlagenen Checks
-        failed_checks_str = ", ".join(result.failed_checks)
+        failed_checks_str: str = ", ".join(result.failed_checks)
         if len(failed_checks_str) > 50:
-            failed_checks_str = truncate(failed_checks_str, 50)
-        
+            failed_checks_str = cast(str, truncate(failed_checks_str, 50))
+
         table.add_row(result.item_id, success, package_name, duration, rpg_status, failed_checks_str, error)
     
     console.print(table)
@@ -1172,10 +1344,11 @@ def create_example_eval_file(file_path: str, start_id: int = 21, count: int = 20
 if __name__ == "__main__":
     # Standardpfade (Datasets/Results/Config)
     base_eval = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "eval")
-    eval_dir = DEFAULT_EVAL_DIR  # datasets
+    eval_dir = DEFAULT_EVAL_DIR
     results_dir = DEFAULT_RESULTS_DIR
     config_dir = DEFAULT_CONFIG_DIR
-    default_pattern = os.path.join(eval_dir, DEFAULT_FILE_PATTERN)
+    # Standardmäßig im datasets-Ordner suchen
+    default_pattern = os.path.join(DEFAULT_DATASET_DIR, DEFAULT_FILE_PATTERN)
     api_url = DEFAULT_API_URL
     
     # Parse Kommandozeilenargumente
@@ -1197,6 +1370,7 @@ if __name__ == "__main__":
     parser.add_argument("--sweep-temp", nargs="*", type=float, dest="sweep_temp", help="Parameter-Sweep über Temperaturen (z. B. 0.1 0.2 0.3)")
     parser.add_argument("--sweep-top-p", nargs="*", type=float, dest="sweep_top_p", help="Parameter-Sweep über top_p-Werte (z. B. 0.7 0.9)")
     parser.add_argument("--sweep-max-tokens", nargs="*", type=int, dest="sweep_max_tokens", help="Parameter-Sweep über max_tokens/num_predict (z. B. 128 256 512)")
+    parser.add_argument("--retries", type=int, default=0, help="Inhaltliche Retrys bei fehlgeschlagenen Checks (z. B. 1)")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1251,15 +1425,28 @@ if __name__ == "__main__":
     os.makedirs(results_dir, exist_ok=True)
     os.makedirs(config_dir, exist_ok=True)
     
-    # Bestimme die zu ladenden Dateien
-    patterns = args.packages if args.packages else [default_pattern]
+    # Bestimme die zu ladenden Dateien; ergänze Schwestermaske automatisch
+    patterns: List[str] = args.packages if args.packages else [default_pattern]
+    def _sibling_mask(p: str) -> Optional[str]:
+        if p.endswith(".jsonl"):
+            return p[:-1]  # .jsonl -> .json
+        if p.endswith(".json"):
+            return p + "l"  # .json -> .jsonl
+        return None
+    if patterns and len(patterns) == 1:
+        sib = _sibling_mask(patterns[0])
+        if sib:
+            patterns = [patterns[0], cast(str, sib)]
     
     # Prüfe, ob Eval-Dateien existieren
     if not any(glob.glob(pattern) for pattern in patterns):
         logging.warning("Keine Eval-Dateien gefunden. Erstelle ein Beispiel-Eval-Paket...")
         example_file = os.path.join(eval_dir, "eval-21-40_demo_v1.0.jsonl")
         create_example_eval_file(example_file, 21, 20)
-        patterns = [os.path.join(eval_dir, DEFAULT_FILE_PATTERN)]
+        # Nach Erstellung: beide Masken prüfen
+        base_mask = os.path.join(eval_dir, DEFAULT_FILE_PATTERN)
+        sib = _sibling_mask(base_mask)
+        patterns = [base_mask] + ([sib] if sib else [])
     
     # Führe Evaluierung durch
     console = Console()
@@ -1279,6 +1466,8 @@ if __name__ == "__main__":
         console.print(f"top_p Override: {args.top_p}")
     if args.max_tokens is not None:
         console.print(f"num_predict Override: {args.max_tokens}")
+    if args.retries:
+        console.print(f"Retrys bei Fehlschlag: {args.retries}")
     if args.sweep_temp or args.sweep_top_p:
         console.print(f"Sweep: temp={args.sweep_temp or '-'} top_p={args.sweep_top_p or '-'} max_tokens={args.sweep_max_tokens or '-'}")
     
@@ -1319,7 +1508,8 @@ if __name__ == "__main__":
     top_p_override=args.top_p,
         sweep=sweep_cfg,
         tag=args.tag,
-        quiet=quiet_final,
+    quiet=quiet_final,
+    retries=args.retries,
     ))
     
     if results:

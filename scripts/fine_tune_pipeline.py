@@ -21,6 +21,15 @@ import subprocess
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Kuratierte Liste kostenloser/offener Modelle, die ohne Gate nutzbar sind
+FREE_MODEL_ALLOWLIST: List[str] = [
+    "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "Qwen/Qwen2.5-0.5B-Instruct",
+    "Qwen/Qwen2.5-1.5B-Instruct",
+    "sshleifer/tiny-gpt2",
+    "gpt2",
+]
+
 
 def latest_train_file(dir_path: str) -> Optional[str]:
     files: List[str] = sorted(glob.glob(os.path.join(dir_path, "finetune_*_train.jsonl")), reverse=True)
@@ -53,14 +62,16 @@ def main() -> int:
     p = argparse.ArgumentParser(description="Mini-Pipeline für LoRA Fine-Tuning")
     p.add_argument("--finetune-dir", default=os.path.join("eval", "results", "finetune"))
     p.add_argument("--train-file", default=None, help="Konkrete finetune_*_train.jsonl übergeben")
-    p.add_argument("--model", default="meta-llama/Meta-Llama-3.1-8B-Instruct")
+    p.add_argument("--model", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
     p.add_argument("--output", default=None, help="Ausgabeverzeichnis für Adapter; Standard: outputs/lora-<ts>")
     p.add_argument("--per-device-train-batch-size", type=int, default=1)
     p.add_argument("--epochs", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--max-steps", type=int, default=-1)
     p.add_argument("--bf16", action="store_true")
+    p.add_argument("--fp16", action="store_true")
     p.add_argument("--no-check", action="store_true", help="Umgebungs-Checks überspringen")
+    p.add_argument("--only-free", action="store_true", default=True, help="Nur kostenlose/ungated Modelle erlauben")
     args = p.parse_args()
 
     train_file = args.train_file or latest_train_file(args.finetune_dir)
@@ -70,6 +81,16 @@ def main() -> int:
 
     out_dir = args.output or os.path.join("outputs", f"lora-{datetime.now().strftime('%Y%m%d_%H%M')}")
     os.makedirs(out_dir, exist_ok=True)
+
+    # Optionaler Free-Model-Guard
+    if args.only_free and args.model not in FREE_MODEL_ALLOWLIST:
+        print({
+            "ok": False,
+            "error": f"Modell '{args.model}' ist nicht in der Free-Allowlist.",
+            "allowed": FREE_MODEL_ALLOWLIST,
+            "hint": "Nutze --only-free false, um andere Modelle explizit zu erlauben.",
+        })
+        return 4
 
     if not args.no_check:
         msg = env_check()
@@ -93,6 +114,8 @@ def main() -> int:
     ]
     if args.bf16:
         cmd.append("--bf16")
+    if args.fp16:
+        cmd.append("--fp16")
 
     print({"running": cmd})
     try:

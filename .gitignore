@@ -42,11 +42,16 @@ data/*.sqlite3
 # Evaluation outputs (keep datasets tracked)
 ########################################
 eval/results/
+outputs/
 !eval/datasets/*.json
 !eval/datasets/*.jsonl
 !eval/config/*.json
 !eval/config/*.md
 !eval/README.md
+
+# Ignoriere JSON/JSONL direkt unter eval/ (nur datasets/ soll versioniert werden)
+eval/*.json
+eval/*.jsonl
 
 ########################################
 # Private lokale Kontext-Notizen
