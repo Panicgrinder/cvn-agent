@@ -3,7 +3,7 @@ Beispiel f√ºr die Verwendung der Konversationszusammenfassung.
 """
 
 from app.utils.summarize import summarize_turn
-from app.utils.convlog import create_log_record, log_turn
+from app.utils.convlog import create_log_record
 
 def beispiel_zusammenfassung():
     # Beispiel-Nachrichten
@@ -32,7 +32,7 @@ Wichtig ist, dass Python besonders f√ºr Einsteiger geeignet ist, aber dennoch f√
     for i, fact in enumerate(summary_data["keyfacts"], 1):
         print(f"{i}. {fact}")
     
-    # Optional: Logeintrag mit Zusammenfassung erstellen und speichern
+    # Optional: Logeintrag mit Zusammenfassung erstellen
     log_entry = create_log_record(
         messages=messages,
         response=response,
@@ -41,9 +41,12 @@ Wichtig ist, dass Python besonders f√ºr Einsteiger geeignet ist, aber dennoch f√
     )
     
     # Logeintrag speichern (auskommentiert, um nicht versehentlich zu loggen)
+    # from app.utils.convlog import log_turn
     # log_turn(log_entry)
     
     print("\nZusammenfassung erstellt und bereit zum Loggen.")
+    # Vermeidet Unused-Variable-Warnung im Beispiel
+    _ = log_entry
 
 if __name__ == "__main__":
     beispiel_zusammenfassung()

@@ -39,11 +39,8 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 #### app/api
 
 - [`app/api/__init__.py`](app/api/__init__.py) - API-Package-Initialisierung
-- [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing (geparkt/optional)
+- [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing (aktiv)
 - [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (Quelle)
-- [`app/api/api.py`](app/api/api.py) - (geparkt) alternative API-Struktur
-- [`app/api/chat_helpers.py`](app/api/chat_helpers.py) - (geparkt) Helper-Funktionen
-- [`app/api/endpoints/`](app/api/endpoints/) - (geparkt) Endpunktmodule
 
 #### app/core
 
@@ -57,7 +54,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### app/routers (entfernt)
 
-- `app/routers/` wurde in Cleanup Phase 4 entfernt (Duplikate zu main/api).
+- `app/routers/` wurde entfernt (Duplikate zu main/api). Verbleibende Stub-Dateien wurden bereinigt.
 
 #### app/services
 
@@ -113,7 +110,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### eval (weitere Dateien)
 
-- [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) - Neutralisiertes Duplikat außerhalb von datasets/ (per .gitignore markiert)
+- (keine; Duplikate außerhalb von `datasets/` wurden entfernt)
 
 ### examples
 
@@ -146,9 +143,9 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-08-26
+Letzte Aktualisierung: 2025-08-28
 
 Hinweise:
 
 - Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py); [`app/prompt/system.txt`](app/prompt/system.txt) dient als optionales Template.
-- Eval-Duplikat: [`eval/eval-21-40_demo_v1.0.json`](eval/eval-21-40_demo_v1.0.json) ist neutralisiert; bitte [`eval/datasets/...`](eval/datasets/) verwenden.
+- Eval-Duplikate wurden entfernt; bitte ausschließlich [`eval/datasets/...`](eval/datasets/) verwenden.

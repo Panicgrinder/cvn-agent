@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import os, sys, glob, json, re, time
-from typing import List, Dict, Any, Optional, Tuple
+import os, sys, glob, json, re
+from typing import List, Dict, Any, Tuple
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -17,8 +17,11 @@ def check_runner_constants() -> Dict[str, Any]:
     import importlib.util
     rp = os.path.join(ROOT, "scripts", "run_eval.py")
     spec = importlib.util.spec_from_file_location("run_eval", rp)
+    if spec is None or spec.loader is None:
+        err("Konnte ModuleSpec für run_eval.py nicht erstellen")
+        return {}
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)  # type: ignore
+    spec.loader.exec_module(mod)
 
     req_attrs = [
         "DEFAULT_EVAL_DIR", "DEFAULT_DATASET_DIR", "DEFAULT_RESULTS_DIR",
@@ -46,8 +49,11 @@ def check_ui_refs():
     import importlib.util
     up = os.path.join(ROOT, "scripts", "eval_ui.py")
     spec = importlib.util.spec_from_file_location("eval_ui", up)
+    if spec is None or spec.loader is None:
+        warn("Konnte ModuleSpec für eval_ui.py nicht erstellen")
+        return
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)  # type: ignore
+    spec.loader.exec_module(mod)
     code = read(up)
     if "DEFAULT_DATASET_DIR" in code and "DEFAULT_RESULTS_DIR" in code:
         ok("eval_ui referenziert DEFAULT_DATASET_DIR/DEFAULT_RESULTS_DIR")
@@ -71,8 +77,11 @@ def check_synonyms():
     import importlib.util
     rp = os.path.join(ROOT, "scripts", "run_eval.py")
     spec = importlib.util.spec_from_file_location("run_eval", rp)
+    if spec is None or spec.loader is None:
+        warn("Konnte ModuleSpec für run_eval.py nicht erstellen (synonyms)")
+        return
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)  # type: ignore
+    spec.loader.exec_module(mod)
     cfg = getattr(mod, "DEFAULT_CONFIG_DIR", os.path.join(ROOT, "eval", "config"))
     base = os.path.join(cfg, "synonyms.json")
     overlay = os.path.join(cfg, "synonyms.local.json")
@@ -98,13 +107,13 @@ def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
             return []
     except Exception:
         # JSONL
-        out = []
+        out: List[Dict[str, Any]] = []
         for line in (text or "").splitlines():
             line = line.strip()
             if not line:
                 continue
             try:
-                obj = json.loads(line)
+                obj: Any = json.loads(line)
                 if isinstance(obj, dict):
                     out.append(obj)
             except Exception:
@@ -119,7 +128,7 @@ def check_datasets_and_precedence():
         return
     ok(f"{len(files)} Dataset-Dateien gefunden")
     # Prüfe Schema grob und Duplikat-Priorisierung
-    seen: Dict[str, Tuple[dict, float, str]] = {}
+    seen: Dict[str, Tuple[Dict[str, Any], float, str]] = {}
     for fp in files:
         mtime = os.path.getmtime(fp)
         text = read(fp).strip()
@@ -131,7 +140,7 @@ def check_datasets_and_precedence():
             pid = str(obj.get("id") or f"{os.path.splitext(os.path.basename(fp))[0]}-{idx:04d}")
             has_messages = isinstance(obj.get("messages"), list)
             has_prompt = isinstance(obj.get("prompt"), str)
-            checks = obj.get("checks") or obj.get("must_include") or {}
+            checks: Dict[str, Any] | Any = obj.get("checks") or obj.get("must_include") or {}
             if not (has_messages or has_prompt):
                 warn(f"{os.path.basename(fp)}:{idx} hat weder messages noch prompt")
             if not checks:
@@ -152,7 +161,7 @@ def check_prompt_files_not_referenced():
         os.path.join(ROOT, "data", "system.txt"),
         os.path.join(ROOT, "app", "prompt", "system.txt"),
     ]
-    code_files = []
+    code_files: List[str] = []
     for base in ("app", "scripts", "utils"):
         for dp, _, fns in os.walk(os.path.join(ROOT, base)):
             for fn in fns:

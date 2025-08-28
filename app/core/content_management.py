@@ -6,7 +6,6 @@ ohne externe Einschränkungen zu berücksichtigen. Der Benutzer kann eigene Filt
 Regeln definieren oder alle Inhaltstypen zulassen.
 """
 
-from typing import Dict, Any, List, Optional
 
 # Flag, das angibt, ob Inhaltsfilterung aktiviert ist (standardmäßig deaktiviert)
 CONTENT_FILTERING_ENABLED = False

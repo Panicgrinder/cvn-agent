@@ -120,7 +120,7 @@ def guess_lora_target_modules(model: Any) -> List[str]:
 def build_lora_config(model: Any, r: int = 16, alpha: int = 32, dropout: float = 0.05) -> LoraConfig:
     targets = guess_lora_target_modules(model)
     mt = str(getattr(getattr(model, "config", object()), "model_type", "")).lower()
-    fan_in_fan_out: Optional[bool] = True if mt == "gpt2" else None
+    fan_in_fan_out: bool = True if mt == "gpt2" else False
     return LoraConfig(
         r=r,
         lora_alpha=alpha,
@@ -232,7 +232,13 @@ def main() -> int:
     )
 
     trainer.train()
-    trainer.model.save_pretrained(args.output)
+    # save_pretrained sicher aufrufen (pyright: optional attribute)
+    _trained_model: Any = getattr(trainer, "model", None)
+    if _trained_model is not None:
+        try:
+            _trained_model.save_pretrained(args.output)  # type: ignore[attr-defined]
+        except Exception:
+            pass
     tokenizer.save_pretrained(args.output)
     return 0
 

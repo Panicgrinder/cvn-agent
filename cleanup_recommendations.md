@@ -1,16 +1,17 @@
 # Empfehlungen zur weiteren Bereinigung des Projekts
 
 ## Abgeschlossene Maßnahmen
+
 1. ✅ System-Prompt-Dateien synchronisiert und Code-Referenzen aktualisiert
    - Zentrale Quelle ist `app/core/prompts.py`. `app/prompt/system.txt` bleibt als optionales Template bestehen und wird nicht produktiv referenziert.
-   - `app/api/chat_helpers.py` ist entfallen.
+   - `app/api/chat_helpers.py` wurde entfernt (Funktionalität in `app/api/chat.py` integriert).
 
 2. ✅ Chat-Router verbessert
    - Veraltete Router und Endpunkte entfernt; aktuelle Chat-Logik liegt unter `app/api/chat.py`
    - Robustere Fehlerbehandlung für leere Nachrichten und LLM-Fehler
 
 3. ✅ Entfernen von redundanten Chat-Implementierungen
-   - `app/api/endpoints/chat.py` wurde als veraltet markiert
+   - `app/api/endpoints/` wurde entfernt; zentraler Einstieg ist `app/api/chat.py` und `app/main.py`.
    - `app/main.py` verwendet direkt `process_chat_request` aus `app/api/chat.py`
    - Der direkte Chat-Endpunkt in `app/main.py` wurde entfernt
    - Logging und Zusammenfassung wurden in den Chat-Router integriert
@@ -26,11 +27,13 @@
 ## Empfohlene nächste Maßnahmen
 
 ### Niedrige Priorität
+
 1. Anpassen der Import-Pfade
    - Empfehlung: Konsequente Verwendung von relativen Imports innerhalb des app-Pakets
    - Vorteile: Bessere Modularisierung, einfacheres Refactoring, einheitliche Struktur
 
 ## Langfristige Überlegungen
+
 1. Klare Trennung zwischen API-Endpunkten und Routers
    - Endpunkte sind konsolidiert unter `app/api/`; `app/routers/` wurde entfernt
    - Einheitliche Struktur für alle Endpunkte

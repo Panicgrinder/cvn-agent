@@ -7,17 +7,17 @@ Analyse:
   - Fügt Systemprompt direkt hinzu, wenn keiner vorhanden ist
   - Ruft generate_reply() direkt auf
 
-  - APIRouter ohne Präfix
-  - Nutzt ensure_system_message() aus app/api/chat_helpers.py
-  - Prüft auf leere Nachrichten mit HTTPException
-  - Ruft generate_reply() direkt auf
+  - Altstruktur (entfernt): APIRouter ohne Präfix, eigene Helper-Funktion
+  - Heutiger Stand: zentrale Verarbeitung in `app/api/chat.py` inkl. Systemprompt-Injektion und Modus-Handling
 
 Hauptunterschiede:
+
 1. Pfad: "/chat" vs "/"
 2. Systemprompt-Handling: direkt vs über Hilfsfunktion
 3. Fehlerbehandlung: Keine vs. explizite Prüfung auf leere Nachrichten
 
 Empfehlung:
+
 - Altes Router-Setup wurde entfernt.
 - Aktuelle Chat-Verarbeitung: `app/api/chat.py` mit `process_chat_request` und Modus-Handling (eval/unrestricted).
 """

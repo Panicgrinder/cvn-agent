@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, cast
 
 import httpx
 from fastapi.testclient import TestClient
@@ -50,11 +50,11 @@ def test_chat_injects_default_system_prompt(monkeypatch: MonkeyPatch) -> None:
     body = resp.json()
     assert body.get("content") == "ok"
 
-    sent_any = payload_box.get("last") or {}
+    sent_any = cast(Dict[str, Any], payload_box.get("last") or {})
     assert isinstance(sent_any, dict)
-    msgs_any = sent_any.get("messages", [])
+    msgs_any = cast(List[Dict[str, Any]], sent_any.get("messages", []))
     assert isinstance(msgs_any, list)
-    msgs: List[Dict[str, str]] = [dict(m) for m in msgs_any]
+    msgs: List[Dict[str, str]] = [cast(Dict[str, str], m) for m in msgs_any]
     assert msgs, "Es wurden keine Nachrichten an das LLM gesendet"
     assert msgs[0]["role"] == "system"
     assert msgs[0]["content"] == prompts.DEFAULT_SYSTEM_PROMPT
@@ -75,11 +75,11 @@ def test_chat_injects_eval_system_prompt(monkeypatch: MonkeyPatch) -> None:
     })
     assert resp.status_code == 200
 
-    sent_any = payload_box.get("last") or {}
+    sent_any = cast(Dict[str, Any], payload_box.get("last") or {})
     assert isinstance(sent_any, dict)
-    msgs_any = sent_any.get("messages", [])
+    msgs_any = cast(List[Dict[str, Any]], sent_any.get("messages", []))
     assert isinstance(msgs_any, list)
-    msgs: List[Dict[str, str]] = [dict(m) for m in msgs_any]
+    msgs: List[Dict[str, str]] = [cast(Dict[str, str], m) for m in msgs_any]
     assert msgs and msgs[0]["role"] == "system"
     assert msgs[0]["content"] == prompts.EVAL_SYSTEM_PROMPT
 
@@ -99,10 +99,10 @@ def test_chat_injects_unrestricted_system_prompt(monkeypatch: MonkeyPatch) -> No
     })
     assert resp.status_code == 200
 
-    sent_any = payload_box.get("last") or {}
+    sent_any = cast(Dict[str, Any], payload_box.get("last") or {})
     assert isinstance(sent_any, dict)
-    msgs_any = sent_any.get("messages", [])
+    msgs_any = cast(List[Dict[str, Any]], sent_any.get("messages", []))
     assert isinstance(msgs_any, list)
-    msgs: List[Dict[str, str]] = [dict(m) for m in msgs_any]
+    msgs: List[Dict[str, str]] = [cast(Dict[str, str], m) for m in msgs_any]
     assert msgs and msgs[0]["role"] == "system"
     assert msgs[0]["content"] == prompts.UNRESTRICTED_SYSTEM_PROMPT

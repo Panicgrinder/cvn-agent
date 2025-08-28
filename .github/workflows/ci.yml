@@ -22,6 +22,6 @@ jobs:
       - name: Type check (pyright)
         run: pyright
       - name: Type check (mypy)
-        run: mypy app/api app/core app/services
+        run: mypy app/api app/core app/services scripts utils
       - name: Run tests
         run: pytest -q

@@ -30,7 +30,7 @@ def open_file(path: Path) -> None:
         pass
     # Fallback: OS-specific open
     if sys.platform.startswith("win"):
-        os.startfile(str(path))  # type: ignore[attr-defined]
+        os.startfile(str(path))
     elif sys.platform == "darwin":
         os.system(f"open '{path}'")
     else:

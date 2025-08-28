@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import platform
 from typing import List
@@ -36,7 +35,7 @@ def pick_target(paths: List[str]) -> str:
 def open_file(path: str) -> None:
     system = platform.system().lower()
     if system.startswith("win"):
-        os.startfile(path)  # type: ignore[attr-defined]
+        os.startfile(path)
     elif system == "darwin":
         os.system(f"open '{path}'")
     else:

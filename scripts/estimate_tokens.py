@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os, sys, json
+from typing import Any, Dict, Set
 
 TRY_TIKTOKEN = True
-enc = None
+enc: Any | None = None
 if TRY_TIKTOKEN:
     try:
         import tiktoken  # pip install tiktoken
@@ -10,8 +11,8 @@ if TRY_TIKTOKEN:
     except Exception:
         enc = None
 
-EXCLUDE_DIRS = {".git", ".venv", "venv", "__pycache__", ".pytest_cache", "eval/results"}
-TEXT_EXTS = {".py", ".md", ".json", ".jsonl", ".txt", ".gitignore", ".cfg", ".ini", ".yml", ".yaml"}
+EXCLUDE_DIRS: Set[str] = {".git", ".venv", "venv", "__pycache__", ".pytest_cache", "eval/results"}
+TEXT_EXTS: Set[str] = {".py", ".md", ".json", ".jsonl", ".txt", ".gitignore", ".cfg", ".ini", ".yml", ".yaml"}
 
 def is_text_file(path: str) -> bool:
     _, ext = os.path.splitext(path)
@@ -29,7 +30,7 @@ def count_tokens(text: str) -> int:
 def main() -> int:
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     total_tokens = 0
-    per_dir = {}
+    per_dir: Dict[str, int] = {}
     files_counted = 0
 
     for dirpath, dirnames, filenames in os.walk(root):

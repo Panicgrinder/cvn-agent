@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import httpx
 import asyncio
-from typing import Any, Dict
+from typing import Any
 from pytest import MonkeyPatch
 
 from app.services import llm as llm_module
