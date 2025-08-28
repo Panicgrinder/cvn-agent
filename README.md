@@ -130,3 +130,10 @@ Der Server kann optionale, lokale Kontext-Notizen als zusätzliche System-Nachri
    - Optional Größe begrenzen: `CONTEXT_NOTES_MAX_CHARS=4000`
 - Die Notizen werden als zweite System-Nachricht eingefügt (nach dem gewählten System-Prompt), sowohl im normalen als auch im Streaming-Endpunkt.
 - Fehlende Overlay-Datei wird stillschweigend ignoriert.
+
+## Copilot @workspace / #codebase (Code-Suche)
+
+- Empfehlung: Remote-Index nutzen (Repo liegt auf GitHub). Lokaler Index dient als Fallback.
+- Push regelmäßig, damit der Remote-Index aktuell bleibt.
+- Nutzung in Prompts: `@workspace` oder `#codebase` hinzufügen, optional Code markieren/auswählen.
+- Status und Index-Build über die Copilot-Statusleiste; bei Bedarf "Build Remote Workspace Index" ausführen.

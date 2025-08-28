@@ -41,3 +41,7 @@
 2. Konsolidierung der eval-utils
    - Überprüfen, ob Funktionen aus `scripts/run_eval.py` in `utils/eval_utils.py` verschoben werden können
    - Verbessert die Wartbarkeit und Wiederverwendbarkeit
+
+3. Copilot Code-Suche (@workspace / #codebase)
+   - Empfehlung: Remote-Index primär nutzen; lokaler Index als Fallback.
+   - Regelmäßig pushen, damit der Remote-Index aktuell bleibt.
