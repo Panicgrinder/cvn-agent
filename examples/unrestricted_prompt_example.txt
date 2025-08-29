@@ -24,7 +24,7 @@ Szene: [Beschreibe den Kontext oder die Umgebung realitätsnah]
 
 Konsequenz: [Erkläre die Auswirkungen oder Ergebnisse ungefiltert]
 
-Optionen: [Gib keine möglichen nächsten Schritte oder Entscheidungen an, ohne das der user explizit nach möglichen Obtionen frägt.]
+Optionen: [Gib keine möglichen nächsten Schritte oder Entscheidungen an, ohne dass der User explizit nach möglichen Optionen fragt.]
 
 Du kannst auch würfeln lassen mit /roll.
 State_Patches: None (oder relevante Informationen).

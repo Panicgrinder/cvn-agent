@@ -63,8 +63,10 @@ async def stream_chat_request(
     req_options: _Dict[str, _Any] = getattr(request, "options", None) or {}
     temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
     base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
+    # num_predict Alias: max_tokens zulassen (Kompatibilität zu CLI)
     try:
-        requested_tokens = int(req_options.get("num_predict", settings.REQUEST_MAX_TOKENS))
+        requested_tokens_raw = req_options.get("num_predict", req_options.get("max_tokens", settings.REQUEST_MAX_TOKENS))
+        requested_tokens = int(requested_tokens_raw)
     except Exception:
         requested_tokens = settings.REQUEST_MAX_TOKENS
     num_predict = max(1, min(requested_tokens, settings.REQUEST_MAX_TOKENS))
@@ -211,8 +213,10 @@ async def process_chat_request(
         req_options: _Dict[str, _Any] = getattr(request, "options", None) or {}
         temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
         base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
+        # num_predict Alias: max_tokens zulassen (Kompatibilität zu CLI)
         try:
-            requested_tokens = int(req_options.get("num_predict", settings.REQUEST_MAX_TOKENS))
+            requested_tokens_raw = req_options.get("num_predict", req_options.get("max_tokens", settings.REQUEST_MAX_TOKENS))
+            requested_tokens = int(requested_tokens_raw)
         except Exception:
             requested_tokens = settings.REQUEST_MAX_TOKENS
         num_predict = max(1, min(requested_tokens, settings.REQUEST_MAX_TOKENS))

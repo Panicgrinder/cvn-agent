@@ -5,6 +5,7 @@
 ### Root-Verzeichnis
 
 - [`.coverage`](.coverage) - Coverage-Report (generiert)
+- [`pytest.ini`](pytest.ini) - Pytest-Konfiguration
 - [`.env`](.env) - Umgebungsvariablen (private Konfiguration)
 - [`.env.example`](.env.example) - Template für Umgebungsvariablen
 - [`.gitignore`](.gitignore) - Git-Ignorier-Regeln
@@ -41,12 +42,15 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`app/api/__init__.py`](app/api/__init__.py) - API-Package-Initialisierung
 - [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing (aktiv)
 - [`app/api/models.py`](app/api/models.py) - API-Datenmodelle (Quelle)
+- [`app/api/chat_helpers.py`](app/api/chat_helpers.py) - Legacy/Geparkt (historische Helper)
+- [`app/api/endpoints/README.md`](app/api/endpoints/README.md) - Legacy/Geparkt (historische Endpunktmodule, nicht produktiv)
 
 #### app/core
 
 - [`app/core/__init__.py`](app/core/__init__.py) - Core-Package-Initialisierung
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates (zentral genutzt)
+- [`app/core/content_management.py`](app/core/content_management.py) - Inhaltsfilter (optional/geparkt)
 
 #### app/prompt
 
@@ -58,20 +62,18 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### app/services
 
-
 - [`app/services/llm.py`](app/services/llm.py) - LLM-Service (geparkt)
 
 #### app/utils
-
 
 - [`app/utils/convlog.py`](app/utils/convlog.py) - Konversations-Logging (geparkt)
 - [`app/utils/summarize.py`](app/utils/summarize.py) - Zusammenfassungs-Tools (geparkt)
 - [`app/utils/examples/`](app/utils/examples/) - Beispiele (geparkt)
 
 ### utils
-
-
 - [`utils/context_notes.py`](utils/context_notes.py) - Lokale Kontext-Notizen laden
+- [`utils/eval_utils.py`](utils/eval_utils.py) - Eval-Helfer (truncate, coerce_json_to_jsonl, load_synonyms)
+- [`utils/eval_cache.py`](utils/eval_cache.py) - Einfacher JSONL-Cache für LLM-Summaries
 
 ### data
 
@@ -88,6 +90,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 - [`eval/.gitignore`](eval/.gitignore) - Eval-spezifische Git-Ignorier-Regeln
 - [`eval/README.md`](eval/README.md) - Hinweise zu Eval
+- [`eval/DEPRECATIONS.md`](eval/DEPRECATIONS.md) - Deprecations/Altpfade (Eval)
 
 #### eval/datasets
 
@@ -107,6 +110,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 #### eval/results
 
 - [`eval/results/results_*.jsonl`](eval/results/) - Evaluierungsergebnisse (generiert, gitignored)
+- `eval/results/summaries/` - Generierte Workspace-Zusammenfassungen (Map-Reduce)
 
 #### eval (weitere Dateien)
 
@@ -129,21 +133,28 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/run_eval.py`](scripts/run_eval.py) - Hauptevaluierungsskript
 - [`scripts/eval_ui.py`](scripts/eval_ui.py) - Konsolen-UI für Evaluierung
 - [`scripts/audit_workspace.py`](scripts/audit_workspace.py) - Einfacher Workspace-Audit
+- [`scripts/dependency_check.py`](scripts/dependency_check.py) - Konsistenz-/Abhängigkeits-Checks (Eval/Config)
 - [`scripts/quick_eval.py`](scripts/quick_eval.py) - Schnelle Eval (ASGI, wenige Items)
 - [`scripts/map_reduce_summary.py`](scripts/map_reduce_summary.py) - Heuristische Workspace-Zusammenfassung
 - [`scripts/map_reduce_summary_llm.py`](scripts/map_reduce_summary_llm.py) - LLM-gestützte Zusammenfassung via /chat
 - [`scripts/curate_dataset_from_latest.py`](scripts/curate_dataset_from_latest.py) - Kuratiert Trainingspakete aus der neuesten results_*.jsonl
+- [`scripts/rerun_failed.py`](scripts/rerun_failed.py) - Erzeugt JSONL mit fehlgeschlagenen Items zur gezielten Wiederholung
+- [`scripts/todo_gather.py`](scripts/todo_gather.py) - Sammelt Metriken/Status für TODO-Überblick und erzeugt optional Markdown-Bericht
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata
 - [`scripts/customize_prompts.py`](scripts/customize_prompts.py) - Tool zur Prompt-Anpassung
+- [`scripts/fine_tune_pipeline.py`](scripts/fine_tune_pipeline.py) - Mini-Pipeline fürs Fine-Tuning/LoRA
 - [`scripts/cleanup_phase4.ps1`](scripts/cleanup_phase4.ps1) - Phase‑4 Cleanup-Skript (WhatIf/Confirm)
 
 ### tests
 
 - [`tests/`](tests/) - Testsuite (Einheiten-/Integrations-Tests)
 
+### .github
+- [`.github/workflows/`](.github/workflows/) - CI-Workflows (GitHub Actions)
+
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-08-28
+Letzte Aktualisierung: 2025-08-29
 
 Hinweise:
 

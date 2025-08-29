@@ -36,7 +36,6 @@ from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms  # ty
 try:
     # Importiere die Einstellungen
     from app.core.settings import settings  # type: ignore
-    
     # Verwende die Einstellungen für Standardwerte (neue Unterordner-Struktur)
     _st_any: Any = cast(Any, settings)
     DEFAULT_EVAL_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_DIRECTORY", "eval")))
@@ -46,6 +45,8 @@ try:
     # Bevorzuge JSONL als Default; Nutzer kann via Settings EVAL_FILE_PATTERN überschreiben
     DEFAULT_FILE_PATTERN: str = cast(str, getattr(_st_any, "EVAL_FILE_PATTERN", "eval-*.jsonl"))
     DEFAULT_API_URL = f"http://localhost:8000/chat"
+    # NEU: Request-ID-Header aus Settings übernehmen (Fallback siehe except)
+    REQUEST_ID_HEADER: str = cast(str, getattr(_st_any, "REQUEST_ID_HEADER", "X-Request-ID"))
 except ImportError:
     # Fallback-Werte, wenn die Anwendungseinstellungen nicht verfügbar sind
     base_eval = os.path.join(project_root, "eval")
@@ -55,6 +56,7 @@ except ImportError:
     DEFAULT_CONFIG_DIR = os.path.join(base_eval, "config")
     DEFAULT_FILE_PATTERN = "eval-*.jsonl"
     DEFAULT_API_URL = "http://localhost:8000/chat"
+    REQUEST_ID_HEADER = "X-Request-ID"
 
 # Globale Variablen
 _synonyms_cache: Optional[Dict[str, List[str]]] = None  # Cache für Synonyme, wird lazy geladen
@@ -576,7 +578,7 @@ async def evaluate_item(
         # Entweder übergebenen Client verwenden (ASGI-Modus) oder einen temporären erstellen (HTTP-Modus)
         headers: Dict[str, str] = {}
         if request_id:
-            headers["X-Request-ID"] = request_id
+            headers[REQUEST_ID_HEADER] = request_id
         async def _send_and_get(_payload: Dict[str, Any]) -> str:
             if client is None:
                 async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
@@ -898,7 +900,12 @@ async def preflight_check(api_url: str) -> bool:
     logger = logging.getLogger("preflight")
     
     # Extrahiere die Basis-URL ohne Pfad
-    base_url: str = api_url.split("/")[0] + "//" + api_url.split("/")[2]
+    try:
+        from urllib.parse import urlsplit
+        parts = urlsplit(api_url)
+        base_url: str = f"{parts.scheme}://{parts.netloc}"
+    except Exception:
+        base_url = api_url.split("/")[0] + "//" + api_url.split("/")[2]
     health_url: str = f"{base_url}/health"
     
     try:
@@ -930,6 +937,7 @@ async def run_evaluation(
     temperature_override: Optional[float] = None,
     host_override: Optional[str] = None,
     top_p_override: Optional[float] = None,
+    num_predict_override: Optional[int] = None,
     sweep: Optional[Dict[str, List[Any]]] = None,
     tag: Optional[str] = None,
     quiet: bool = False,
@@ -1051,7 +1059,7 @@ async def run_evaluation(
                 "model": _model_name,
                 "temperature": _temperature,
                 "host": _host,
-                "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override, "top_p": top_p_override, "num_predict": None},
+                "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override, "top_p": top_p_override, "num_predict": num_predict_override},
                 "sweep": sweep or None,
                 "retries": retries,
             }
@@ -1095,9 +1103,9 @@ async def run_evaluation(
                         f.write(json.dumps(rd, ensure_ascii=False) + "\n")
                     progress.update(task, advance=1)
 
-            # Falls kein Sweep definiert, einfacher Durchlauf
+            # Falls kein Sweep definiert, einfacher Durchlauf (unterstützt num_predict_override)
             if not sweep:
-                await _run_once(temperature_override, top_p_override, None)
+                await _run_once(temperature_override, top_p_override, num_predict_override)
             else:
                 temps = sweep.get("temperature") if sweep else None
                 tops = sweep.get("top_p") if sweep else None
@@ -1387,6 +1395,9 @@ if __name__ == "__main__":
     parser.add_argument("--quiet", action="store_true", help="Unterdrückt Logausgaben lauter Logger während der Progress-Anzeige")
     parser.add_argument("--no-quiet", action="store_true", help="Quiet-Mode deaktivieren (setzt sich gegen --quiet durch)")
     # Overrides & Sweeps
+    parser.add_argument("--host", type=str, dest="host", help="Override für OLLAMA_HOST (z. B. http://localhost:11434)")
+    parser.add_argument("--model", type=str, dest="model", help="Override für Modellnamen (z. B. llama3.1:8b)")
+    parser.add_argument("--temperature", type=float, dest="temperature", help="Override für temperature")
     parser.add_argument("--top-p", type=float, dest="top_p", help="Override für top_p")
     parser.add_argument("--max-tokens", type=int, dest="max_tokens", help="Override für num_predict/max_tokens")
     parser.add_argument("--tag", type=str, help="Zusätzlicher Tag im Ergebnisdateinamen")
@@ -1489,8 +1500,14 @@ if __name__ == "__main__":
         console.print(f"top_p Override: {args.top_p}")
     if args.max_tokens is not None:
         console.print(f"num_predict Override: {args.max_tokens}")
+    if args.temperature is not None:
+        console.print(f"temperature Override: {args.temperature}")
+    if args.model:
+        console.print(f"Model Override: {args.model}")
+    if args.host:
+        console.print(f"Host Override: {args.host}")
     if args.retries:
-        console.print(f"Retrys bei Fehlschlag: {args.retries}")
+        console.print(f"Retries bei Fehlschlag: {args.retries}")
     if args.sweep_temp or args.sweep_top_p:
         console.print(f"Sweep: temp={args.sweep_temp or '-'} top_p={args.sweep_top_p or '-'} max_tokens={args.sweep_max_tokens or '-'}")
     
@@ -1525,10 +1542,11 @@ if __name__ == "__main__":
         skip_preflight=args.skip_preflight,
         asgi=args.asgi,
         enabled_checks=args.checks,
-        model_override=None,
-        temperature_override=None,
-        host_override=None,
+    model_override=args.model,
+    temperature_override=args.temperature,
+    host_override=args.host,
     top_p_override=args.top_p,
+    num_predict_override=args.max_tokens,
         sweep=sweep_cfg,
         tag=args.tag,
     quiet=quiet_final,

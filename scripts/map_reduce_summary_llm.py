@@ -19,6 +19,20 @@ import argparse
 import asyncio
 import datetime as _dt
 from typing import List, Dict, Any, Tuple, Optional, TYPE_CHECKING
+# Cache für LLM-Summaries
+try:
+    from utils.eval_cache import EvalCache, make_key  # type: ignore
+except Exception:
+    EvalCache = None  # type: ignore
+    def make_key(obj: Any) -> str:  # fallback
+        import hashlib, json as _json
+        return hashlib.sha256(_json.dumps(obj, sort_keys=True, default=str).encode("utf-8")).hexdigest()
+_LLM_CACHE = None  # type: ignore
+def _get_llm_cache():
+    global _LLM_CACHE
+    if _LLM_CACHE is None and EvalCache is not None:
+        _LLM_CACHE = EvalCache(os.path.join(PROJECT_ROOT, "eval", "results", "cache_llm.jsonl"))
+    return _LLM_CACHE
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
@@ -118,14 +132,38 @@ async def llm_summarize_file(
             "num_predict": int(num_predict),
         },
     }
+    # Cache-Hit prüfen
+    cache = _get_llm_cache()
+    if cache is not None:
+        cache_key = make_key({"rel": rel, "api": api_url, "options": payload["options"], "messages": messages})
+        cached = cache.get(cache_key)
+        if isinstance(cached, str) and cached:
+            return cached
     headers = {"Content-Type": "application/json", settings.REQUEST_ID_HEADER: f"{run_id}-{rel}"}
     resp = await client.post(api_url, json=payload, headers=headers)  # type: ignore[call-arg]
     resp.raise_for_status()
     data_any = resp.json()
-    data: Dict[str, Any] = dict(data_any) if isinstance(data_any, dict) else {}
-    content_val: Any = data.get("content", "")
-    content_out = str(content_val)
-    return f"Datei: {rel}\n\n{content_out.strip()}"
+    # sichere Typisierung
+    from typing import cast as _cast
+    data: Dict[str, Any]
+    if isinstance(data_any, dict):
+        data = _cast(Dict[str, Any], data_any)
+    else:
+        data = {}
+    try:
+        summary = data.get("content") or data.get("message", {}).get("content") or ""
+        # Cache schreiben
+        # cache_key initialisieren, damit Static-Analyzer keine Unbound-Warnung meldet
+        cache_key: Optional[str] = None
+        if cache is not None:
+            # Rekonstruiere cache_key identisch zu oben (nur bei Bedarf)
+            cache_key = make_key({"rel": rel, "api": api_url, "options": payload["options"], "messages": messages})
+        if cache is not None and summary and cache_key:
+            cache.put(cache_key, summary)
+        return summary
+    except Exception:
+        # Fehler werden im Aufrufer abgefangen und dort per Heuristik gefallbackt
+        raise
 
 
 async def process_scope(
@@ -208,7 +246,8 @@ def write_md(out_path: str, title: str, sections: List[Tuple[str, List[str]]]) -
 
 async def amain(argv: Optional[List[str]] = None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--llm-scopes", type=str, default="app,scripts,utils,tests,docs")
+    # --llm-scopes darf optional ohne Wert übergeben werden (wird dann als leer interpretiert)
+    ap.add_argument("--llm-scopes", type=str, nargs="?", const="", default="app,scripts,utils,tests,docs")
     ap.add_argument("--heuristic-scopes", type=str, default="eval-datasets")
     ap.add_argument("--asgi", action="store_true", help="ASGI In-Process statt HTTP")
     ap.add_argument("--out-dir", type=str, default=DEFAULT_OUT_DIR)
@@ -222,7 +261,8 @@ async def amain(argv: Optional[List[str]] = None) -> int:
     timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M")
     run_id = f"summary-{timestamp}"
 
-    llm_scopes = [s.strip() for s in args.llm_scopes.split(",") if s.strip()]
+    # leere Angabe ("--llm-scopes" ohne Wert) ergibt eine leere Liste → nur Heuristik verwenden
+    llm_scopes = [s.strip() for s in (args.llm_scopes or "").split(",") if s.strip()]
     h_scopes = [s.strip() for s in args.heuristic_scopes.split(",") if s.strip()]
 
     produced: List[str] = []
