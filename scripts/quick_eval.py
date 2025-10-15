@@ -11,7 +11,6 @@ import os
 import sys
 import importlib.util
 import asyncio
-from typing import Any, List
 
 
 def _load_run_eval_module():
@@ -23,7 +22,7 @@ def _load_run_eval_module():
     if spec is None or spec.loader is None:
         raise RuntimeError("Kann run_eval.py nicht laden")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # type: ignore
+    spec.loader.exec_module(module)
     return module
 
 

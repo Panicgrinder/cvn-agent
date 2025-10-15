@@ -2,9 +2,9 @@
 
 ## Abgeschlossene Maßnahmen
 
-1. ✅ System-Prompt-Dateien synchronisiert und Code-Referenzen aktualisiert
+1. ✅ System-Prompt-Zentralisierung
    - Zentrale Quelle ist `app/core/prompts.py`. `app/prompt/system.txt` bleibt als optionales Template bestehen und wird nicht produktiv referenziert.
-   - `app/api/chat_helpers.py` wurde entfernt (Funktionalität in `app/api/chat.py` integriert).
+   - `app/api/chat_helpers.py` referenziert keine Dateien mehr und nutzt ebenfalls die zentrale Prompt-Konstante.
 
 2. ✅ Chat-Router verbessert
    - Veraltete Router und Endpunkte entfernt; aktuelle Chat-Logik liegt unter `app/api/chat.py`

@@ -35,13 +35,22 @@ def check_runner_constants() -> Dict[str, Any]:
     if missing:
         err(f"run_eval: fehlende Attribute/Funktionen: {missing}")
 
-    # Prüfe, dass load_prompts standardmäßig datasets/ nutzt
+    # Prüfe, dass load_prompts standardmäßig datasets/ nutzt (robuster Scan der Funktionsdefinition)
     code = read(rp)
-    block = re.search(r"async def load_prompts\([^\)]*\):(.|\n)*?return", code)
-    if block and "DEFAULT_DATASET_DIR" in block.group(0):
-        ok("load_prompts default -> DEFAULT_DATASET_DIR")
+    start = code.find("async def load_prompts(")
+    if start != -1:
+        # Versuche das Ende der Funktion heuristisch zu finden: Beginn der nächsten async def/def
+        next_async = code.find("\nasync def ", start + 1)
+        next_def = code.find("\ndef ", start + 1)
+        end_candidates = [c for c in [next_async, next_def] if c != -1]
+        end = min(end_candidates) if end_candidates else len(code)
+        func_block = code[start:end]
+        if "DEFAULT_DATASET_DIR" in func_block and "DEFAULT_FILE_PATTERN" in func_block:
+            ok("load_prompts default -> DEFAULT_DATASET_DIR")
+        else:
+            err("load_prompts default nutzt NICHT DEFAULT_DATASET_DIR (Patch nötig)")
     else:
-        err("load_prompts default nutzt NICHT DEFAULT_DATASET_DIR (Patch nötig)")
+        warn("Konnte load_prompts nicht im Code finden")
 
     return {"mod": mod}
 
@@ -168,22 +177,29 @@ def check_prompt_files_not_referenced():
                 if fn.endswith(".py"):
                     code_files.append(os.path.join(dp, fn))
     for c in candidates:
+        rel = os.path.relpath(c, ROOT)
         if not os.path.exists(c):
-            ok(f"{os.path.relpath(c, ROOT)} existiert nicht (gut)")
+            ok(f"{rel} existiert nicht (gut)")
             continue
-        name = os.path.basename(c)
+        # Suche nach exakten Pfadangaben (vor/zurück Slashes), nicht nach dem generischen Basenamen
+        patterns = {
+            rel.replace("\\", "/"),
+            rel.replace("/", "\\"),
+            os.path.normpath(rel),
+        }
         found = False
         for cf in code_files:
             try:
-                if name in read(cf):
+                content = read(cf)
+                if any(p in content for p in patterns):
                     found = True
                     break
             except Exception:
                 pass
         if found:
-            warn(f"Historische Prompt-Datei wird noch referenziert: {os.path.relpath(c, ROOT)}")
+            warn(f"Historische Prompt-Datei wird noch referenziert: {rel}")
         else:
-            ok(f"Historische Prompt-Datei NICHT referenziert: {os.path.relpath(c, ROOT)}")
+            ok(f"Historische Prompt-Datei NICHT referenziert: {rel}")
 
 def main():
     print("= Dependency Check (wichtigste Daten) =")

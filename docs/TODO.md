@@ -38,21 +38,81 @@ Kurzfristige Ziele (Heute)
 - [x] Streaming-Antworten (optional)
   - Status: Done (POST /chat/stream liefert text/event-stream; serverseitige Chunk-Ausgabe via Ollama-Stream; Logs & Fehler-Ereignisse; kompatibel zu bestehender /chat API)
 
+- [x] DONELOG-Disziplin auch für Agent-Änderungen
+  - Ziel: Sicherstellen, dass direkte Pushes auf `main` ebenfalls einen DONELOG-Eintrag erfordern; bequemer Editor-Flow.
+  - Status: Done (CI-Workflow prüft jetzt auch Push auf `main`; PR-Bypass via Label bleibt; VS Code Task "Append DONELOG entry" hinzugefügt.)
+
+- [ ] Mypy-Enforcement für weitere Skripte ausweiten
+  - Ziel: Schrittweises Reduzieren von `[mypy-scripts.*] ignore_errors = True`; per Datei auf `check_untyped_defs = True` heben.
+  - Kandidaten: `scripts/run_eval.py`, `scripts/eval_ui.py`, `scripts/curate_dataset_from_latest.py`, `scripts/openai_finetune.py`, `scripts/train_lora.py`.
+
+- [ ] Testabdeckung erhöhen (inkrementell)
+  - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).
+  - Hinweis: Windows-Pfade beachten (keine Laufwerks-Mismatches; projektwurzelnahe Temp-Verzeichnisse nutzen).
+
+- [ ] Pre-commit-Hook für DONELOG
+  - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde, aber kein aktueller DONELOG-Eintrag vorliegt (Jahres-/Datumscheck).
+  - Optional: Interaktiv `scripts/append_done.py` aufrufen.
+  - Optional (lokal vorbereitet): `.githooks/pre-commit` + VS Code Tasks
+    - Installieren: Task "Git hooks: install local pre-commit"
+    - Prüfen: Task "Git hooks: verify pre-commit"
+    - Manuell ausführen: Task "Pre-commit: run check"
+
+- [ ] VS Code Tasks normalisieren (Portabilität)
+  - Ziel: Harte `F:/`-Pfade durch `${workspaceFolder}` & `${config:python.interpreterPath}` ersetzen; konsistente CWD-Optionen.
+  - Bonus: Tasks für `mypy`, `pyright`, `pytest -q`, `scripts/dependency_check.py` hinzufügen.
+  - Status: In Arbeit (Basis-Tasks portabel; DONELOG-Tasks und Hook-Installer ergänzt.)
+
 3–7 Tage
+
 - Datensatzkurierung aus Logs (Train/Val-Pack)
   - Status: In Arbeit / Done (Teil 1): Skript `scripts/curate_dataset_from_latest.py` erstellt; Export (openai_chat/alpaca), Dedupe & Train/Val-Split; VS Code Task "Curate dataset (latest)" hinzugefügt.
 - Fine-Tuning/LoRA Mini-Pipeline
 - Caching/Memoization für Eval-Reruns
 - Rerun-Failed mit Profil/Meta-Rekonstruktion
 
+- [ ] Mini-Eval → Export → Split → LoRA (Smoke)
+  - Ziel: 10–20 Items evaluieren (quiet/ASGI), `openai_chat` exportieren, Split erzeugen, kurze LoRA-Trainingsprobe (max 10 Steps) mit `--only-free` oder lokalem Modell.
+  - Output: Artefakte in `eval/results/finetune/`, Trainingslogs und Metriken festhalten.
+
+- [ ] Eval-Caching & Reruns
+  - Ziel: Ergebnis-Caching (z. B. per Key: Prompt+Options), `scripts/rerun_failed.py` integrieren/absichern; Tests für Cache-Hits/Misses.
+
+- [ ] Dedupe/Heuristiken für Trainingsdaten schärfen
+  - Ziel: Längenfilter, Near-Duplicate-Checks, optional einfache Qualitätsmetriken vor dem Packen.
+
+- [ ] Dokumentation Training/Feinabstimmung
+  - Ziel: README-Abschnitt oder `docs/training.md` mit Minimalbeispiel, Hardware-Hinweisen und Troubleshooting.
+
 Später
+
 - Narrativspeicher (Session Memory)
 - Formale Stil-Guidelines + Tests
 - Tooling (pre-commit, ruff/black, pins)
 
+- CI/Qualitätstore
+  - Ziel: Optionales Coverage-Minimum in CI (z. B. Zeilen/Branches), Linting (ruff/black) und Format-Checks per Pre-commit & CI.
+
+- Packaging & Deployability
+  - Ziel: Dockerfile/Compose (lokal/offline-freundlich), Healthchecks, Produktionshinweise.
+
 Metriken
+
 - Eval-Erfolgsrate ↑ (gesamt/paketweise)
 - Latenz p95 ↓
 - 0 RPG-Erkennungen im Eval-Modus; konsistenter RP-Stil im UNRESTRICTED
 - Trainingspacks: dedupliziert, ausgewogene Längen
 - Logs strukturiert, korrelierbar, ohne sensible Leaks
+
+- Abdeckung: inkrementelle Erhöhung (z. B. +5–10 Prozentpunkte über mehrere Iterationen); Gate optional.
+
+---
+
+Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)
+
+- Jede nicht-triviale, abgeschlossene Änderung bitte in `docs/DONELOG.txt` erfassen.
+- Format je Zeile: `YYYY-MM-DD HH:MM | Author | Kurzbeschreibung` (keine sensiblen Inhalte!).
+- Helferskript: `python scripts/append_done.py "Kurzbeschreibung..."` hängt automatisch Zeitstempel und Autor an.
+- CI: PRs mit Code-Änderungen (app/, scripts/, utils/) erfordern einen DONELOG-Eintrag; Bypass via Label `skip-donelog` möglich.
+- Zusätzlich: Pushes auf `main` werden ebenfalls geprüft. Für Push-Events gibt es keinen Label-Bypass. Falls nötig, zuvor `docs/DONELOG.txt` aktualisieren.
+- VS Code Task: "Append DONELOG entry" fragt nach einer Kurzbeschreibung und ruft `scripts/append_done.py` mit dem aktiven Python-Interpreter auf.

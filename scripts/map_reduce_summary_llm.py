@@ -18,20 +18,30 @@ import json
 import argparse
 import asyncio
 import datetime as _dt
-from typing import List, Dict, Any, Tuple, Optional, TYPE_CHECKING
-# Cache für LLM-Summaries
+from typing import List, Dict, Any, Tuple, Optional, TYPE_CHECKING, Protocol, cast
+"""Cache/Key Utilities (robust gegen fehlende utils.eval_cache)."""
+# Cache für LLM-Summaries (EvalCache dynamisch geladen in _get_llm_cache)
 try:
-    from utils.eval_cache import EvalCache, make_key  # type: ignore
+    from utils.eval_cache import make_key
 except Exception:
-    EvalCache = None  # type: ignore
     def make_key(obj: Any) -> str:  # fallback
         import hashlib, json as _json
         return hashlib.sha256(_json.dumps(obj, sort_keys=True, default=str).encode("utf-8")).hexdigest()
-_LLM_CACHE = None  # type: ignore
-def _get_llm_cache():
+class _EvalCacheProto(Protocol):
+    def get(self, key: str) -> Optional[str]:
+        ...
+    def put(self, key: str, value: str) -> None:
+        ...
+
+_LLM_CACHE: Optional[_EvalCacheProto] = None
+def _get_llm_cache() -> Optional[_EvalCacheProto]:
     global _LLM_CACHE
-    if _LLM_CACHE is None and EvalCache is not None:
-        _LLM_CACHE = EvalCache(os.path.join(PROJECT_ROOT, "eval", "results", "cache_llm.jsonl"))
+    if _LLM_CACHE is None:
+        try:
+            from utils.eval_cache import EvalCache as _EvalCacheCls
+            _LLM_CACHE = cast(_EvalCacheProto, _EvalCacheCls(os.path.join(PROJECT_ROOT, "eval", "results", "cache_llm.jsonl")))
+        except Exception:
+            _LLM_CACHE = None
     return _LLM_CACHE
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,9 +64,9 @@ TEXT_EXTS = {".py", ".md", ".txt", ".json", ".jsonl"}
 # Import Settings und Heuristik-Fallback
 from app.core.settings import settings
 try:
-    from scripts.map_reduce_summary import summarize_file as heuristic_summarize_file  # type: ignore
+    from scripts.map_reduce_summary import summarize_file as heuristic_summarize_file
 except Exception:
-    heuristic_summarize_file = None  # type: ignore
+    heuristic_summarize_file = None  # type: ignore[assignment]
 
 
 def is_text_file(path: str) -> bool:
@@ -106,11 +116,11 @@ def build_summary_prompt(rel_path: str, content: str) -> List[Dict[str, str]]:
 
 
 if TYPE_CHECKING:
-    import httpx  # type: ignore
+    import httpx
 
 
 async def llm_summarize_file(
-    client: "httpx.AsyncClient",  # type: ignore[name-defined]
+    client: "httpx.AsyncClient",
     api_url: str,
     path: str,
     run_id: str,
@@ -136,11 +146,11 @@ async def llm_summarize_file(
     cache = _get_llm_cache()
     if cache is not None:
         cache_key = make_key({"rel": rel, "api": api_url, "options": payload["options"], "messages": messages})
-        cached = cache.get(cache_key)
+        cached: Optional[str] = cache.get(cache_key)
         if isinstance(cached, str) and cached:
             return cached
     headers = {"Content-Type": "application/json", settings.REQUEST_ID_HEADER: f"{run_id}-{rel}"}
-    resp = await client.post(api_url, json=payload, headers=headers)  # type: ignore[call-arg]
+    resp = await client.post(api_url, json=payload, headers=headers)
     resp.raise_for_status()
     data_any = resp.json()
     # sichere Typisierung
@@ -153,13 +163,9 @@ async def llm_summarize_file(
     try:
         summary = data.get("content") or data.get("message", {}).get("content") or ""
         # Cache schreiben
-        # cache_key initialisieren, damit Static-Analyzer keine Unbound-Warnung meldet
-        cache_key: Optional[str] = None
-        if cache is not None:
-            # Rekonstruiere cache_key identisch zu oben (nur bei Bedarf)
-            cache_key = make_key({"rel": rel, "api": api_url, "options": payload["options"], "messages": messages})
-        if cache is not None and summary and cache_key:
-            cache.put(cache_key, summary)
+        if cache is not None and summary:
+            cache_key2 = make_key({"rel": rel, "api": api_url, "options": payload["options"], "messages": messages})
+            cache.put(cache_key2, summary)
         return summary
     except Exception:
         # Fehler werden im Aufrufer abgefangen und dort per Heuristik gefallbackt
@@ -189,7 +195,7 @@ async def process_scope(
     if use_llm:
         # Client vorbereiten (ASGI/HTTP)
         if asgi:
-            from app.main import app as fastapi_app  # type: ignore
+            from app.main import app as fastapi_app
             transport = httpx.ASGITransport(app=fastapi_app)
             client = httpx.AsyncClient(transport=transport, base_url="http://asgi", timeout=60.0)
             url = "/chat"
@@ -206,8 +212,8 @@ async def process_scope(
                     s: str = await llm_summarize_file(client, url, p, run_id, max_chars, num_predict, temperature)
                 except Exception as e:
                     # Fallback auf Heuristik
-                    if heuristic_summarize_file:
-                        s = str(heuristic_summarize_file(p, max_chars=max_chars))  # type: ignore[call-arg]
+                    if heuristic_summarize_file is not None:
+                        s = str(heuristic_summarize_file(p, max_chars=max_chars))
                     else:
                         s = f"Datei: {os.path.relpath(p, PROJECT_ROOT)}\nFehler: {e}"
                 summaries.append(s)
@@ -220,8 +226,8 @@ async def process_scope(
         # Nur Heuristik
         for p in files:
             try:
-                if heuristic_summarize_file:
-                    summaries.append(heuristic_summarize_file(p, max_chars=max_chars))  # type: ignore
+                if heuristic_summarize_file is not None:
+                    summaries.append(heuristic_summarize_file(p, max_chars=max_chars))
                 else:
                     # Minimaler Fallback
                     rel = os.path.relpath(p, PROJECT_ROOT)

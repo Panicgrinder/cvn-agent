@@ -54,7 +54,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### app/prompt
 
-- [`app/prompt/system.txt`](app/prompt/system.txt) - System-Prompt (Template/optional)
+- [`app/prompt/system.txt`](app/prompt/system.txt) - Optionales Template (nicht produktiv referenziert; zentrale Quelle ist `app/core/prompts.py`)
 
 #### app/routers (entfernt)
 
@@ -71,6 +71,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`app/utils/examples/`](app/utils/examples/) - Beispiele (geparkt)
 
 ### utils
+
 - [`utils/context_notes.py`](utils/context_notes.py) - Lokale Kontext-Notizen laden
 - [`utils/eval_utils.py`](utils/eval_utils.py) - Eval-Helfer (truncate, coerce_json_to_jsonl, load_synonyms)
 - [`utils/eval_cache.py`](utils/eval_cache.py) - Einfacher JSONL-Cache für LLM-Summaries
@@ -150,13 +151,14 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`tests/`](tests/) - Testsuite (Einheiten-/Integrations-Tests)
 
 ### .github
+
 - [`.github/workflows/`](.github/workflows/) - CI-Workflows (GitHub Actions)
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-08-29
+Letzte Aktualisierung: 2025-10-15
 
 Hinweise:
 
-- Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py); [`app/prompt/system.txt`](app/prompt/system.txt) dient als optionales Template.
+- Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py). `app/prompt/system.txt` ist nur ein optionales Template und wird im Code nicht geladen.
 - Eval-Duplikate wurden entfernt; bitte ausschließlich [`eval/datasets/...`](eval/datasets/) verwenden.

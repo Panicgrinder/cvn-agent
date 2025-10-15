@@ -1,0 +1,11 @@
+# DONELOG – Abgeschlossene Arbeiten
+
+Hinweis:
+- Bitte jede abgeschlossene, nicht-triviale Änderung hier kurz dokumentieren.
+- Format: YYYY-MM-DD HH:MM | Author | Kurzbeschreibung
+- Keine sensiblen Inhalte eintragen.
+
+Beispiel:
+2025-10-15 12:34 | username | Eval-Pipeline stabilisiert; map_reduce_summary_llm typisiert; Doku aktualisiert.
+2025-10-15 14:10 | Copilot | CI erweitert: DONELOG-Prüfung auch bei Push auf main; VS Code Task zum schnellen Eintrag hinzugefügt.
+2025-10-15 14:22 | Copilot | Optionale Absicherung: lokaler pre-commit Hook (.githooks) + VS Code Tasks zum Installieren/Prüfen; Tasks portabilisiert.

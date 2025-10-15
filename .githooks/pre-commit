@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Pre-commit Hook: Verhindert Commits ohne aktuellen DONELOG-Eintrag,
+# wenn Code unter app/, scripts/ oder utils/ geändert wurde.
+set -euo pipefail
+
+# Sammle geänderte Dateien im Index (staged)
+CHANGED=$(git diff --cached --name-only | tr '\n' ' ')
+
+# Wenn nichts geändert ist, einfach durchlassen
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+# Prüfen, ob relevante Pfade betroffen sind
+if echo "$CHANGED" | grep -Eq '^(app/|scripts/|utils/)' ; then
+  if ! grep -q "$(date +%Y)" docs/DONELOG.txt ; then
+    echo "\n✖ DONELOG fehlt oder hat keinen Eintrag für dieses Jahr."
+    echo "   Bitte 'python scripts/append_done.py "Kurzbeschreibung"' ausführen und erneut committen." >&2
+    exit 1
+  fi
+fi
+
+exit 0
