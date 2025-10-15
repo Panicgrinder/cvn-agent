@@ -55,14 +55,14 @@ Kurzfristige Ziele (Heute)
   - Status: Done (CI-Workflow prüft jetzt auch Push auf `main`;
     PR-Bypass via Label bleibt; VS Code Task "Append DONELOG entry" hinzugefügt.)
 
-- [ ] Mypy-Enforcement für weitere Skripte ausweiten
+- [x] Mypy-Enforcement für weitere Skripte ausweiten
   - Ziel: Schrittweises Reduzieren von `[mypy-scripts.*] ignore_errors = True`;
     per Datei auf `check_untyped_defs = True` heben.
   - Kandidaten: `scripts/run_eval.py`, `scripts/eval_ui.py`,
     `scripts/curate_dataset_from_latest.py`, `scripts/openai_finetune.py`,
     `scripts/train_lora.py`.
-  - Status: Teil-Done — `scripts/run_eval.py` und `scripts/eval_ui.py` sind nun auf `check_untyped_defs=True`
-    gestellt und mypy-clean; weitere Kandidaten folgen.
+  - Status: Done — Alle genannten Skripte sind jetzt auf `check_untyped_defs=True`
+    gestellt und mypy-clean.
 
 - [ ] Testabdeckung erhöhen (inkrementell)
   - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).

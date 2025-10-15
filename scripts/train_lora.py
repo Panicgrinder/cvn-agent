@@ -110,7 +110,7 @@ def guess_lora_target_modules(model: Any) -> List[str]:
     # Preserve order and unique
     seen: Set[str] = set()
     unique: List[str] = []
-    for x in found:  # type: ignore[assignment]
+    for x in found:
         if x not in seen:
             seen.add(x)
             unique.append(x)
@@ -174,15 +174,16 @@ def main() -> int:
         dtype = torch.bfloat16
     else:
         dtype = None
+    model: Any
     if args.load_in_4bit:
-        model: Any = AutoModelForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             args.model,
             torch_dtype=dtype,
             load_in_4bit=True,
             device_map="auto",
         )
     else:
-        model: Any = AutoModelForCausalLM.from_pretrained(
+        model = AutoModelForCausalLM.from_pretrained(
             args.model,
             torch_dtype=dtype,
             device_map="auto",
@@ -236,7 +237,7 @@ def main() -> int:
     _trained_model: Any = getattr(trainer, "model", None)
     if _trained_model is not None:
         try:
-            _trained_model.save_pretrained(args.output)  # type: ignore[attr-defined]
+            _trained_model.save_pretrained(args.output)
         except Exception:
             pass
     tokenizer.save_pretrained(args.output)

@@ -104,7 +104,7 @@ def main() -> int:
             if args.format == "openai_chat":
                 msgs = cast(List[Dict[str, str]], rec.get("messages") or [])
                 # rpg_style Score über gesamten Assistant-Output beurteilen
-                text = "\n".join([str(m.get("content", "")) for m in msgs if str(m.get("role")) == "assistant"])  # type: ignore[index]
+                text = "\n".join([str(m.get("content", "")) for m in msgs if str(m.get("role")) == "assistant"])
             else:
                 text = str(rec.get("output", ""))
             score = float(_run_eval.rpg_style_score(text))

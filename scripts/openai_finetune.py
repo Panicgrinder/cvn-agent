@@ -11,18 +11,19 @@ from __future__ import annotations
 
 import os
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+import importlib
 
-from typing import Any
-
+# OpenAI-Client dynamisch importieren (zur Compile-Zeit optional)
 try:
-    from openai import OpenAI  # type: ignore[import-not-found]
+    _openai_mod = importlib.import_module("openai")
+    _OpenAI_factory: Optional[Any] = getattr(_openai_mod, "OpenAI", None)
 except Exception:  # pragma: no cover - optional dependency at runtime
-    OpenAI = None  # type: ignore[assignment]
+    _OpenAI_factory = None
 
 # .env laden (nur Workspace, keine Systemweite Variable nötig)
 try:
-    from dotenv import load_dotenv  # type: ignore[import-not-found]
+    from dotenv import load_dotenv
     load_dotenv()
 except Exception:
     pass
@@ -47,20 +48,20 @@ def start_finetune(train_path: str, val_path: str, model: str = "gpt-4o-mini") -
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         return {"ok": False, "error": "OPENAI_API_KEY fehlt"}
-    if OpenAI is None:
+    if _OpenAI_factory is None:
         return {"ok": False, "error": "Package 'openai' nicht installiert"}
     validate_openai_chat_jsonl(train_path)
     validate_openai_chat_jsonl(val_path)
 
-    client: Any = OpenAI(api_key=api_key)
+    client: Any = _OpenAI_factory(api_key=api_key)
 
     # Upload Dateien
     with open(train_path, "rb") as tf:
-        train_file: Any = client.files.create(file=tf, purpose="fine-tune")  # type: ignore[attr-defined]
+        train_file: Any = client.files.create(file=tf, purpose="fine-tune")
     with open(val_path, "rb") as vf:
-        val_file: Any = client.files.create(file=vf, purpose="fine-tune")  # type: ignore[attr-defined]
+        val_file: Any = client.files.create(file=vf, purpose="fine-tune")
 
-    job: Any = client.fine_tuning.jobs.create(  # type: ignore[attr-defined]
+    job: Any = client.fine_tuning.jobs.create(
         training_file=train_file.id,
         validation_file=val_file.id,
         model=model,

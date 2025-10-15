@@ -18,4 +18,5 @@ Beispiel:
 2025-10-15 16:44 | Copilot | Markdownlint: npx-basierte Tasks ergänzt und PowerShell-Fallback-Task hinzugefügt (npx oder globales markdownlint).
 2025-10-15 16:58 | Copilot | mypy: `scripts/run_eval.py` auf check_untyped_defs=True gestellt; ungenutzte ignores entfernt; Typen/Casts ergänzt; Tests grün.
 2025-10-15 17:06 | Copilot | mypy: `scripts/eval_ui.py` auf check_untyped_defs=True gestellt; unused ignores entfernt; Variable umbenannt; Tests grün.
+2025-10-15 17:34 | Copilot | mypy: Enforcement abgeschlossen für curate_dataset_from_latest.py, openai_finetune.py, train_lora.py; unnötige ignores entfernt; kleinere Typanpassungen; pytest grün.
 2025-10-15 17:18 | Copilot | mypy-Enforcement bestätigt: `scripts/eval_ui.py` clean; pytest erneut grün; TODO/DONELOG aktualisiert.
