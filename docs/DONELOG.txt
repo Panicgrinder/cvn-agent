@@ -16,3 +16,4 @@ Beispiel:
 2025-10-15 16:26 | Copilot | README/TODO/Customization nach markdownlint (MD031/MD032/MD012/MD009/MD007) bereinigt.
 2025-10-15 16:41 | Copilot | VS Code Tasks: Git-Hook-Verify/Run auf PowerShell umgestellt; doppelte Ad-hoc-Tasks entfernt; JSON-Syntaxfehler behoben.
 2025-10-15 16:44 | Copilot | Markdownlint: npx-basierte Tasks ergänzt und PowerShell-Fallback-Task hinzugefügt (npx oder globales markdownlint).
+2025-10-15 16:58 | Copilot | mypy: `scripts/run_eval.py` auf check_untyped_defs=True gestellt; ungenutzte ignores entfernt; Typen/Casts ergänzt; Tests grün.

@@ -30,12 +30,12 @@ project_root = os.path.dirname(script_dir)
 sys.path.insert(0, project_root)
 
 # Importiere die Utility-Funktionen
-from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms  # type: ignore
+from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms
 
 # Versuche, die Anwendungseinstellungen zu importieren
 try:
     # Importiere die Einstellungen
-    from app.core.settings import settings  # type: ignore
+    from app.core.settings import settings
     # Verwende die Einstellungen für Standardwerte (neue Unterordner-Struktur)
     _st_any: Any = cast(Any, settings)
     DEFAULT_EVAL_DIR = os.path.join(project_root, cast(str, getattr(_st_any, "EVAL_DIRECTORY", "eval")))
@@ -433,10 +433,12 @@ async def load_evaluation_items(patterns: Optional[List[str]] = None) -> List[Ev
                     if check_type not in data["checks"]:
                         data["checks"][check_type] = [] if check_type != "keywords_at_least" else {"count": 0, "items": []}
                 
+                msgs_typed = cast(List[Dict[str, str]], data["messages"])  # narrow to expected shape
+                checks_typed = cast(Dict[str, Any], data["checks"])  # checks is a dict with mixed values
                 item = EvaluationItem(
                     id=data["id"],
-                    messages=data["messages"],  # type: ignore
-                    checks=data["checks"],  # type: ignore
+                    messages=msgs_typed,
+                    checks=checks_typed,
                     source_file=source_file,
                     source_package=source_package
                 )
@@ -651,8 +653,8 @@ async def evaluate_item(
                 required_count = 0
                 items_list = []
                 if hasattr(keywords_at_least, 'get'):
-                    count_val = keywords_at_least.get("count")  # type: ignore
-                    items_val = keywords_at_least.get("items")  # type: ignore
+                    count_val = keywords_at_least.get("count")
+                    items_val = keywords_at_least.get("items")
                     if count_val is not None:
                         required_count = int(count_val)
                     if items_val is not None:
@@ -995,7 +997,7 @@ async def run_evaluation(
     asgi_client: Optional[httpx.AsyncClient] = None
     if asgi:
         # FastAPI-App importieren und In-Process-Client erstellen
-        from app.main import app as fastapi_app  # type: ignore
+        from app.main import app as fastapi_app
         transport = httpx.ASGITransport(app=cast(Any, fastapi_app))
         asgi_client = httpx.AsyncClient(transport=transport, base_url="http://asgi")
         # Im ASGI-Modus gegen Pfad arbeiten
@@ -1039,7 +1041,7 @@ async def run_evaluation(
             _host = None
             try:
                 # Verwende das bereits importierte settings-Objekt, falls vorhanden
-                from app.core.settings import settings as _st  # type: ignore
+                from app.core.settings import settings as _st
                 _st_any: Any = cast(Any, _st)
                 _model_name = cast(Optional[str], getattr(_st_any, "MODEL_NAME", None))
                 _temperature = cast(Optional[float], getattr(_st_any, "TEMPERATURE", None))

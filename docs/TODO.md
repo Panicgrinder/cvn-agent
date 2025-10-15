@@ -61,6 +61,8 @@ Kurzfristige Ziele (Heute)
   - Kandidaten: `scripts/run_eval.py`, `scripts/eval_ui.py`,
     `scripts/curate_dataset_from_latest.py`, `scripts/openai_finetune.py`,
     `scripts/train_lora.py`.
+  - Status: Teil-Done — `scripts/run_eval.py` ist nun auf `check_untyped_defs=True`
+    gestellt und mypy-clean; weitere Kandidaten folgen.
 
 - [ ] Testabdeckung erhöhen (inkrementell)
   - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).
