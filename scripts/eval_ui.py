@@ -35,7 +35,7 @@ def _load_run_eval_module():
     if spec is None or spec.loader is None:
         raise RuntimeError("Konnte run_eval.py nicht laden")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # type: ignore
+    spec.loader.exec_module(module)
     return module
 
 
@@ -375,8 +375,8 @@ def action_trends() -> None:
         rpg = sum(1 for r in results if run_eval.check_rpg_mode(r.response))
         top_p_val = None
         try:
-            m = cast(Dict[str, Any], meta)
-            ov = cast(Dict[str, Any], (m.get("overrides") or {}))
+            meta_dict = cast(Dict[str, Any], meta)
+            ov = cast(Dict[str, Any], (meta_dict.get("overrides") or {}))
             top_p_val = ov.get("top_p")
         except Exception:
             top_p_val = None
@@ -399,8 +399,8 @@ def action_trends() -> None:
         # Erwartete Namen: results_YYYYmmdd_HHMM[_tag]_tX[_pY][_nZ].jsonl
         base: str = str(row.get("file", ""))
         import re as _re
-        m = _re.match(r"results_\d{8}_\d{4}(?:_[^_]+)?(?:_.+)?\.jsonl$", base)
-        if m:
+        match = _re.match(r"results_\d{8}_\d{4}(?:_[^_]+)?(?:_.+)?\.jsonl$", base)
+        if match:
             sweep_summaries.setdefault("all", []).append(row)
 
     if not summaries:
@@ -528,7 +528,7 @@ async def _evaluate_specific_items(items: List[EvalItem]) -> List[EvalResult]:
     out_path = os.path.join(results_dir, f"results_{timestamp}.jsonl")
 
     # ASGI-Client vorbereiten
-    from app.main import app as fastapi_app  # type: ignore
+    from app.main import app as fastapi_app
     import httpx
     transport = httpx.ASGITransport(app=fastapi_app)
     client = httpx.AsyncClient(transport=transport, base_url="http://asgi")

@@ -63,6 +63,7 @@ Kurzfristige Ziele (Heute)
     `scripts/train_lora.py`.
   - Status: Teil-Done — `scripts/run_eval.py` ist nun auf `check_untyped_defs=True`
     gestellt und mypy-clean; weitere Kandidaten folgen.
+  - Fortschritt: `scripts/eval_ui.py` ebenfalls auf `check_untyped_defs=True` gesetzt und mypy-clean.
 
 - [ ] Testabdeckung erhöhen (inkrementell)
   - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).
