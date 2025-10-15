@@ -19,5 +19,6 @@ Beispiel:
 2025-10-15 16:58 | Copilot | mypy: `scripts/run_eval.py` auf check_untyped_defs=True gestellt; ungenutzte ignores entfernt; Typen/Casts ergänzt; Tests grün.
 2025-10-15 17:06 | Copilot | mypy: `scripts/eval_ui.py` auf check_untyped_defs=True gestellt; unused ignores entfernt; Variable umbenannt; Tests grün.
 2025-10-15 17:34 | Copilot | mypy: Enforcement abgeschlossen für curate_dataset_from_latest.py, openai_finetune.py, train_lora.py; unnötige ignores entfernt; kleinere Typanpassungen; pytest grün.
+2025-10-15 17:55 | Copilot | Tests: Marker-Gruppierung (unit/api/streaming/eval/scripts) eingeführt; Streaming-Fehlerpfad, dependency_check und Export→Prepare-Pipeline als offline-Tests ergänzt; Tasks für Marker-Läufe.
 2025-10-15 17:48 | Copilot | Tests gruppiert: pytest-Marker (unit, api, streaming, eval, scripts) eingeführt; VS Code Tasks für gruppierte Läufe hinzugefügt; Marker auf repräsentative Tests angewendet.
 2025-10-15 17:18 | Copilot | mypy-Enforcement bestätigt: `scripts/eval_ui.py` clean; pytest erneut grün; TODO/DONELOG aktualisiert.
