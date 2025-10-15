@@ -32,7 +32,7 @@ def _make_fake_stream_client(chunks: list[str]):
             return self
         async def __aexit__(self, exc_type, exc, tb):
             return False
-        def stream(self, *args, **kwargs):  # type: ignore[override]
+        def stream(self, *args, **kwargs):
             return _CM()
 
     return _Client()
@@ -40,7 +40,7 @@ def _make_fake_stream_client(chunks: list[str]):
 
 def test_stream_chat_sends_sse_chunks_and_done(monkeypatch: MonkeyPatch) -> None:
     from typing import Callable
-    fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["a", "b"])  # type: ignore[assignment]
+    fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["a", "b"])  
     monkeypatch.setattr(chat_module.httpx, "AsyncClient", fake_factory)
     req = ChatRequest(messages=[{"role": "user", "content": "hi"}])
     agen = asyncio.run(chat_module.stream_chat_request(req))

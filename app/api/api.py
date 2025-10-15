@@ -3,9 +3,10 @@ API-Router für die Anwendung
 """
 from fastapi import APIRouter
 
-from .endpoints import chat
+# Hinweis: Endpunkte werden derzeit in app.main direkt registriert.
 
 api_router = APIRouter()
 
 # Chat-Endpunkt einbinden
-api_router.include_router(chat.router, tags=["chat"])
+# Hinweis: Endpunkte werden derzeit in app.main direkt registriert.
+# Dieser Router bleibt für mögliche künftige Modularisierung bestehen.

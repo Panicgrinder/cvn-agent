@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, cast
 
 import httpx
 from fastapi.testclient import TestClient
@@ -55,7 +55,8 @@ def test_chat_applies_top_p_and_temperature_cap(monkeypatch: MonkeyPatch) -> Non
     sent = cast(Dict[str, Any], payload_box.get("last") or {})
     opts = cast(Dict[str, Any], sent.get("options", {}))
     # Temperatur sollte im Eval-Modus gedeckelt sein
-    assert opts.get("temperature") <= 0.25
+    temp_val = opts.get("temperature")
+    assert temp_val is not None and float(temp_val) <= 0.25
     # top_p sollte übernommen sein
     assert opts.get("top_p") == 0.9
     # num_predict sollte auf SETTINGS.REQUEST_MAX_TOKENS gedeckelt sein
@@ -72,7 +73,10 @@ def test_chat_injects_context_notes_when_enabled(monkeypatch: MonkeyPatch) -> No
     monkeypatch.setattr(chat_module.httpx, "AsyncClient", _factory)
     # Kontext-Notizen aktivieren und Funktion stubben
     monkeypatch.setattr(settings_module.settings, "CONTEXT_NOTES_ENABLED", True, raising=False)
-    monkeypatch.setattr(chat_module, "load_context_notes", lambda paths, max_chars=4000: "CTX-NOTES")
+    from typing import Iterable
+    def _stub_load_context_notes(paths: Iterable[str], max_chars: int = 4000) -> str:
+        return "CTX-NOTES"
+    monkeypatch.setattr(chat_module, "load_context_notes", _stub_load_context_notes)
 
     client = TestClient(app)
     resp = client.post(

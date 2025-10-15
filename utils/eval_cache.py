@@ -43,7 +43,7 @@ class EvalCache:
             return self._idx.get(key)
 
     def put(self, key: str, value: Any) -> None:
-        rec = {"k": key, "v": value}
+        rec: Dict[str, Any] = {"k": key, "v": value}
         data = json.dumps(rec, ensure_ascii=False)
         with self._lock:
             self._idx[key] = value

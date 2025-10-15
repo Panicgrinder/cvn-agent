@@ -2,4 +2,6 @@
 Prompt-Vorlagen für die Anwendung.
 """
 
-__all__ = []
+from typing import List
+
+__all__: List[str] = []

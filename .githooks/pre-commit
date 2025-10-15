@@ -20,4 +20,26 @@ if echo "$CHANGED" | grep -Eq '^(app/|scripts/|utils/)' ; then
   fi
 fi
 
+# Markdownlint für geänderte Markdown-Dateien (README.md, docs/*.md etc.)
+MD_FILES=$(git diff --cached --name-only --diff-filter=ACMRTUXB | grep -Ei '\.md$' || true)
+if [ -n "${MD_FILES}" ]; then
+  if command -v markdownlint >/dev/null 2>&1; then
+    echo "→ Prüfe Markdown mit markdownlint"
+    # Lint
+    if ! markdownlint ${MD_FILES} -c .markdownlint.json; then
+      echo "⚠ markdownlint hat Probleme gefunden. Versuche automatische Korrektur …"
+      # Optionaler Auto-Fix; danach Dateien erneut zum Commit hinzufügen
+      if markdownlint --fix ${MD_FILES} -c .markdownlint.json; then
+        echo "✔ Fixes angewendet. Bitte Änderungen prüfen und erneut committen."
+        git add ${MD_FILES} || true
+      else
+        echo "✖ markdownlint --fix fehlgeschlagen. Bitte manuell beheben (siehe VS Code Tasks)." >&2
+      fi
+      exit 1
+    fi
+  else
+    echo "[WARN] markdownlint nicht gefunden. Überspringe Markdown-Prüfung. Installieren: 'npm install -g markdownlint-cli'" >&2
+  fi
+fi
+
 exit 0

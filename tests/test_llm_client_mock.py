@@ -40,6 +40,6 @@ def test_generate_reply_with_mock_transport(monkeypatch: MonkeyPatch) -> None:
 
     msgs: List[ChatMessage] = [ChatMessage(role="user", content="hi")]
 
-    res: ChatResponse = asyncio.run(generate_reply(msgs))  # type: ignore[misc]
+    res: ChatResponse = asyncio.run(generate_reply(msgs))
     assert isinstance(res, ChatResponse)
     assert "Hallo Welt" in res.content

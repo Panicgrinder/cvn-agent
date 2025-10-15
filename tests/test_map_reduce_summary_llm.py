@@ -24,7 +24,7 @@ async def test_process_scope_llm_uses_stub(tmp_path):
 
     # Patch llm function
     orig = mr.llm_summarize_file
-    mr.llm_summarize_file = fake_llm  # type: ignore[assignment]
+    mr.llm_summarize_file = fake_llm
     try:
         # Act: use use_llm=True, but with stubbed function, no network used
         res = await mr.process_scope(
@@ -41,7 +41,7 @@ async def test_process_scope_llm_uses_stub(tmp_path):
             concurrency=1,
         )
     finally:
-        mr.llm_summarize_file = orig  # type: ignore[assignment]
+        mr.llm_summarize_file = orig
         try:
             import shutil
             shutil.rmtree(base.parent)
@@ -63,7 +63,8 @@ async def test_process_scope_heuristic_minimal_fallback(tmp_path, monkeypatch):
     p.write_text("content", encoding="utf-8")
 
     # Force heuristic_summarize_file to None to hit minimal fallback
-    monkeypatch.setattr(mr, "heuristic_summarize_file", None, raising=False)
+    # pyright: ignore[reportUnknownMemberType] - monkeypatch modifies attribute dynamically for tests
+    monkeypatch.setattr(mr, "heuristic_summarize_file", None, raising=False)  # type: ignore[attr-defined]
 
     # Act
     res = await mr.process_scope(

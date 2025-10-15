@@ -15,7 +15,7 @@ Hinweise:
 import argparse
 import json
 import os
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
 
 import torch
 from datasets import Dataset

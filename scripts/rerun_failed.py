@@ -11,7 +11,7 @@ Aufruf:
 """
 from __future__ import annotations
 import os, glob, json, datetime as dt
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List, Dict, Any, Optional, cast
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATASETS_DIR = os.path.join(PROJECT_ROOT, "eval", "datasets")
@@ -37,7 +37,7 @@ def _load_failed_ids(path: str) -> List[str]:
             rid = str(rec.get("id") or rec.get("item_id") or rec.get("eval_id") or "")
             success = bool(rec.get("success")) if "success" in rec else None
             error = rec.get("error")
-            failed_checks = rec.get("failed_checks") or []
+            failed_checks: List[Any] = rec.get("failed_checks") or []  # type: ignore[assignment]
             if not rid:
                 continue
             if success is False or error or (isinstance(failed_checks, list) and len(failed_checks) > 0):
@@ -57,9 +57,12 @@ def _load_registry() -> Dict[str, Dict[str, Any]]:
                     obj = json.loads(line)
                 except Exception:
                     continue
-                rid = obj.get("id")
+                if not isinstance(obj, dict):
+                    continue
+                objd2: Dict[str, Any] = cast(Dict[str, Any], obj)
+                rid = objd2.get("id")
                 if isinstance(rid, str):
-                    reg[rid] = obj
+                    reg[rid] = objd2
     # JSON (Array)
     for p in glob.glob(os.path.join(DATASETS_DIR, "eval-*.json")):
         if p.endswith(".jsonl"):
@@ -67,10 +70,14 @@ def _load_registry() -> Dict[str, Dict[str, Any]]:
         try:
             arr = json.load(open(p, "r", encoding="utf-8"))
             if isinstance(arr, list):
-                for obj in arr:
-                    rid = obj.get("id")
+                arr_list: List[Any] = cast(List[Any], arr)
+                for obj in arr_list:
+                    if not isinstance(obj, dict):
+                        continue
+                    objd: Dict[str, Any] = cast(Dict[str, Any], obj)
+                    rid = objd.get("id")
                     if isinstance(rid, str):
-                        reg[rid] = obj
+                        reg[rid] = objd
         except Exception:
             continue
     return reg

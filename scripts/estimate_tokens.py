@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 import os, sys, json
-from typing import Any, Dict, Set
+from typing import Dict, Set, TYPE_CHECKING, Protocol
+
+class _EncoderLike(Protocol):
+    def encode(self, text: str) -> list[int]: ...
 
 TRY_TIKTOKEN = True
-enc: Any | None = None
+enc: _EncoderLike | None = None
 if TRY_TIKTOKEN:
     try:
-        import tiktoken  # pip install tiktoken
-        enc = tiktoken.get_encoding("cl100k_base")
+        if TYPE_CHECKING:
+            import tiktoken  # type: ignore[import-not-found]
+            enc = tiktoken.get_encoding("cl100k_base")  # type: ignore[reportUnknownVariableType]
+        else:
+            import importlib
+            tiktoken = importlib.import_module("tiktoken")
+            enc = tiktoken.get_encoding("cl100k_base")
     except Exception:
         enc = None
 
@@ -19,7 +27,7 @@ def is_text_file(path: str) -> bool:
     return ext.lower() in TEXT_EXTS
 
 def count_tokens(text: str) -> int:
-    if enc:
+    if enc is not None:
         try:
             return len(enc.encode(text))
         except Exception:

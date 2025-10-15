@@ -7,6 +7,7 @@ import os
 import json
 import argparse
 import sys
+from typing import List
 
 # Pfad zum Projektverzeichnis
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +54,7 @@ def customize_unrestricted_prompt():
     print("Drücken Sie Strg+D (Unix) oder Strg+Z (Windows), gefolgt von Enter, um die Eingabe abzuschließen.")
     print("--- EINGABE BEGINNEN ---")
     
-    lines = []
+    lines: List[str] = []
     try:
         while True:
             line = input()

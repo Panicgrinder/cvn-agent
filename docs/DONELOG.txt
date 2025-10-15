@@ -9,3 +9,10 @@ Beispiel:
 2025-10-15 12:34 | username | Eval-Pipeline stabilisiert; map_reduce_summary_llm typisiert; Doku aktualisiert.
 2025-10-15 14:10 | Copilot | CI erweitert: DONELOG-Prüfung auch bei Push auf main; VS Code Task zum schnellen Eintrag hinzugefügt.
 2025-10-15 14:22 | Copilot | Optionale Absicherung: lokaler pre-commit Hook (.githooks) + VS Code Tasks zum Installieren/Prüfen; Tasks portabilisiert.
+2025-10-15 14:27 | Copilot | Neuer System-Prompt: docs/AGENT_PROMPT.md; VS Code Task zum Kopieren in die Zwischenablage.
+2025-10-15 16:05 | Copilot | Pyright auf 1.1.406 aktualisiert; 0 Fehler/0 Warnungen; mypy/pytest grün.
+2025-10-15 16:12 | Copilot | VS Code Tasks portabilisiert; ProblemMatcher für pyright/mypy hinzugefügt; schema warnings behoben.
+2025-10-15 16:18 | Copilot | Markdownlint eingeführt (.markdownlint.json); Lint/Fix Tasks; Pre-commit Hook um Markdownlint mit Auto-Fix erweitert.
+2025-10-15 16:26 | Copilot | README/TODO/Customization nach markdownlint (MD031/MD032/MD012/MD009/MD007) bereinigt.
+2025-10-15 16:41 | Copilot | VS Code Tasks: Git-Hook-Verify/Run auf PowerShell umgestellt; doppelte Ad-hoc-Tasks entfernt; JSON-Syntaxfehler behoben.
+2025-10-15 16:44 | Copilot | Markdownlint: npx-basierte Tasks ergänzt und PowerShell-Fallback-Task hinzugefügt (npx oder globales markdownlint).

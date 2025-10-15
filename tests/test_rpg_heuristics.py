@@ -85,8 +85,8 @@ class TestRPGHeuristics(unittest.IsolatedAsyncioTestCase):
             def _mk_client(*args, **kwargs):
                 return FakeClient(content)
 
-            with patch.object(run_eval, "httpx") as httpx_mod:  # type: ignore[attr-defined]
-                httpx_mod.AsyncClient = _mk_client  # type: ignore[assignment]
+            with patch.object(run_eval, "httpx") as httpx_mod:
+                httpx_mod.AsyncClient = _mk_client
                 res = await run_eval.evaluate_item(
                     item,
                     api_url="http://dummy/chat",

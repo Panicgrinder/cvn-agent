@@ -28,8 +28,8 @@ if settings.RATE_LIMIT_ENABLED:
     import threading
 
     class _RateLimiter(BaseHTTPMiddleware):
-        def __init__(self, app):
-            super().__init__(app)  # type: ignore[arg-type]
+        def __init__(self, app: Any):
+            super().__init__(app)
             self.lock = threading.Lock()
             self.window = float(settings.RATE_LIMIT_WINDOW_SEC)
             self.capacity = max(1, int(settings.RATE_LIMIT_REQUESTS_PER_MINUTE))
@@ -80,9 +80,9 @@ if settings.RATE_LIMIT_ENABLED:
                 from typing import Deque
                 q2: Deque[float] = self.buckets[client_host]
                 remaining = max(0, (self.capacity + self.burst) - len(q2))
-                response.headers["X-RateLimit-Limit"] = str(self.capacity + self.burst)  # type: ignore[assignment]
-                response.headers["X-RateLimit-Remaining"] = str(remaining)  # type: ignore[assignment]
-                response.headers["X-RateLimit-Window"] = str(int(self.window))  # type: ignore[assignment]
+                response.headers["X-RateLimit-Limit"] = str(self.capacity + self.burst)
+                response.headers["X-RateLimit-Remaining"] = str(remaining)
+                response.headers["X-RateLimit-Window"] = str(int(self.window))
             except Exception:
                 pass
             return response
@@ -134,7 +134,7 @@ async def request_context_mw(request: Request, call_next):
             )
         else:
             logger.info(f"{request.method} {request.url.path} -> {int(response.status_code)} [{duration_ms} ms] rid={rid}")
-        response.headers[settings.REQUEST_ID_HEADER] = rid  # type: ignore[assignment]
+        response.headers[settings.REQUEST_ID_HEADER] = rid
         return response
     except Exception as exc:
         duration_ms = int((time.time() - start) * 1000)

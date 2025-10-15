@@ -133,7 +133,7 @@ def summarize_json(path: str, text: str, max_chars: int = 1200) -> str:
             try:
                 obj: Any = json.loads(ln)
                 if isinstance(obj, dict):
-                    out.append(obj)
+                    out.append(cast(Dict[str, Any], obj))
             except Exception:
                 # stop on first non-json line beyond some threshold
                 if i > 3:

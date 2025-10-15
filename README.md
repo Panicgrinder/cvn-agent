@@ -19,23 +19,27 @@ Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwende
    .\venv\Scripts\activate  # Windows
    source venv/bin/activate  # Linux/Mac
    ```
+
 3. Abhängigkeiten installieren:
 
    ```powershell
    pip install -r requirements.txt
    ```
-   Oder manuell:
    
+   Oder manuell:
+
    ```bash
    pip install fastapi uvicorn httpx python-dotenv
    ```
+
 4. Ollama installieren und starten:
- 
+
    ```bash
    # Windows-Installer von https://ollama.com/download/windows
    # Nach der Installation:
    ollama serve
    ```
+
 5. LLM-Modell herunterladen:
 
    ```powershell
@@ -90,7 +94,6 @@ Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters 
 
 Die zentralen Pydantic-Modelle für Requests/Responses liegen in `app/api/models.py`.
 Historische `app/schemas.py` wurde entfernt. Bitte nur `app/api/models.py` importieren.
-
 
 ## Workspace-Zusammenfassung
 

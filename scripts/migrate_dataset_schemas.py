@@ -28,22 +28,32 @@ def migrate_demo_dataset():
             content = f.read().strip()
             if content.startswith('['):
                 # JSON-Array Format
-                entries = json.loads(content)
+                entries: List[Dict[str, Any]] = json.loads(content)
             else:
                 # JSONL Format
-                entries = [json.loads(line) for line in content.split('\n') if line.strip()]
-        
+                entries = []  # type: List[Dict[str, Any]]
+                for line in content.split('\n'):
+                    if not line.strip():
+                        continue
+                    try:
+                        obj = json.loads(line)
+                        if isinstance(obj, dict):
+                            from typing import cast
+                            entries.append(cast(Dict[str, Any], obj))
+                    except Exception:
+                        continue
+
         if not entries:
             print(f"Keine Einträge gefunden in: {path}")
             return False
-        
+
         print(f"Gefunden: {len(entries)} Einträge in {path}")
-        
-        migrated = []
+
+        migrated: List[Dict[str, Any]] = []
         changes_made = False
-        
+
         for i, e in enumerate(entries):
-            original_e = dict(e)  # Kopie für Vergleich
+            # original_e wurde nicht verwendet; entfernt
             
             # Migration 1: prompt -> messages
             if "prompt" in e and "messages" not in e:

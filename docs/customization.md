@@ -1,12 +1,10 @@
-"""
-Dokumentation für die Anpassung des CVN Agents an Ihre persönlichen Anforderungen
+# Anpassung des CVN Agents
 
 Diese Anleitung erklärt, wie Sie den CVN Agent ohne die üblichen Einschränkungen
 von KI-Assistenten verwenden können. Sie haben volle Kontrolle über den Inhalt und
 die Regeln, die in Ihrer privaten Installation des Agents gelten.
-"""
 
-# Übersicht
+## Übersicht
 
 Der CVN Agent wurde so konzipiert, dass Sie ihn vollständig an Ihre Bedürfnisse anpassen können.
 Als privater Benutzer haben Sie die Möglichkeit, Einschränkungen zu entfernen und den
@@ -25,17 +23,20 @@ Der CVN Agent unterstützt drei verschiedene Modi:
 Um den CVN Agent ohne Einschränkungen zu verwenden, können Sie:
 
 1. Den uneingeschränkten Prompt anpassen:
-   ```
+
+   ```bash
    python scripts/customize_prompts.py --customize-unrestricted
    ```
 
 2. Eigene Regeln definieren:
-   ```
+   
+   ```bash
    python scripts/customize_prompts.py --create-rules
    ```
 
 3. Den uneingeschränkten Modus beim Aufruf aktivieren:
-   ```
+   
+   ```bash
    curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Deine Anfrage"}],"unrestricted_mode":true}'
    ```
 

@@ -9,7 +9,7 @@ Aufruf:
   python scripts/todo_gather.py --write-md
 """
 from __future__ import annotations
-import os, glob, json, argparse, datetime as dt, re
+import os, glob, json, argparse, datetime as dt
 from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

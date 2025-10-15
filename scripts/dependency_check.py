@@ -1,6 +1,9 @@
 #!/usr/bin/env python
-import os, sys, glob, json, re
-from typing import List, Dict, Any, Tuple
+import os
+import sys
+import glob
+import json
+from typing import List, Dict, Any, Tuple, cast
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -107,27 +110,32 @@ def check_synonyms():
 def coerce_json_to_jsonl(text: str) -> List[Dict[str, Any]]:
     # kleiner localer Fallback, falls utils nicht importiert werden soll
     try:
-        data = json.loads(text)
-        if isinstance(data, list):
-            return [x for x in data if isinstance(x, dict)]
-        elif isinstance(data, dict):
-            return [data]
-        else:
-            return []
+        data: Any = json.loads(text)
     except Exception:
-        # JSONL
-        out: List[Dict[str, Any]] = []
-        for line in (text or "").splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                obj: Any = json.loads(line)
-                if isinstance(obj, dict):
-                    out.append(obj)
-            except Exception:
-                pass
-        return out
+        data = None
+
+    if isinstance(data, list):
+        result: List[Dict[str, Any]] = []
+        for x in cast(List[Any], data):
+            if isinstance(x, dict):
+                result.append(cast(Dict[str, Any], x))
+        return result
+    if isinstance(data, dict):
+        return [cast(Dict[str, Any], data)]
+
+    # JSONL-Fallback
+    out: List[Dict[str, Any]] = []
+    for line in (text or "").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj_any: Any = json.loads(line)
+            if isinstance(obj_any, dict):
+                out.append(cast(Dict[str, Any], obj_any))
+        except Exception:
+            pass
+    return out
 
 def check_datasets_and_precedence():
     datasets_dir = os.path.join(ROOT, "eval", "datasets")
