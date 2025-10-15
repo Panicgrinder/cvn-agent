@@ -67,6 +67,8 @@ Kurzfristige Ziele (Heute)
 - [ ] Testabdeckung erhöhen (inkrementell)
   - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).
   - Hinweis: Windows-Pfade beachten (keine Laufwerks-Mismatches; projektwurzelnahe Temp-Verzeichnisse nutzen).
+  - Gruppierung: pytest-Marker eingerichtet (unit, api, streaming, eval, scripts);
+    VS Code Tasks für "Tests: unit" und "Tests: api+streaming" hinzugefügt.
 
 - [x] Pre-commit-Hook für DONELOG
   - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde,

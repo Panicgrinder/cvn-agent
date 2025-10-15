@@ -1,9 +1,12 @@
 import types
 import importlib.abc
+import pytest
 import scripts.quick_eval as qe
 from importlib.machinery import ModuleSpec
 
 
+@pytest.mark.scripts
+@pytest.mark.unit
 def test_load_run_eval_module_minimal(monkeypatch):
     # Provide a tiny fake run_eval module via spec loader path
     class Loader(importlib.abc.Loader):

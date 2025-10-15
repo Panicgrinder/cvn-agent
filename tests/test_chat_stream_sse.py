@@ -4,6 +4,7 @@ import asyncio
 import json
 
 from pytest import MonkeyPatch
+import pytest
 
 import app.api.chat as chat_module
 from app.api.models import ChatRequest
@@ -38,6 +39,8 @@ def _make_fake_stream_client(chunks: list[str]):
     return _Client()
 
 
+@pytest.mark.streaming
+@pytest.mark.api
 def test_stream_chat_sends_sse_chunks_and_done(monkeypatch: MonkeyPatch) -> None:
     from typing import Callable
     fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["a", "b"])  

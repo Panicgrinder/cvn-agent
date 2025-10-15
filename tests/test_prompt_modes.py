@@ -1,4 +1,5 @@
 import unittest
+import pytest
 from unittest.mock import patch
 from typing import Any, Dict, List, Tuple, cast
 
@@ -35,6 +36,8 @@ class FakeClient:
         return ResponseStub()
 
 
+@pytest.mark.unit
+@pytest.mark.eval
 class TestPromptModes(unittest.IsolatedAsyncioTestCase):
     async def _capture_messages(self, req: ChatRequest, **kwargs: Any) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         sent_payload: Dict[str, Any] = {}

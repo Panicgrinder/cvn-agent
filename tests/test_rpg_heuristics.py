@@ -1,4 +1,5 @@
 import unittest
+import pytest
 from unittest.mock import patch
 from typing import Any, Dict, List, Optional
 import sys
@@ -49,6 +50,8 @@ class FakeClient:
         return ResponseStub(self._content)
 
 
+@pytest.mark.unit
+@pytest.mark.eval
 class TestRPGHeuristics(unittest.IsolatedAsyncioTestCase):
     async def test_rpg_style_score_basic(self):
         run_eval = _get_run_eval()
