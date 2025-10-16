@@ -12,6 +12,7 @@
 - [`.markdownlint.json`](.markdownlint.json) - Markdownlint-Konfiguration
 - [`analysis_chat_routers.md`](analysis_chat_routers.md) - Analyse der Chat-Router
 - [`cleanup_recommendations.md`](cleanup_recommendations.md) - Aufräum-Empfehlungen
+- [`CONTEXT_ARCH.md`](docs/CONTEXT_ARCH.md) – Kontextfluss Developer ⇄ Copilot ⇄ GPT (Rollen, Beispiele, Privacy)
 - [`mypy.ini`](mypy.ini) - mypy-Konfiguration
 - [`pyrightconfig.json`](pyrightconfig.json) - Python-Typsystem-Konfiguration
 - [`pytest.ini`](pytest.ini) - Pytest-Konfiguration
