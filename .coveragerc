@@ -1,0 +1,22 @@
+[run]
+branch = True
+source =
+    app
+    scripts
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.
+    @overload
+    pass
+omit =
+    app/utils/examples/*
+    scripts/eval_ui.py
+    scripts/train_lora.py
+    scripts/run_eval.py
+    scripts/openai_finetune.py
+    scripts/run_tests.py
+
+[html]
+directory = htmlcov
