@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import os
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 import importlib
 
 # OpenAI-Client dynamisch importieren (zur Compile-Zeit optional)
@@ -74,7 +74,14 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(description="OpenAI Fine-Tuning Job starten")
     p.add_argument("train", help="Pfad zu *_train.jsonl (openai_chat)")
     p.add_argument("val", help="Pfad zu *_val.jsonl (openai_chat)")
-    p.add_argument("--model", default="gpt-4o-mini")
+    # Modell aus ENV überschreibbar: OPENAI_FINETUNE_MODEL; Fallback: gpt-4o-mini
+    p.add_argument("--model", default=os.getenv("OPENAI_FINETUNE_MODEL", "gpt-4o-mini"))
+    p.add_argument("--official-only", action="store_true", help="Nur Modelle aus offizieller Allowlist zulassen")
+    p.add_argument(
+        "--official-models-file",
+        default=os.getenv("OPENAI_OFFICIAL_MODELS_FILE", os.path.join(os.path.dirname(os.path.dirname(__file__)), "eval", "config", "openai_official_models.json")),
+        help="Pfad zu JSON-Liste erlaubter Modell-IDs"
+    )
     p.add_argument("--validate-only", action="store_true", help="Nur JSONL prüfen, keinen Job starten")
     args = p.parse_args()
 
@@ -86,6 +93,24 @@ if __name__ == "__main__":
         except Exception as e:
             print("VALIDATION_ERROR:", str(e))
     else:
+        # Optional: Nur Modelle aus Allowlist akzeptieren
+        if args.official_only:
+            try:
+                with open(args.official_models_file, "r", encoding="utf-8") as f:
+                    allowed: List[str] = json.load(f)
+                if not isinstance(allowed, list) or not all(isinstance(x, str) for x in allowed):
+                    raise ValueError("Ungültiges Format der Allowlist (erwarte JSON-Array von Strings)")
+            except FileNotFoundError:
+                print("Fehler: official-only aktiv, aber Allowlist fehlt:", args.official_models_file)
+                raise SystemExit(2)
+            except Exception as e:
+                print("Fehler beim Laden der Allowlist:", str(e))
+                raise SystemExit(2)
+            if args.model not in allowed:
+                print("Fehler: Modell nicht in offizieller Allowlist:", args.model)
+                print("Datei:", args.official_models_file)
+                raise SystemExit(2)
+
         out = start_finetune(args.train, args.val, args.model)
         if out.get("ok"):
             print("Job:", out["job"], "TrainFile:", out["train_file"], "ValFile:", out["val_file"])

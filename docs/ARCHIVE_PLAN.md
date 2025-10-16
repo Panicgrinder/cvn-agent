@@ -12,6 +12,20 @@ Vorgehen:
 1. Zunächst via .gitignore ausgeschlossen (bereits umgesetzt).
 2. Nach Review endgültig löschen (Phase 3) und Referenzen prüfen.
 
+Aktueller Status (2025-10-16):
+
+- `eval/eval-21-40_demo_v1.0.json`: Derzeit nicht im Repo vorhanden; zusätzlich per `.gitignore` ignoriert.
+- `data/system.txt`: Derzeit nicht im Repo vorhanden; zusätzlich per `.gitignore` ignoriert.
+- Zentrale Prompt-Quelle: `app/core/prompts.py` (vorhanden); optionales Template: `app/prompt/system.txt` (leer, optional).
+
+Prüfkommandos (PowerShell):
+
+```powershell
+Get-ChildItem -Path "eval" -Filter "eval-21-40_demo_v1.0.json" -Recurse
+Test-Path "data/system.txt"
+Select-String -Path .gitignore -SimpleMatch "eval/eval-21-40_demo_v1.0.json","data/system.txt"
+```
+
 ## Phase 4 – Ausführung
 
 - PowerShell (WhatIf/Dry-Run):

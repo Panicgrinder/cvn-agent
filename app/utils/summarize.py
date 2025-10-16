@@ -49,8 +49,8 @@ def extract_key_points(text: str, max_points: int = 5) -> List[str]:
     
     # Wenn nicht genug wichtige Sätze gefunden wurden, verwende die längsten Sätze
     if len(key_sentences) < max_points:
-        # Sortiere Sätze nach Länge (längere zuerst)
-        remaining_sentences: List[str] = [s for s in sentences if s not in key_sentences]
+        # Sortiere Sätze nach Länge (längere zuerst), leere Sätze ignorieren
+        remaining_sentences: List[str] = [s for s in sentences if s and s.strip() and s not in key_sentences]
         remaining_sentences.sort(key=len, reverse=True)
         
         # Füge die längsten Sätze hinzu, bis max_points erreicht ist

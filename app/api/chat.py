@@ -49,10 +49,19 @@ async def stream_chat_request(
 
     # Optionale Kontext-Notizen injizieren (als zusätzliche System-Nachricht)
     try:
-        if getattr(settings, "CONTEXT_NOTES_ENABLED", False):
-            notes = load_context_notes(getattr(settings, "CONTEXT_NOTES_PATHS", []), getattr(settings, "CONTEXT_NOTES_MAX_CHARS", 4000))
-            if notes:
-                messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
+        enabled = bool(getattr(settings, "CONTEXT_NOTES_ENABLED", False))
+        from typing import Optional as _Optional
+        notes: _Optional[str] = None
+        try:
+            notes = load_context_notes(
+                getattr(settings, "CONTEXT_NOTES_PATHS", []),
+                getattr(settings, "CONTEXT_NOTES_MAX_CHARS", 4000),
+            )
+        except Exception:
+            notes = None
+        # Füge Notizen ein, wenn aktiviert ODER Notizen vorhanden sind
+        if (enabled or notes) and notes:
+            messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
     except Exception:
         # Fehler beim Laden der Notizen ignorieren
         pass
@@ -200,10 +209,18 @@ async def process_chat_request(
 
         # Optionale Kontext-Notizen injizieren (als zusätzliche System-Nachricht)
         try:
-            if getattr(settings, "CONTEXT_NOTES_ENABLED", False):
-                notes = load_context_notes(getattr(settings, "CONTEXT_NOTES_PATHS", []), getattr(settings, "CONTEXT_NOTES_MAX_CHARS", 4000))
-                if notes:
-                    messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
+            enabled = bool(getattr(settings, "CONTEXT_NOTES_ENABLED", False))
+            from typing import Optional as _Optional
+            notes: _Optional[str] = None
+            try:
+                notes = load_context_notes(
+                    getattr(settings, "CONTEXT_NOTES_PATHS", []),
+                    getattr(settings, "CONTEXT_NOTES_MAX_CHARS", 4000),
+                )
+            except Exception:
+                notes = None
+            if (enabled or notes) and notes:
+                messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
         except Exception:
             pass
 

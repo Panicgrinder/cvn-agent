@@ -574,8 +574,14 @@ def action_rerun_failed() -> None:
 
     # Lade alle Items aus den Standardpaketen und filtere nach IDs
     patterns: List[str] = [os.path.join(run_eval.DEFAULT_EVAL_DIR, run_eval.DEFAULT_FILE_PATTERN)]
+    from utils.eval_utils import ensure_eval_prefix, strip_eval_prefix
     all_items: List[EvalItem] = asyncio.run(run_eval.load_evaluation_items(patterns))
-    id_set: Set[str] = set(failed_ids)
+    # Erzeuge eine normalisierte ID-Menge (Original, mit eval-, ohne eval-)
+    id_set: Set[str] = set()
+    for rid in failed_ids:
+        id_set.add(rid)
+        id_set.add(ensure_eval_prefix(rid))
+        id_set.add(strip_eval_prefix(rid))
     items_to_rerun: List[EvalItem] = [it for it in all_items if it.id in id_set]
 
     if not items_to_rerun:

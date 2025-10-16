@@ -60,6 +60,10 @@ def main() -> int:
     p.add_argument("--min-rpg-style", type=float, default=0.0, help="Mindestschwelle für rpg_style Score (0..1)")
     p.add_argument("--exclude-regex", default=None, help="Regex zum Ausschließen von Items nach Instruction/Input")
     p.add_argument("--results-file", default=None, help="Konkrete results_*.jsonl statt neuester wählen")
+    # Zusätzliche Filter/Metriken (Defaults: aus)
+    p.add_argument("--min-assistant-words", type=int, default=0, help="Mindestanzahl Wörter im Assistant-Output")
+    p.add_argument("--min-instr-cover", type=float, default=0.0, help="Mindestanteil Instruktions-Token in Antwort (0..1)")
+    p.add_argument("--require-list-min", type=int, default=0, help="Minimale Anzahl Listenpunkte im Output (-/*/1./1))")
     args = p.parse_args()
 
     results_dir = args.results_dir
@@ -85,8 +89,12 @@ def main() -> int:
 
     exported_path = str(exp.get("out"))
 
-    # Optional: Qualitätsfilter anwenden (rpg_style, exclude_regex) für openai_chat
-    if args.min_rpg_style > 0.0 or args.exclude_regex:
+    # Optional: Qualitätsfilter anwenden, wenn mind. ein Filter aktiv ist
+    do_filter = (
+        args.min_rpg_style > 0.0 or bool(args.exclude_regex) or
+        args.min_assistant_words > 0 or args.min_instr_cover > 0.0 or args.require_list_min > 0
+    )
+    if do_filter:
         # Laden und filtern
         import re
         def _iter_jsonl(path: str):
@@ -100,13 +108,37 @@ def main() -> int:
         records: List[Dict[str, Any]] = list(_iter_jsonl(exported_path))
         filtered: List[Dict[str, Any]] = []
         pattern = re.compile(args.exclude_regex) if args.exclude_regex else None
-        for rec in records:
+        word_re = re.compile(r"[a-z0-9]+", re.IGNORECASE)
+
+        def _assistant_text(rec: Dict[str, Any]) -> str:
             if args.format == "openai_chat":
                 msgs = cast(List[Dict[str, str]], rec.get("messages") or [])
-                # rpg_style Score über gesamten Assistant-Output beurteilen
-                text = "\n".join([str(m.get("content", "")) for m in msgs if str(m.get("role")) == "assistant"])
+                return "\n".join([str(m.get("content", "")) for m in msgs if str(m.get("role")) == "assistant"]) or ""
             else:
-                text = str(rec.get("output", ""))
+                return str(rec.get("output", ""))
+
+        def _instruction_text(rec: Dict[str, Any]) -> str:
+            if args.format == "openai_chat":
+                msgs2 = cast(List[Dict[str, str]], rec.get("messages") or [])
+                return next((str(m.get("content", "")) for m in msgs2 if str(m.get("role")) == "user"), "")
+            else:
+                return str(rec.get("instruction", ""))
+
+        def _tokenize(text: str) -> List[str]:
+            return word_re.findall(text.lower())
+
+        def _list_points(text: str) -> int:
+            cnt = 0
+            for line in text.splitlines():
+                s = line.strip()
+                if s.startswith("- ") or s.startswith("* "):
+                    cnt += 1
+                elif re.match(r"^\d+[\.)]\s+", s):
+                    cnt += 1
+            return cnt
+        for rec in records:
+            text = _assistant_text(rec)
+            instr = _instruction_text(rec)
             score = float(_run_eval.rpg_style_score(text))
             if score < args.min_rpg_style:
                 continue
@@ -114,14 +146,31 @@ def main() -> int:
                 # Instruction/Input heranziehen
                 if args.format == "openai_chat":
                     msgs2 = cast(List[Dict[str, str]], rec.get("messages") or [])
-                    instruction = next((str(m.get("content", "")) for m in msgs2 if str(m.get("role")) == "user"), "")
                     other = "\n".join([str(m.get("content", "")) for m in msgs2 if str(m.get("role")) != "user"]) or ""
-                    hay = f"{instruction}\n{other}"
+                    hay = f"{instr}\n{other}"
                 else:
-                    instruction = str(rec.get("instruction", ""))
                     inp = str(rec.get("input", ""))
-                    hay = f"{instruction}\n{inp}"
+                    hay = f"{instr}\n{inp}"
                 if pattern.search(hay):
+                    continue
+
+            # Mindestanzahl Wörter im Assistant-Output
+            if args.min_assistant_words > 0:
+                if len(_tokenize(text)) < int(args.min_assistant_words):
+                    continue
+
+            # Instruction-Coverage
+            if args.min_instr_cover > 0.0:
+                instr_toks = set(_tokenize(instr))
+                if instr_toks:
+                    resp_toks = set(_tokenize(text))
+                    cover = len(instr_toks & resp_toks) / max(1, len(instr_toks))
+                    if cover < float(args.min_instr_cover):
+                        continue
+
+            # Listenformat mindestens N Punkte
+            if args.require_list_min > 0:
+                if _list_points(text) < int(args.require_list_min):
                     continue
             filtered.append(rec)
 

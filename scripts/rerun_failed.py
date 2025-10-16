@@ -12,6 +12,7 @@ Aufruf:
 from __future__ import annotations
 import os, glob, json, datetime as dt
 from typing import List, Dict, Any, Optional, cast
+from utils.eval_utils import strip_eval_prefix, ensure_eval_prefix
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATASETS_DIR = os.path.join(PROJECT_ROOT, "eval", "datasets")
@@ -41,7 +42,11 @@ def _load_failed_ids(path: str) -> List[str]:
             if not rid:
                 continue
             if success is False or error or (isinstance(failed_checks, list) and len(failed_checks) > 0):
-                failed.append(rid)
+                # Füge beide Schlüsselvarianten hinzu, um robust gegen Präfixe zu sein
+                if rid:
+                    failed.append(rid)
+                    failed.append(strip_eval_prefix(rid))
+                    failed.append(ensure_eval_prefix(rid))
     return sorted(set(failed))
 
 def _load_registry() -> Dict[str, Dict[str, Any]]:
@@ -62,7 +67,10 @@ def _load_registry() -> Dict[str, Dict[str, Any]]:
                 objd2: Dict[str, Any] = cast(Dict[str, Any], obj)
                 rid = objd2.get("id")
                 if isinstance(rid, str):
+                    # Mappe sowohl mit als auch ohne eval- Präfix
                     reg[rid] = objd2
+                    reg[strip_eval_prefix(rid)] = objd2
+                    reg[ensure_eval_prefix(rid)] = objd2
     # JSON (Array)
     for p in glob.glob(os.path.join(DATASETS_DIR, "eval-*.json")):
         if p.endswith(".jsonl"):
@@ -78,6 +86,8 @@ def _load_registry() -> Dict[str, Dict[str, Any]]:
                     rid = objd.get("id")
                     if isinstance(rid, str):
                         reg[rid] = objd
+                        reg[strip_eval_prefix(rid)] = objd
+                        reg[ensure_eval_prefix(rid)] = objd
         except Exception:
             continue
     return reg
@@ -102,7 +112,12 @@ def main() -> int:
     with open(out_path, "w", encoding="utf-8") as out:
         for obj in items:
             out.write(json.dumps(obj, ensure_ascii=False) + "\n")
-    print(f"Re-Run Dataset erstellt: {os.path.relpath(out_path, PROJECT_ROOT)}")
+    # Robust gegenüber unterschiedlichen Laufwerken (Windows):
+    try:
+        rel = os.path.relpath(out_path, PROJECT_ROOT)
+    except Exception:
+        rel = out_path
+    print(f"Re-Run Dataset erstellt: {rel}")
     print("Nächster Schritt:")
     print('  python scripts/run_eval.py --patterns "eval/results/tmp/rerun_*.jsonl"')
     return 0

@@ -69,6 +69,14 @@ Kurzfristige Ziele (Heute)
   - Hinweis: Windows-Pfade beachten (keine Laufwerks-Mismatches; projektwurzelnahe Temp-Verzeichnisse nutzen).
   - Gruppierung: pytest-Marker eingerichtet (unit, api, streaming, eval, scripts);
     VS Code Tasks für "Tests: unit" und "Tests: api+streaming" hinzugefügt.
+  - Fortschritt:
+    - Neue Tests für Rate-Limit/Timeout, Prompt-/Options-Parsing, Context-Notes,
+      Settings-Validatoren, LLM-Service, Summaries.
+    - Skript-Smokes (audit_workspace, smoke_asgi, fine_tune_pipeline, openai_ft_status [stubbed],
+      open_latest_summary, map_reduce_summary) heben niedrige Skriptabdeckung >5%.
+    - Zusätzlich: Beispiel‑Test `tests/test_chai_checks.py` prüft `check_term_inclusion`
+      inkl. Synonym‑Erkennung.
+  - Nächste Schritte: Weitere Smokes für verbleibende Low-Coverage-Skripte; gezielte Edge-Case-Tests für Export→Prepare→Pack Pipeline; erneute Gesamtabdeckung messen und iterativ anheben.
 
 - [x] Pre-commit-Hook für DONELOG
   - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde,
@@ -87,20 +95,44 @@ Kurzfristige Ziele (Heute)
     Lint/Fix Tasks ergänzt; Windows-Optimierungen für Hook-Tasks und
     Markdownlint-Fallback)
 
+### Coverage-Ziele & Tasks
+
+- Ziele (vereinbart):
+  - App: ≥85% Zeilen, ≥75–80% Branches (inkrementell anziehen)
+  - Scripts: ≥60% Zeilen (Basis, später anheben)
+  - Kombiniert: Fail-Under=80 (angezogen)
+- VS Code Tasks:
+  - "Tests: coverage app (≥85%)"
+  - "Tests: coverage scripts (≥60%)"
+  - "Tests: coverage (fail-under)" (kombiniert, 80)
+  
+Hinweise:
+- Branch-Coverage ist in `.coveragerc` aktiviert; schwere/interactive Skripte sind ausgeschlossen.
+- Zielwerte werden sukzessive angehoben, sobald Teilbereiche stabil darüber liegen.
+
 3–7 Tage
 
 - Datensatzkurierung aus Logs (Train/Val-Pack)
   - Status: In Arbeit / Done (Teil 1): Skript `scripts/curate_dataset_from_latest.py` erstellt;
     Export (openai_chat/alpaca), Dedupe & Train/Val-Split;
     VS Code Task "Curate dataset (latest)" hinzugefügt.
+  - Robustheit: Export/Kuratierung verbessert
+    - `app/core/settings.py`: `EVAL_FILE_PATTERN` auf `eval-*.json*` erweitert (unterstützt .json und .jsonl).
+    - `scripts/export_finetune.py`: nutzt zusätzlich `source_file` aus den Results, um Dataset‑Items zuverlässig zuzuordnen (auch wenn Dateien nicht mit `eval-*` benannt sind).
 - Fine-Tuning/LoRA Mini-Pipeline
 - Caching/Memoization für Eval-Reruns
 - Rerun-Failed mit Profil/Meta-Rekonstruktion
 
-- [ ] Mini-Eval → Export → Split → LoRA (Smoke)
+- [x] Mini-Eval → Export → Split → LoRA (Smoke)
   - Ziel: 10–20 Items evaluieren (quiet/ASGI), `openai_chat` exportieren, Split erzeugen,
     kurze LoRA-Trainingsprobe (max 10 Steps) mit `--only-free` oder lokalem Modell.
   - Output: Artefakte in `eval/results/finetune/`, Trainingslogs und Metriken festhalten.
+  - Status: Done (chai-Profil)
+    - Eval: 15 Items (ASGI/quiet) aus `eval/datasets/chai-ai_small_v1.jsonl` → `eval/results/results_20251016_0930.jsonl`
+    - Kuratierung: `openai_chat` Export + Split → Train (13) / Val (2)
+    - Validation: `scripts/openai_finetune.py ... --validate-only` → VALIDATION_OK
+    - LoRA Mini: 10 Schritte (TinyLlama), Output: `outputs/lora-chai-mini-0937/`
+    - Begleitende Verbesserungen: Checks vereinfacht; Synonyms‑Overlay erweitert; Test `tests/test_chai_checks.py` hinzugefügt.
 
 - [ ] Eval-Caching & Reruns
   - Ziel: Ergebnis-Caching (z. B. per Key: Prompt+Options), `scripts/rerun_failed.py` integrieren/absichern; Tests für Cache-Hits/Misses.

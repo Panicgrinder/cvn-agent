@@ -20,7 +20,13 @@ ENTRYPOINTS = [
 
 
 def to_module_name(path: str) -> str:
-    rel = os.path.relpath(path, PROJECT_ROOT).replace(os.sep, "/")
+    try:
+        rel = os.path.relpath(path, PROJECT_ROOT).replace(os.sep, "/")
+    except Exception:
+        # Fallback: nutze absolute Pfadangabe und schneide Projektwurzel grob weg
+        p = path.replace("\\", "/")
+        root = PROJECT_ROOT.replace("\\", "/")
+        rel = p[len(root)+1:] if p.startswith(root + "/") else os.path.basename(p)
     if rel.endswith("/__init__.py"):
         rel = rel[: -len("/__init__.py")]
     elif rel.endswith(".py"):
@@ -140,20 +146,32 @@ def main() -> int:
     print("Projektwurzel:", PROJECT_ROOT)
     print("Einstiegspunkte:")
     for name, p in ENTRYPOINTS:
-        rel = os.path.relpath(p, PROJECT_ROOT)
+        try:
+            rel = os.path.relpath(p, PROJECT_ROOT)
+        except Exception:
+            rel = p
         print(f" - {name}: {rel}")
 
     print(f"\nGesamt Python-Module: {len(pyfiles)} | Erreichbar: {len(used)} | Potenziell ungenutzt: {len(unused)}")
     if unused:
         print("\nPotenziell ungenutzte Python-Dateien:")
         for m in unused:
-            print(" -", os.path.relpath(pyfiles[m], PROJECT_ROOT))
+            pth = pyfiles[m]
+            try:
+                r = os.path.relpath(pth, PROJECT_ROOT)
+            except Exception:
+                r = pth
+            print(" -", r)
 
     refs = scan_text_references()
     if refs:
         print("\nNicht-Python-Dateien mit Referenzen im Code:")
         for p in refs:
-            print(" -", os.path.relpath(p, PROJECT_ROOT))
+            try:
+                r = os.path.relpath(p, PROJECT_ROOT)
+            except Exception:
+                r = p
+            print(" -", r)
 
     print("\nHinweise:")
     hp = os.path.join(PROJECT_ROOT, "app", "routers", "health.py")

@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     EVAL_DATASET_DIR: str = os.path.join("eval", "datasets")
     EVAL_RESULTS_DIR: str = os.path.join("eval", "results")
     EVAL_CONFIG_DIR: str = os.path.join("eval", "config")
-    EVAL_FILE_PATTERN: str = "eval-*.json"
+    # Unterstütze sowohl .json als auch .jsonl (z.B. eval-*.jsonl)
+    EVAL_FILE_PATTERN: str = "eval-*.json*"
     
     # CORS-Einstellungen
     BACKEND_CORS_ORIGINS: List[str] = []

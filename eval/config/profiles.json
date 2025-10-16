@@ -21,5 +21,19 @@
     "asgi": true,
     "eval_mode": true,
     "skip_preflight": true
+  },
+  "chai": {
+    "model": null,
+    "host": null,
+    "temperature": 0.5,
+    "checks": [
+      "must_include",
+      "keywords_any",
+      "not_include"
+    ],
+    "quiet": true,
+    "asgi": true,
+    "eval_mode": true,
+    "skip_preflight": true
   }
 }

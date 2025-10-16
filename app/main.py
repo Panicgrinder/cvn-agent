@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi.responses import JSONResponse
 from typing import cast as _cast
 import json as _json
 from fastapi.middleware.cors import CORSMiddleware
@@ -142,6 +143,26 @@ async def request_context_mw(request: Request, call_next):
             logger.exception(_json.dumps({"event": "error", "path": request.url.path, "request_id": rid, "duration_ms": duration_ms, "error": str(exc)}, ensure_ascii=False))
         else:
             logger.exception(f"Fehler bei {request.url.path} rid={rid}: {exc}")
+        # HTTPException in eine reguläre Antwort umwandeln, damit TestClient/Clients eine Response erhalten
+        if isinstance(exc, HTTPException):
+            # Merge evtl. vorhandene Exception-Header mit unserer Request-ID
+            from typing import Any as _Any, Mapping as _Mapping
+            raw_headers: _Any = getattr(exc, "headers", None)
+            headers: Dict[str, str] = {settings.REQUEST_ID_HEADER: str(rid)}
+            try:
+                if isinstance(raw_headers, dict):
+                    m: _Mapping[_Any, _Any] = raw_headers
+                    for key_obj, val_obj in m.items():
+                        k: str = str(key_obj)
+                        v: str = str(val_obj)
+                        headers[k] = v
+            except Exception:
+                pass
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"detail": exc.detail},
+                headers=headers,
+            )
         raise
 
 @app.post("/chat", response_model=ChatResponse)
@@ -185,6 +206,9 @@ async def chat(request: ChatRequest, req: Request):
         )
         return response
 
+    except HTTPException:
+        # Bekannte HTTP-Fehler (z. B. 400 bei zu langem Input) unverändert durchreichen
+        raise
     except Exception as e:
         logger.exception(f"Fehler bei der Verarbeitung der Chat-Anfrage: {str(e)}")
         raise HTTPException(
@@ -210,6 +234,9 @@ async def chat_stream(request: ChatRequest, req: Request):
             request_id=rid,
         )
         return StreamingResponse(gen, media_type="text/event-stream")
+    except HTTPException:
+        # HTTP-Exceptions (falls sie auftreten) direkt durchreichen
+        raise
     except Exception as e:
         logger.exception(f"Fehler bei der Streaming-Chat-Anfrage: {str(e)}")
         raise HTTPException(

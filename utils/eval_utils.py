@@ -3,6 +3,29 @@ import re
 import os
 from typing import List, Dict, Any, Union
 
+def strip_eval_prefix(s: str) -> str:
+    """
+    Entfernt das führende "eval-" Präfix von einer ID, falls vorhanden.
+
+    Beispiel: "eval-123" -> "123", "item-1" -> "item-1"
+    """
+    try:
+        return s[5:] if isinstance(s, str) and s.startswith("eval-") else s
+    except Exception:
+        return s
+
+def ensure_eval_prefix(s: str) -> str:
+    """
+    Stellt sicher, dass eine ID mit "eval-" beginnt.
+
+    Beispiel: "123" -> "eval-123", "eval-123" -> "eval-123"
+    """
+    try:
+        s_str = str(s)
+        return s_str if s_str.startswith("eval-") else f"eval-{s_str}"
+    except Exception:
+        return str(s)
+
 def truncate(text: str, n: int = 200) -> str:
     """
     Kürzt einen Text auf eine maximale Länge.

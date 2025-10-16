@@ -146,6 +146,7 @@ def main() -> int:
     p.add_argument("--model", default="TinyLlama/TinyLlama-1.1B-Chat-v1.0")
     p.add_argument("--output", default=os.path.join("outputs", "lora-out"))
     p.add_argument("--per-device-train-batch-size", type=int, default=1)
+    p.add_argument("--grad-accum", type=int, default=8, help="Gradient Accumulation steps (effektiver Batch auf kleinem VRAM)")
     p.add_argument("--epochs", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--max-steps", type=int, default=-1)
@@ -153,6 +154,10 @@ def main() -> int:
     p.add_argument("--fp16", action="store_true")
     p.add_argument("--load-in-4bit", action="store_true", help="4bit-Loading aktivieren (erfordert bitsandbytes und passenden Stack)")
     p.add_argument("--max-length", type=int, default=1024)
+    # LoRA Hyperparameter explizit überschreibbar
+    p.add_argument("--lora-r", type=int, default=int(os.getenv("LORA_R", "8")))
+    p.add_argument("--lora-alpha", type=int, default=int(os.getenv("LORA_ALPHA", "16")))
+    p.add_argument("--lora-dropout", type=float, default=float(os.getenv("LORA_DROPOUT", "0.05")))
     args = p.parse_args()
 
     os.makedirs(args.output, exist_ok=True)
@@ -207,6 +212,7 @@ def main() -> int:
     sft_cfg = SFTConfig(
         output_dir=args.output,
         per_device_train_batch_size=max(1, args.per_device_train_batch_size),
+        gradient_accumulation_steps=max(1, args.grad_accum),
         num_train_epochs=float(args.epochs),
         max_steps=int(args.max_steps),
         learning_rate=float(args.lr),
@@ -222,7 +228,11 @@ def main() -> int:
         packing=False,
     )
 
-    lora_cfg = build_lora_config(model)
+    # LoRA Hyperparameter (CLI überschreibt ENV)
+    r = int(args.lora_r)
+    alpha = int(args.lora_alpha)
+    dropout = float(args.lora_dropout)
+    lora_cfg = build_lora_config(model, r=r, alpha=alpha, dropout=dropout)
 
     trainer = SFTTrainer(
         model=model,

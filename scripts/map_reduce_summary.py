@@ -40,6 +40,16 @@ EXCLUDE_DIR_NAMES = {"__pycache__", ".pytest_cache", ".git", ".venv", "venv", "n
 TEXT_EXTS = {".py", ".md", ".txt", ".json", ".jsonl"}
 
 
+def _safe_rel(path: str) -> str:
+    try:
+        return os.path.relpath(path, PROJECT_ROOT)
+    except Exception:
+        # Fallback für Cross-Drive unter Windows
+        p = path.replace("\\", "/")
+        root = PROJECT_ROOT.replace("\\", "/")
+        return p[len(root)+1:] if p.startswith(root + "/") else p
+
+
 def is_text_file(path: str) -> bool:
     _, ext = os.path.splitext(path)
     return ext.lower() in TEXT_EXTS
@@ -81,7 +91,7 @@ def summarize_python(path: str, text: str, max_chars: int = 1200) -> str:
                     constants.append(t.id)
 
     lines: List[str] = []
-    lines.append(f"Datei: {os.path.relpath(path, PROJECT_ROOT)}")
+    lines.append(f"Datei: {_safe_rel(path)}")
     if mod_doc:
         d = mod_doc.strip().splitlines()
         head = d[0][:200]
@@ -103,7 +113,7 @@ def summarize_markdown(path: str, text: str, max_chars: int = 1200) -> str:
     lines = text.splitlines()
     headings = [ln.strip() for ln in lines if ln.lstrip().startswith("#")]
     bullets = [ln.strip() for ln in lines if ln.lstrip().startswith(('-', '*'))]
-    out: List[str] = [f"Datei: {os.path.relpath(path, PROJECT_ROOT)}"]
+    out: List[str] = [f"Datei: {_safe_rel(path)}"]
     if headings:
         out.append("Überschriften:")
         out.extend([f"- {h}" for h in headings[:12]])
@@ -118,7 +128,7 @@ def summarize_markdown(path: str, text: str, max_chars: int = 1200) -> str:
 def summarize_text(path: str, text: str, max_chars: int = 1200) -> str:
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
     head = lines[:15]
-    out = [f"Datei: {os.path.relpath(path, PROJECT_ROOT)}", *head]
+    out = [f"Datei: {_safe_rel(path)}", *head]
     return "\n".join(out)[:max_chars]
 
 
@@ -152,7 +162,7 @@ def summarize_json(path: str, text: str, max_chars: int = 1200) -> str:
             is_jsonl = True
             parsed = objs
 
-    lines: List[str] = [f"Datei: {os.path.relpath(path, PROJECT_ROOT)}"]
+    lines: List[str] = [f"Datei: {_safe_rel(path)}"]
     if parsed is None:
         lines.append("Hinweis: Konnte JSON nicht parsen; Rohtext-Ausschnitt folgt.")
         lines.append(content[:max_chars])

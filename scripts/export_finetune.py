@@ -53,18 +53,37 @@ def _load_results(path: str) -> List[Dict[str, Any]]:
 
 async def _load_items_map(patterns: Optional[List[str]] = None) -> Dict[str, Any]:
     items = await run_eval.load_evaluation_items(patterns)
-    return {it.id: it for it in items}
+    id_map: Dict[str, Any] = {}
+    for it in items:
+        # Primärer Key: die vom Loader gesetzte ID
+        try:
+            key = str(it.id)
+        except Exception:
+            continue
+        id_map[key] = it
+        # Sekundärer Key: falls die ID mit "eval-" beginnt, zusätzlich Variante ohne Präfix mappen
+        if key.startswith("eval-"):
+            id_map[key[len("eval-"):]] = it
+    return id_map
 
 
 def _first_user_message(messages: List[Dict[str, str]]) -> Tuple[str, str]:
     """Liefert (instruction, input)."""
     if not messages:
         return ("", "")
-    # Nimm erste user-Nachricht als Instruction, Rest als Input-Zusammenfassung
-    instruction = next((m["content"] for m in messages if m.get("role") == "user"), messages[0].get("content", ""))
-    others = [m["content"] for m in messages if m.get("role") != "user"]
-    input_text = "\n\n".join(others) if others else ""
-    return (instruction or "", input_text)
+    # Nimm die erste user-Nachricht als Instruction,
+    # alles andere (weitere user/assistant/system) wird als Input zusammengefasst
+    instruction = ""
+    others: List[str] = []
+    for m in messages:
+        role = m.get("role")
+        content = m.get("content", "")
+        if instruction == "" and role == "user":
+            instruction = content
+        else:
+            if content:
+                others.append(content)
+    return (instruction, "\n\n".join(others))
 
 
 async def export_from_results(
@@ -89,14 +108,30 @@ async def export_from_results(
     if not rows:
         return {"ok": False, "error": "Keine Ergebnisse in Datei"}
 
-    # Map Items laden: Standardmäßig sowohl datasets- als auch eval-Verzeichnis berücksichtigen
+    # Map Items laden: Bevorzuge explizite Source-Dateien aus den Results,
+    # plus Standard-Globs aus Settings, damit auch nicht 'eval-*' benannte Datasets gefunden werden.
     if patterns is None:
         cand: List[str] = []
+        # 1) Explizite Quell-Dateien aus den Results
+        try:
+            ddir = str(getattr(run_eval, "DEFAULT_DATASET_DIR"))
+        except Exception:
+            ddir = None
+        src_files: List[str] = []
+        for r in rows:
+            sf = r.get("source_file")
+            if isinstance(sf, str) and sf:
+                # Wenn möglich mit dem Dataset-Verzeichnis verknüpfen
+                if ddir:
+                    src_files.append(os.path.join(ddir, sf))
+                else:
+                    src_files.append(sf)
+        # 2) Fallback-Globs
         if hasattr(run_eval, "DEFAULT_DATASET_DIR"):
             try:
-                ddir = str(getattr(run_eval, "DEFAULT_DATASET_DIR"))
+                ddir2 = str(getattr(run_eval, "DEFAULT_DATASET_DIR"))
                 pat = str(getattr(run_eval, "DEFAULT_FILE_PATTERN"))
-                cand.append(os.path.join(ddir, pat))
+                cand.append(os.path.join(ddir2, pat))
             except Exception:
                 pass
         try:
@@ -105,7 +140,7 @@ async def export_from_results(
             cand.append(os.path.join(edir, pat2))
         except Exception:
             pass
-        patterns = cand or None
+        patterns = (src_files + cand) or None
     id2item = await _load_items_map(patterns)
 
     # Filter
