@@ -134,14 +134,14 @@ Hinweise:
     - LoRA Mini: 10 Schritte (TinyLlama), Output: `outputs/lora-chai-mini-0937/`
     - Begleitende Verbesserungen: Checks vereinfacht; Synonyms‑Overlay erweitert; Test `tests/test_chai_checks.py` hinzugefügt.
 
-- [ ] Eval-Caching & Reruns
-  - Ziel: Ergebnis-Caching (z. B. per Key: Prompt+Options), `scripts/rerun_failed.py` integrieren/absichern; Tests für Cache-Hits/Misses.
+- [x] Eval-Caching (Basis)
+  - Status: Done — Optional per `--cache`; speichert Antworten in `eval/results/cache_eval.jsonl` (Key: messages+options+model+eval_mode). Reruns folgen separat.
 
-- [ ] Dedupe/Heuristiken für Trainingsdaten schärfen
-  - Ziel: Längenfilter, Near-Duplicate-Checks, optional einfache Qualitätsmetriken vor dem Packen.
+- [x] Dedupe/Heuristiken für Trainingsdaten schärfen (Basis)
+  - Status: Done — `prepare_finetune_pack.py` unterstützt `--near-dup-threshold` (Token‑Jaccard) zusätzlich zur Instruktions‑Dedupe.
 
-- [ ] Dokumentation Training/Feinabstimmung
-  - Ziel: README-Abschnitt oder `docs/training.md` mit Minimalbeispiel, Hardware-Hinweisen und Troubleshooting.
+- [x] Dokumentation Training/Feinabstimmung
+  - Status: Done — `docs/training.md` (Minimalablauf, Optionen, Hinweise).
 
 Später
 

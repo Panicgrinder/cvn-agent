@@ -14,6 +14,7 @@ import os
 import json
 import random
 from typing import Any, Dict, List, Optional, cast
+import re
 
 
 def _read_jsonl(path: str) -> List[Dict[str, Any]]:
@@ -73,6 +74,7 @@ def prepare_pack(
     seed: int = 42,
     min_output_chars: int = 20,
     dedupe_by_instruction: bool = True,
+    near_dup_threshold: float = 0.0,
 ) -> Dict[str, Any]:
     if out_dir is None:
         out_dir = os.path.dirname(src_path) or "."
@@ -95,6 +97,29 @@ def prepare_pack(
                 seen.add(key)
                 uniq.append(r)
         rows = uniq
+
+    # Optionale Near-Duplicate-Reduktion (einfacher Token-Jaccard auf Instruction)
+    def _tok_set(s: str) -> set[str]:
+        toks = re.findall(r"\w+", s.lower())
+        return set(toks)
+    if near_dup_threshold and near_dup_threshold > 0.0:
+        kept: List[Dict[str, Any]] = []
+        seen_instr: List[set[str]] = []
+        for r in rows:
+            instr = _instr_key(r, format)
+            ts = _tok_set(instr)
+            is_dup = False
+            for prev in seen_instr:
+                inter = len(ts & prev)
+                union = len(ts | prev) or 1
+                j = inter / union
+                if j >= near_dup_threshold:
+                    is_dup = True
+                    break
+            if not is_dup:
+                kept.append(r)
+                seen_instr.append(ts)
+        rows = kept
 
     if not rows:
         return {"ok": False, "error": "Alle Einträge wurden gefiltert"}
@@ -129,6 +154,7 @@ if __name__ == "__main__":
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--min-output-chars", type=int, default=20)
     p.add_argument("--no-dedupe", action="store_true")
+    p.add_argument("--near-dup-threshold", type=float, default=0.0, help="Optional: [0.0–1.0] Token-Jaccard-Schwelle für Near-Dedupe (z. B. 0.8)")
     args = p.parse_args()
 
     res = prepare_pack(
@@ -138,6 +164,7 @@ if __name__ == "__main__":
         seed=args.seed,
         min_output_chars=args.min_output_chars,
         dedupe_by_instruction=(not args.no_dedupe),
+        near_dup_threshold=float(args.near_dup_threshold),
     )
     if res.get("ok"):
         print("Train:", res["train"], "Val:", res["val"], "Counts:", res["counts"])

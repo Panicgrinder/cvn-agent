@@ -31,6 +31,13 @@ sys.path.insert(0, project_root)
 
 # Importiere die Utility-Funktionen
 from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms
+try:
+    # Optionaler Cache für Antworten (lokal JSONL-basiert)
+    from utils.eval_cache import EvalCache, make_key  # type: ignore
+except Exception:
+    EvalCache = None  # type: ignore
+    def make_key(obj: Any) -> str:  # type: ignore
+        return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 # Versuche, die Anwendungseinstellungen zu importieren
 try:
@@ -533,6 +540,7 @@ async def evaluate_item(
     num_predict_override: Optional[int] = None,
     request_id: Optional[str] = None,
     retries: int = 0,
+    cache: Optional["EvalCache"] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -582,6 +590,22 @@ async def evaluate_item(
         if request_id:
             headers[REQUEST_ID_HEADER] = request_id
         async def _send_and_get(_payload: Dict[str, Any]) -> str:
+            # Cache-Hit prüfen
+            cache_key: Optional[str] = None
+            if cache is not None:
+                try:
+                    cache_key = make_key({
+                        "api_url": api_url,
+                        "messages": _payload.get("messages"),
+                        "options": _payload.get("options"),
+                        "model": _payload.get("model") or model_override,
+                        "eval_mode": eval_mode,
+                    })
+                    cached = cache.get(cache_key)
+                    if isinstance(cached, str) and cached:
+                        return cached
+                except Exception:
+                    pass
             if client is None:
                 async with httpx.AsyncClient(timeout=60.0) as temp_client:  # Erhöhtes Timeout für komplexere Anfragen
                     resp = await temp_client.post(api_url, json=_payload, headers=headers)
@@ -589,7 +613,14 @@ async def evaluate_item(
                 resp = await client.post(api_url, json=_payload, headers=headers)
             resp.raise_for_status()
             data_local = resp.json()
-            return data_local.get("content", "")
+            content_local = data_local.get("content", "")
+            # Cache schreiben
+            if cache is not None and cache_key is not None and content_local:
+                try:
+                    cache.put(cache_key, content_local)
+                except Exception:
+                    pass
+            return content_local
 
         # Initial-Hinweis für Szenen/Dialoge: als User-Nachricht injizieren, damit er eval_mode übersteht
         try:
@@ -944,6 +975,7 @@ async def run_evaluation(
     tag: Optional[str] = None,
     quiet: bool = False,
     retries: int = 0,
+    use_cache: bool = False,
 ) -> List[EvaluationResult]:
     """
     Führt die Evaluierung für alle Einträge durch.
@@ -1068,6 +1100,16 @@ async def run_evaluation(
             with open(results_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(meta_header, ensure_ascii=False) + "\n")
 
+            # Optional: Cache vorbereiten
+            eval_cache = None
+            if use_cache and EvalCache is not None:
+                try:
+                    cache_path = os.path.join(DEFAULT_RESULTS_DIR, "cache_eval.jsonl")
+                    eval_cache = EvalCache(cache_path)  # type: ignore
+                    logging.info(f"Eval-Cache aktiv: {cache_path}")
+                except Exception:
+                    eval_cache = None
+
             # Hilfsfunktion zur Ausführung eines Durchlaufs mit gegebenen Overrides
             async def _run_once(temp_override: Optional[float], top_p_ov: Optional[float], num: Optional[int], tag_suffix: Optional[str] = None) -> None:
                 nonlocal results_file
@@ -1097,6 +1139,7 @@ async def run_evaluation(
                         num_predict_override=num,
                         request_id=rid,
                         retries=retries,
+                        cache=eval_cache,
                     )
                     results.append(r)
                     with open(results_file, "a", encoding="utf-8") as f:
@@ -1407,6 +1450,8 @@ if __name__ == "__main__":
     parser.add_argument("--sweep-top-p", nargs="*", type=float, dest="sweep_top_p", help="Parameter-Sweep über top_p-Werte (z. B. 0.7 0.9)")
     parser.add_argument("--sweep-max-tokens", nargs="*", type=int, dest="sweep_max_tokens", help="Parameter-Sweep über max_tokens/num_predict (z. B. 128 256 512)")
     parser.add_argument("--retries", type=int, default=0, help="Inhaltliche Retrys bei fehlgeschlagenen Checks (z. B. 1)")
+    parser.add_argument("--cache", dest="use_cache", action="store_true", help="Antworten lokal cachen (eval/results/cache_eval.jsonl)")
+    parser.add_argument("--no-cache", dest="no_cache", action="store_true", help="Caching explizit deaktivieren")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1512,6 +1557,8 @@ if __name__ == "__main__":
         console.print(f"Retries bei Fehlschlag: {args.retries}")
     if args.sweep_temp or args.sweep_top_p:
         console.print(f"Sweep: temp={args.sweep_temp or '-'} top_p={args.sweep_top_p or '-'} max_tokens={args.sweep_max_tokens or '-'}")
+    if args.use_cache and not args.no_cache:
+        console.print("[green]Eval-Cache: aktiviert (cache_eval.jsonl)[/green]")
     
     # Verarbeite "show-prompts" Kommando
     if args.show_prompts:
@@ -1553,6 +1600,7 @@ if __name__ == "__main__":
         tag=args.tag,
     quiet=quiet_final,
     retries=args.retries,
+    use_cache=(args.use_cache and not args.no_cache),
     ))
     
     if results:
