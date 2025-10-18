@@ -35,3 +35,4 @@ Beispiel:
 2025-10-19 12:12 | Copilot | Backup: Separates Backup-Repo finalisiert (origin auf neues Repo), orphan main mit README+MANIFEST; GitHub Release erstellt und alle Snapshot-Dateien als Assets hochgeladen (um LFS-Grenzen zu vermeiden).
 2025-10-19 12:14 | Copilot | VS Code: Task "Eval: rerun from results" hinzugefügt; docs/TODO.md und docs/DONELOG.txt aktualisiert.
 2025-10-19 12:28 | Copilot | Backup-Härtung: cvn-root-files ZIP sanitized (ohne .env) und im Release ersetzt; MANIFEST mit SHA-256 für alle Assets aktualisiert; README mit Restore-Anleitung ergänzt.
+2025-10-19 13:05 | Copilot | Tests: Neue Script-Smokes (todo_gather, customize_prompts, map_reduce_summary_llm, open_latest_summary, fine_tune_pipeline) hinzugefügt; Scripts-Abdeckung auf ~67% erhöht.

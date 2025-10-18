@@ -64,7 +64,6 @@ Kurzfristige Ziele (Heute)
   - Status: Done — Alle genannten Skripte sind jetzt auf `check_untyped_defs=True`
     gestellt und mypy-clean.
 
-- [ ] Testabdeckung erhöhen (inkrementell)
   - Ziel: Mehr Edge- und Fehlerpfade testen (Streaming-Fehler, Timeout/Rate-Limit, dependency_check-Sonderfälle, Export/Prepare-Interop).
   - Hinweis: Windows-Pfade beachten (keine Laufwerks-Mismatches; projektwurzelnahe Temp-Verzeichnisse nutzen).
   - Gruppierung: pytest-Marker eingerichtet (unit, api, streaming, eval, scripts);
@@ -72,8 +71,13 @@ Kurzfristige Ziele (Heute)
   - Fortschritt:
     - Neue Tests für Rate-Limit/Timeout, Prompt-/Options-Parsing, Context-Notes,
       Settings-Validatoren, LLM-Service, Summaries.
-    - Skript-Smokes (audit_workspace, smoke_asgi, fine_tune_pipeline, openai_ft_status [stubbed],
-      open_latest_summary, map_reduce_summary) heben niedrige Skriptabdeckung >5%.
+    - Skript-Smokes erweitert (neu hinzugefügt):
+      - `tests/scripts/test_todo_gather_smoke.py` → scripts/todo_gather.py (jetzt ~88%)
+      - `tests/scripts/test_customize_prompts_smoke.py` → scripts/customize_prompts.py (jetzt ~48%)
+      - `tests/scripts/test_map_reduce_summary_llm_smoke.py` → scripts/map_reduce_summary_llm.py (jetzt ~62%)
+      - `tests/scripts/test_open_latest_summary_smoke.py` → scripts/open_latest_summary.py (Happy-Path, Print)
+      - `tests/scripts/test_fine_tune_pipeline_smoke.py` → scripts/fine_tune_pipeline.py (Free‑Modell, --no-check, kurzer Pfad)
+    - Ergebnis: Scripts-Zeilenabdeckung insgesamt ~67% (vorher ~60–65%).
     - Zusätzlich: Beispiel‑Test `tests/test_chai_checks.py` prüft `check_term_inclusion`
       inkl. Synonym‑Erkennung.
   - Nächste Schritte:
