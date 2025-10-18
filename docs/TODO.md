@@ -161,9 +161,10 @@ Neu (Backups & Releases)
   - Status: Done — Neues GitHub-Repo erstellt; `main` enthält README+MANIFEST; kompletter
     Snapshot als Release-Assets hochgeladen (ZIPs, gesplittete .venv-Parts). LFS-Grenzen
     damit umgangen.
-- [ ] Checksums & Restore-Doku ergänzen
-  - Ziel: SHA-256 für alle Release-Assets in MANIFEST.json ablegen; README: kurze Anleitung
-    zum Zusammenfügen von *.part* (PowerShell) und Integritätsprüfung.
+- [x] Checksums & Restore-Doku ergänzen
+  - Status: Done — Backup-Repo: MANIFEST mit SHA-256 für alle Assets erzeugt; README
+    um Restore-Anleitung (Parts zusammenfügen, Verifikation) ergänzt.
+  - Hinweis: Optional Verschlüsselung (7‑Zip AES‑256) für sensible Artefakte vorbereiten.
 
 Später
 

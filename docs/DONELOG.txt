@@ -34,3 +34,4 @@ Beispiel:
 2025-10-18 09:15 | Copilot | Reruns: `scripts/rerun_from_results.py` (profile-aware, liest Meta/Overrides/Patterns), Pattern-Normalisierung implementiert; Smoke-Test hinzugefügt.
 2025-10-19 12:12 | Copilot | Backup: Separates Backup-Repo finalisiert (origin auf neues Repo), orphan main mit README+MANIFEST; GitHub Release erstellt und alle Snapshot-Dateien als Assets hochgeladen (um LFS-Grenzen zu vermeiden).
 2025-10-19 12:14 | Copilot | VS Code: Task "Eval: rerun from results" hinzugefügt; docs/TODO.md und docs/DONELOG.txt aktualisiert.
+2025-10-19 12:28 | Copilot | Backup-Härtung: cvn-root-files ZIP sanitized (ohne .env) und im Release ersetzt; MANIFEST mit SHA-256 für alle Assets aktualisiert; README mit Restore-Anleitung ergänzt.
