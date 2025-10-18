@@ -63,6 +63,9 @@ eval/config/context.local.jsonl
 Thumbs.db
 .idea/
 .vscode/
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
 *.swp
 *.swo
 *~

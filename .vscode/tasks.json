@@ -1,0 +1,391 @@
+{
+  "version": "2.0.0",
+  "options": { "cwd": "${workspaceFolder}" },
+  "tasks": [
+    {
+      "label": "Tests: pytest -q",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["-m", "pytest", "-q"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests: coverage app (≥85%)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "-m",
+        "pytest",
+        "-q",
+        "--cov=app",
+        "--cov-report=term-missing",
+        "--cov-branch",
+        "--cov-config",
+        "${workspaceFolder}/.coveragerc",
+        "--cov-fail-under=85"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests: coverage scripts (≥60%)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "-m",
+        "pytest",
+        "-q",
+        "--cov=scripts",
+        "--cov-report=term-missing",
+        "--cov-branch",
+        "--cov-config",
+        "${workspaceFolder}/.coveragerc",
+        "--cov-fail-under=60"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests: unit",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["-m", "pytest", "-q", "-m", "unit"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests: api+streaming",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["-m", "pytest", "-q", "-m", "api or streaming"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Type check: pyright",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["-m", "pyright", "-p", "${workspaceFolder}/pyrightconfig.json"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": [
+        {
+          "owner": "pyright",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "^(.+):(\\d+):(\\d+) - (error|warning): (.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        }
+      ]
+    },
+    {
+      "label": "Type check: mypy",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["-m", "mypy", "--config-file", "${workspaceFolder}/mypy.ini", "."],
+      "problemMatcher": [
+        {
+          "owner": "mypy",
+          "fileLocation": ["absolute"],
+          "pattern": {
+            "regexp": "^(.+):(\\d+)(?::(\\d+))?: (error|warning|note): (.*)$",
+            "file": 1,
+            "line": 2,
+            "column": 3,
+            "severity": 4,
+            "message": 5
+          }
+        }
+      ]
+    },
+    {
+      "label": "Audit: dependency_check",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/dependency_check.py"]
+    },
+    {
+      "label": "Eval: quick (ASGI, eval-mode)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/quick_eval.py"]
+    },
+    {
+      "label": "Eval: UI (Konsole)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/eval_ui.py"]
+    },
+    {
+      "label": "Summary: heuristic (map-reduce)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/map_reduce_summary.py",
+        "--out-dir",
+        "${workspaceFolder}/eval/results/summaries"
+      ]
+    },
+    {
+      "label": "Curate dataset (latest)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/curate_dataset_from_latest.py"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "OpenAI: validate finetune pack",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/openai_finetune.py",
+        "${input:openaiTrain}",
+        "${input:openaiVal}",
+        "--validate-only"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "OpenAI: start finetune (safe)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/openai_finetune.py",
+        "${input:openaiTrain}",
+        "${input:openaiVal}",
+        "--model",
+        "${input:openaiModel}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "LoRA: mini 10-steps (8GB)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/train_lora.py",
+        "${input:loraTrainJsonl}",
+        "--model", "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+        "--output", "${workspaceFolder}/outputs/lora-mini",
+        "--per-device-train-batch-size", "1",
+        "--grad-accum", "16",
+        "--epochs", "1",
+        "--lr", "2e-4",
+        "--max-steps", "10",
+        "--fp16",
+        "--max-length", "512"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "TODO-Report schreiben",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/todo_gather.py", "--write-md"]
+    },
+    {
+      "label": "Open context notes",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/open_context_notes.py"]
+    },
+    {
+      "label": "Cleanup Phase 4 (WhatIf)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        "${workspaceFolder}/scripts/cleanup_phase4.ps1",
+        "-WhatIf",
+        "true"
+      ],
+      "presentation": { "reveal": "always" }
+    },
+    {
+      "label": "Git hooks: install local pre-commit",
+      "type": "shell",
+      "command": "git",
+      "args": ["config", "core.hooksPath", ".githooks"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Git hooks: verify pre-commit",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "if (Test-Path '.githooks/pre-commit') { Write-Output 'pre-commit hook vorhanden' } else { Write-Error 'pre-commit fehlt'; exit 1 }"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pre-commit: run check",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "if (Get-Command bash -ErrorAction SilentlyContinue) { bash -lc '.githooks/pre-commit' } else { Write-Error 'bash nicht gefunden. Bitte Git Bash installieren oder Hook manuell prüfen.'; exit 1 }"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Copy AGENT_PROMPT to clipboard",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "Get-Content -Raw '${workspaceFolder}/docs/AGENT_PROMPT.md' | Set-Clipboard"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Append DONELOG entry",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": ["${workspaceFolder}/scripts/append_done.py", "${input:doneMessage}"],
+      "options": { "cwd": "${workspaceFolder}" }
+    },
+    {
+      "label": "Lint: markdownlint (docs+README)",
+      "type": "shell",
+      "command": "markdownlint",
+      "args": ["README.md", "docs/**/*.md"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Fix: markdownlint --fix (docs+README)",
+      "type": "shell",
+      "command": "markdownlint",
+      "args": ["--fix", "README.md", "docs/**/*.md"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Markdownlint: lint",
+      "type": "process",
+      "command": "npx",
+      "args": ["-y", "@davidanson/markdownlint-cli2", "**/*.md"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Markdownlint: fix (cli2)",
+      "type": "process",
+      "command": "npx",
+      "args": ["-y", "@davidanson/markdownlint-cli2-fix", "**/*.md"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Markdownlint: lint (PowerShell fallback)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "if (Get-Command npx -ErrorAction SilentlyContinue) { npx -y @davidanson/markdownlint-cli2 '**/*.md' } elseif (Get-Command markdownlint -ErrorAction SilentlyContinue) { markdownlint 'README.md' 'docs/**/*.md' } else { Write-Error 'Weder npx noch markdownlint gefunden. Bitte Node.js/NPM installieren oder markdownlint-cli global bereitstellen.'; exit 1 }"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Tests: coverage (fail-under)",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "-m",
+        "pytest",
+        "-q",
+        "--cov",
+        "--cov-report=term-missing",
+        "--cov-branch",
+        "--cov-config",
+        "${workspaceFolder}/.coveragerc",
+        "--cov-fail-under=80"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+    ,
+    {
+      "label": "Eval: rerun from results",
+      "type": "process",
+      "command": "${config:python.interpreterPath}",
+      "args": [
+        "${workspaceFolder}/scripts/rerun_from_results.py",
+        "${input:rerunResults}",
+        "${input:rerunMode}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "openaiTrain",
+      "type": "promptString",
+      "description": "Pfad zu *_train.jsonl (openai_chat)",
+      "default": "${workspaceFolder}/eval/results/finetune/finetune_openai_chat_*_train.jsonl"
+    },
+    {
+      "id": "openaiVal",
+      "type": "promptString",
+      "description": "Pfad zu *_val.jsonl (openai_chat)",
+      "default": "${workspaceFolder}/eval/results/finetune/finetune_openai_chat_*_val.jsonl"
+    },
+    {
+      "id": "loraTrainJsonl",
+      "type": "promptString",
+      "description": "Pfad zu openai_chat JSONL für LoRA (train)",
+      "default": "${workspaceFolder}/eval/results/finetune/finetune_openai_chat_*_train.jsonl"
+    },
+    {
+      "id": "openaiModel",
+      "type": "promptString",
+      "description": "OpenAI Fine-tune Modell-ID (leer = ENV OPENAI_FINETUNE_MODEL oder 'gpt-4o-mini')",
+      "default": "${env:OPENAI_FINETUNE_MODEL}"
+    },
+    {
+      "id": "doneMessage",
+      "type": "promptString",
+      "description": "Kurzbeschreibung für DONELOG",
+      "default": "Kleine Korrekturen"
+    },
+    {
+      "id": "rerunResults",
+      "type": "promptString",
+      "description": "Pfad zu results_*.jsonl für Rerun",
+      "default": "${workspaceFolder}/eval/results/results_*.jsonl"
+    },
+    {
+      "id": "rerunMode",
+      "type": "pickString",
+      "description": "Rerun-Modus",
+      "options": ["--all", ""],
+      "default": ""
+    }
+  ]
+}
