@@ -76,7 +76,10 @@ Kurzfristige Ziele (Heute)
       open_latest_summary, map_reduce_summary) heben niedrige Skriptabdeckung >5%.
     - Zusätzlich: Beispiel‑Test `tests/test_chai_checks.py` prüft `check_term_inclusion`
       inkl. Synonym‑Erkennung.
-  - Nächste Schritte: Weitere Smokes für verbleibende Low-Coverage-Skripte; gezielte Edge-Case-Tests für Export→Prepare→Pack Pipeline; erneute Gesamtabdeckung messen und iterativ anheben.
+  - Nächste Schritte:
+    - Weitere Smokes für verbleibende Low-Coverage-Skripte
+    - Export→Prepare→Pack: Randfälle abgedeckt (alpaca/openai_chat, Near‑Dup, min_output)
+    - Gesamtabdeckung erneut messen und iterativ anheben
 
 - [x] Pre-commit-Hook für DONELOG
   - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde,
@@ -95,7 +98,7 @@ Kurzfristige Ziele (Heute)
     Lint/Fix Tasks ergänzt; Windows-Optimierungen für Hook-Tasks und
     Markdownlint-Fallback)
 
-### Coverage-Ziele & Tasks
+## Coverage-Ziele & Tasks
 
 - Ziele (vereinbart):
   - App: ≥85% Zeilen, ≥75–80% Branches (inkrementell anziehen)
@@ -107,6 +110,7 @@ Kurzfristige Ziele (Heute)
   - "Tests: coverage (fail-under)" (kombiniert, 80)
   
 Hinweise:
+
 - Branch-Coverage ist in `.coveragerc` aktiviert; schwere/interactive Skripte sind ausgeschlossen.
 - Zielwerte werden sukzessive angehoben, sobald Teilbereiche stabil darüber liegen.
 
@@ -118,10 +122,15 @@ Hinweise:
     VS Code Task "Curate dataset (latest)" hinzugefügt.
   - Robustheit: Export/Kuratierung verbessert
     - `app/core/settings.py`: `EVAL_FILE_PATTERN` auf `eval-*.json*` erweitert (unterstützt .json und .jsonl).
-    - `scripts/export_finetune.py`: nutzt zusätzlich `source_file` aus den Results, um Dataset‑Items zuverlässig zuzuordnen (auch wenn Dateien nicht mit `eval-*` benannt sind).
+    - `scripts/export_finetune.py`: nutzt zusätzlich `source_file` aus den Results,
+      um Dataset‑Items zuverlässig zuzuordnen (auch wenn Dateien nicht mit `eval-*` benannt sind).
 - Fine-Tuning/LoRA Mini-Pipeline
 - Caching/Memoization für Eval-Reruns
 - Rerun-Failed mit Profil/Meta-Rekonstruktion
+  - Status: Done (Basis)
+    - `scripts/rerun_from_results.py` rekonstruiert Model/Host/Temperature/Checks aus Meta
+    - ASGI/HTTP unterstützt
+    - Smoke-Test vorhanden
 
 - [x] Mini-Eval → Export → Split → LoRA (Smoke)
   - Ziel: 10–20 Items evaluieren (quiet/ASGI), `openai_chat` exportieren, Split erzeugen,
@@ -135,7 +144,10 @@ Hinweise:
     - Begleitende Verbesserungen: Checks vereinfacht; Synonyms‑Overlay erweitert; Test `tests/test_chai_checks.py` hinzugefügt.
 
 - [x] Eval-Caching (Basis)
-  - Status: Done — Optional per `--cache`; speichert Antworten in `eval/results/cache_eval.jsonl` (Key: messages+options+model+eval_mode). Reruns folgen separat.
+  - Status: Done — Optional per `--cache`
+    - Speichert Antworten in `eval/results/cache_eval.jsonl`
+    - Key: messages+options+model+eval_mode
+    - Reruns folgen separat
 
 - [x] Dedupe/Heuristiken für Trainingsdaten schärfen (Basis)
   - Status: Done — `prepare_finetune_pack.py` unterstützt `--near-dup-threshold` (Token‑Jaccard) zusätzlich zur Instruktions‑Dedupe.

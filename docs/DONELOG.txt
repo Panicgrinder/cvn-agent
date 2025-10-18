@@ -31,3 +31,4 @@ Beispiel:
 2025-10-16 09:41 | Copilot | Export/Kuratierung robuster: `EVAL_FILE_PATTERN` auf `eval-*.json*` erweitert; `export_finetune` nutzt `source_file` aus Results für zuverlässige Zuordnung; Mini-LoRA-Lauf (10 Schritte) auf chai-Pack durchgeführt.
 2025-10-16 09:45 | Copilot | Docs aktualisiert: AGENT_PROMPT.md um Pipeline/PowerShell‑Shortcuts/Artefakte erweitert; ARCHIVE_PLAN.md mit Status & Prüfkommandos ergänzt; TODO.md Fortschritte/Robustheit dokumentiert.
 2025-10-17 10:10 | Copilot | Eval: optionaler Response-Cache in `scripts/run_eval.py` (`--cache`), Near-Dedupe in `prepare_finetune_pack.py` (`--near-dup-threshold`), neue Tests hinzugefügt; VS Code Test-Explorer konfiguriert (pytest), Run-&-Debug-Profile für Marker.
+2025-10-18 09:15 | Copilot | Reruns: `scripts/rerun_from_results.py` (profile-aware, liest Meta/Overrides/Patterns), Pattern-Normalisierung implementiert; Smoke-Test hinzugefügt.
