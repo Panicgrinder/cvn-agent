@@ -33,6 +33,7 @@
 - [`.vscode/launch.json`](.vscode/launch.json) - Startkonfigurationen
 - [`.vscode/settings.json`](.vscode/settings.json) - Workspace-spezifische Einstellungen
 - [`.vscode/tasks.json`](.vscode/tasks.json) - VSCode-Tasks (z. B. Tests, Eval)
+  - Enthält u. a. die Task „Eval: rerun from results“ (profile-aware Reruns aus results_*.jsonl)
 
 ### app
 
@@ -59,7 +60,8 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### app/prompt
 
-- [`app/prompt/system.txt`](app/prompt/system.txt) - Optionales Template (nicht produktiv referenziert; zentrale Quelle ist `app/core/prompts.py`)
+- [`app/prompt/system.txt`](app/prompt/system.txt) - Optionales Template (nicht produktiv
+  referenziert; zentrale Quelle ist `app/core/prompts.py`)
 
 #### app/routers (legacy/geparkt)
 
@@ -96,6 +98,9 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`docs/TODO.md`](docs/TODO.md) - ToDo & Roadmap für lokale Entwicklungsarbeit
 - [`docs/AGENT_PROMPT.md`](docs/AGENT_PROMPT.md) - Agent System-Prompt & Arbeitsprinzipien
 - [`docs/DONELOG.txt`](docs/DONELOG.txt) - DONELOG – Abgeschlossene Arbeiten
+- [`docs/training.md`](docs/training.md) - Kurzleitfaden Training/Finetuning (inkl. Reruns)
+  - Hinweis: Reruns via `scripts/rerun_from_results.py` (Flags: `--all`, `--ids`)
+  - Backup/Restore: Separates Backup-Repo mit privaten Releases; MANIFEST (SHA-256) und README mit Restore-Anleitung
 
 ### eval
 
@@ -106,13 +111,19 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### eval/datasets
 
-- [`eval/datasets/eval-01-20_prompts_v1.0.json`](eval/datasets/eval-01-20_prompts_v1.0.json) - Sachliche Prompts (eval-001 bis eval-020)
-- [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) - Demo-/Fantasy-Prompts (eval-021 bis eval-040)
-- [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json) - Dialog-Prompts (eval-041 bis eval-060)
-- [`eval/datasets/eval-61-80_szenen_prompts_v1.0.json`](eval/datasets/eval-61-80_szenen_prompts_v1.0.json) - Szenen-Prompts (eval-061 bis eval-080)
-- [`eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json`](eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json) - Technische Erklärungen (eval-081 bis eval-100)
+- [`eval/datasets/eval-01-20_prompts_v1.0.json`](eval/datasets/eval-01-20_prompts_v1.0.json) -
+  Sachliche Prompts (eval-001 bis eval-020)
+- [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) -
+  Demo-/Fantasy-Prompts (eval-021 bis eval-040)
+- [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json)
+  - Dialog-Prompts (eval-041 bis eval-060)
+- [`eval/datasets/eval-61-80_szenen_prompts_v1.0.json`](eval/datasets/eval-61-80_szenen_prompts_v1.0.json)
+  - Szenen-Prompts (eval-061 bis eval-080)
+- [`eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json`](eval/datasets/eval-81-100_technik_erklaerungen_v1.0.json)
+  - Technische Erklärungen (eval-081 bis eval-100)
 - [`eval/datasets/chai-ai_small_v1.jsonl`](eval/datasets/chai-ai_small_v1.jsonl) - Chai-Smalltalk/Empathie-Dataset (aktuell)
-- [`eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip`](eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip) - Archiv (optional)
+- [`eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip`](eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip)
+  - Archiv (optional)
 
 #### eval/config
 
@@ -131,7 +142,8 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 ### examples
 
-- [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel für uneingeschränkten Prompt
+- [`examples/unrestricted_prompt_example.txt`](examples/unrestricted_prompt_example.txt) - Beispiel
+  für uneingeschränkten Prompt
 - [`examples/rpg/models.py`](examples/rpg/models.py) - RPG-Modelle (geparkte Features)
 - [`examples/rpg/state.py`](examples/rpg/state.py) - RPG-State-Router (geparkt)
 - [`examples/rpg/roll.py`](examples/rpg/roll.py) - RPG-Roll-Router (geparkt)
@@ -158,6 +170,8 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/fine_tune_pipeline.py`](scripts/fine_tune_pipeline.py) - Mini-Pipeline fürs Fine-Tuning/LoRA
 - [`scripts/rerun_failed.py`](scripts/rerun_failed.py) - JSONL mit fehlgeschlagenen Items
 - [`scripts/todo_gather.py`](scripts/todo_gather.py) - Sammelt Metriken/Status und erzeugt Markdown
+- [`scripts/rerun_from_results.py`](scripts/rerun_from_results.py) - Profile-aware Reruns auf Basis
+  von results_*.jsonl (unterstützt `--all` und `--ids`)
 - [`scripts/map_reduce_summary.py`](scripts/map_reduce_summary.py) - Heuristische Workspace-Zusammenfassung
 - [`scripts/map_reduce_summary_llm.py`](scripts/map_reduce_summary_llm.py) - LLM-gestützte Zusammenfassung via /chat
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata
@@ -186,9 +200,11 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-10-16
+Letzte Aktualisierung: 2025-10-19
 
 Hinweise:
 
-- Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py). `app/prompt/system.txt` ist nur ein optionales Template und wird im Code nicht geladen.
-- Eval-Daten bitte ausschließlich unter [`eval/datasets/...`](eval/datasets/) pflegen. Zusätzliche Dateien im Ordner `eval/` sind dokumentiert.
+- Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py).
+  `app/prompt/system.txt` ist nur ein optionales Template und wird im Code nicht geladen.
+- Eval-Daten bitte ausschließlich unter [`eval/datasets/...`](eval/datasets/) pflegen. Zusätzliche
+  Dateien im Ordner `eval/` sind dokumentiert.
