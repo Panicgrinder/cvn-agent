@@ -155,6 +155,16 @@ Hinweise:
 - [x] Dokumentation Training/Feinabstimmung
   - Status: Done — `docs/training.md` (Minimalablauf, Optionen, Hinweise).
 
+Neu (Backups & Releases)
+
+- [x] Backup-Repo (Release-Assets) erstellen und initial befüllen
+  - Status: Done — Neues GitHub-Repo erstellt; `main` enthält README+MANIFEST; kompletter
+    Snapshot als Release-Assets hochgeladen (ZIPs, gesplittete .venv-Parts). LFS-Grenzen
+    damit umgangen.
+- [ ] Checksums & Restore-Doku ergänzen
+  - Ziel: SHA-256 für alle Release-Assets in MANIFEST.json ablegen; README: kurze Anleitung
+    zum Zusammenfügen von *.part* (PowerShell) und Integritätsprüfung.
+
 Später
 
 - Narrativspeicher (Session Memory)

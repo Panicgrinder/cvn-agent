@@ -32,3 +32,5 @@ Beispiel:
 2025-10-16 09:45 | Copilot | Docs aktualisiert: AGENT_PROMPT.md um Pipeline/PowerShell‑Shortcuts/Artefakte erweitert; ARCHIVE_PLAN.md mit Status & Prüfkommandos ergänzt; TODO.md Fortschritte/Robustheit dokumentiert.
 2025-10-17 10:10 | Copilot | Eval: optionaler Response-Cache in `scripts/run_eval.py` (`--cache`), Near-Dedupe in `prepare_finetune_pack.py` (`--near-dup-threshold`), neue Tests hinzugefügt; VS Code Test-Explorer konfiguriert (pytest), Run-&-Debug-Profile für Marker.
 2025-10-18 09:15 | Copilot | Reruns: `scripts/rerun_from_results.py` (profile-aware, liest Meta/Overrides/Patterns), Pattern-Normalisierung implementiert; Smoke-Test hinzugefügt.
+2025-10-19 12:12 | Copilot | Backup: Separates Backup-Repo finalisiert (origin auf neues Repo), orphan main mit README+MANIFEST; GitHub Release erstellt und alle Snapshot-Dateien als Assets hochgeladen (um LFS-Grenzen zu vermeiden).
+2025-10-19 12:14 | Copilot | VS Code: Task "Eval: rerun from results" hinzugefügt; docs/TODO.md und docs/DONELOG.txt aktualisiert.
