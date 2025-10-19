@@ -96,9 +96,13 @@ Kurzfristige Ziele (Heute)
       - Resultat: Suite grün; Scripts-Coverage ~79%
     - [x] 3+1 Testrunde (audit_workspace Fallback, curate_dataset_from_latest Minimal, open_context_notes Happy, /chat Fehlerpfad)
       - Resultat: Suite grün; Scripts-Coverage stabil ~79%
-    - [ ] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
-      (weitere kleine Smokes bei customize_prompts/map_reduce_summary/quick_eval
-      bei Bedarf)
+    - [x] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
+      - Erreicht: 80% (Branch-Coverage aktiv)
+      - Neu hinzugefügt:
+        - tests/scripts/test_curate_dataset_filters_empty.py (Filter führen zu Exit 5)
+        - tests/test_audit_workspace_references.py (scan_text_references findet Referenzen)
+        - tests/test_app_root_request_id.py (X-Request-ID Header auf /)
+      - Messung: vollständige Suite mit --cov=scripts --cov-branch
 
 - [x] Pre-commit-Hook für DONELOG
   - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde,
