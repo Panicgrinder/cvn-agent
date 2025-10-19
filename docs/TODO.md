@@ -90,6 +90,8 @@ Kurzfristige Ziele (Heute)
       - Resultat: Suite grün; Scripts-Coverage ~75% (Branch-Coverage aktiv)
     - [x] 3+1 Testrunde (map_reduce_summary Python/JSON, rerun_failed JSON-Array, export_finetune Fallback + /404 Header)
       - Resultat: Suite grün; Scripts-Coverage ~78%
+    - [x] 3+1 Testrunde (fine_tune_pipeline fp16/KeyboardInterrupt, export_finetune openai_chat include_failures, /chat/stream Fehler-SSE)
+      - Resultat: Suite grün; Scripts-Coverage stabil ~78%
     - [ ] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
       (weitere kleine Smokes bei customize_prompts/map_reduce_summary/quick_eval
       bei Bedarf)

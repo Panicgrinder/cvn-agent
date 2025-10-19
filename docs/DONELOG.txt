@@ -39,3 +39,4 @@ Beispiel:
 2025-10-19 14:25 | Copilot | Tests: Integration "alpaca Export→Prepare" ergänzt; Edge-Tests für export_finetune, open_context_notes, rerun_failed, fine_tune_pipeline und App-Header auf 400; Suite grün, erneute Scripts-Coverage-Messung anstehend.
 2025-10-19 15:10 | Copilot | Tests: 3+1-Runde durchgeführt (customize_prompts EOF/KeyboardInterrupt, map_reduce_summary Markdown+Excludes, fine_tune_pipeline Happy-Path, /health Header). Suite grün, Scripts-Coverage ~75%.
 2025-10-19 15:30 | Copilot | Tests: 3+1-Runde II (map_reduce_summary Python/JSON-Zweige, rerun_failed JSON-Array, export_finetune Outdir-Fallback, /404 Header). Suite grün, Scripts-Coverage ~78%.
+2025-10-19 15:50 | Copilot | Tests: 3+1-Runde III (fine_tune_pipeline fp16 & KeyboardInterrupt, export_finetune openai_chat include_failures, /chat/stream Fehler als SSE). Suite grün, Scripts-Coverage ~78%.
