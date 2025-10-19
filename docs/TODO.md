@@ -86,6 +86,8 @@ Kurzfristige Ziele (Heute)
     - [x] Integrationstest: alpaca Export→Prepare
       - Test: `tests/scripts/test_export_and_prepare_pipeline_alpaca.py` (Export alpaca → Prepare-Pack; Train/Val erzeugt)
     - [x] Weitere Edge-Tests ergänzt (export_finetune, open_context_notes, rerun_failed, fine_tune_pipeline)
+    - [x] 3+1 Testrunde (customize_prompts, map_reduce_summary, fine_tune_pipeline + /health Header)
+      - Resultat: Suite grün; Scripts-Coverage jetzt ~75% (Branch-Coverage aktiv)
     - [ ] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
       (weitere kleine Smokes bei customize_prompts/map_reduce_summary/quick_eval
       bei Bedarf)

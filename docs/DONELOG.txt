@@ -37,3 +37,4 @@ Beispiel:
 2025-10-19 12:28 | Copilot | Backup-Härtung: cvn-root-files ZIP sanitized (ohne .env) und im Release ersetzt; MANIFEST mit SHA-256 für alle Assets aktualisiert; README mit Restore-Anleitung ergänzt.
 2025-10-19 13:05 | Copilot | Tests: Neue Script-Smokes (todo_gather, customize_prompts, map_reduce_summary_llm, open_latest_summary, fine_tune_pipeline) hinzugefügt; Scripts-Abdeckung auf ~67% erhöht.
 2025-10-19 14:25 | Copilot | Tests: Integration "alpaca Export→Prepare" ergänzt; Edge-Tests für export_finetune, open_context_notes, rerun_failed, fine_tune_pipeline und App-Header auf 400; Suite grün, erneute Scripts-Coverage-Messung anstehend.
+2025-10-19 15:10 | Copilot | Tests: 3+1-Runde durchgeführt (customize_prompts EOF/KeyboardInterrupt, map_reduce_summary Markdown+Excludes, fine_tune_pipeline Happy-Path, /health Header). Suite grün, Scripts-Coverage ~75%.

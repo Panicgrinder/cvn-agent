@@ -10,6 +10,9 @@ from typing import Dict, Any
 from .core.settings import settings
 from .api.models import ChatRequest, ChatResponse
 from .api.chat import process_chat_request, stream_chat_request
+import os as _os
+import platform as _platform
+import fastapi as _fastapi
 
 # Logger-Konfiguration
 logging.basicConfig(level=logging.INFO)
@@ -104,6 +107,19 @@ if settings.BACKEND_CORS_ORIGINS:
 async def health_check() -> Dict[str, Any]:
     """Gesundheitscheck für den API-Server."""
     return {"status": "ok", "time": time.time()}
+
+
+@app.get("/version", status_code=status.HTTP_200_OK)
+async def version_info() -> Dict[str, Any]:
+    """Gibt Version und Laufzeitinformationen der Anwendung zurück."""
+    return {
+        "app_name": settings.PROJECT_NAME,
+        "version": settings.PROJECT_VERSION,
+        "git_sha": _os.getenv("GIT_SHA"),
+        "build_time": _os.getenv("BUILD_TIME"),
+        "python_version": _platform.python_version(),
+        "fastapi_version": getattr(_fastapi, "__version__", None),
+    }
 
 
 # Einfache Middleware für Request-ID und JSON-Logs
