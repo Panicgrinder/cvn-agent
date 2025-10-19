@@ -94,6 +94,8 @@ Kurzfristige Ziele (Heute)
       - Resultat: Suite grün; Scripts-Coverage stabil ~78%
     - [x] 3+1 Testrunde (migrate_dataset_schemas Happy-Path, openai_ft_status Snapshot+Follow, [App-Test bereits enthalten])
       - Resultat: Suite grün; Scripts-Coverage ~79%
+    - [x] 3+1 Testrunde (audit_workspace Fallback, curate_dataset_from_latest Minimal, open_context_notes Happy, /chat Fehlerpfad)
+      - Resultat: Suite grün; Scripts-Coverage stabil ~79%
     - [ ] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
       (weitere kleine Smokes bei customize_prompts/map_reduce_summary/quick_eval
       bei Bedarf)

@@ -41,3 +41,4 @@ Beispiel:
 2025-10-19 15:30 | Copilot | Tests: 3+1-Runde II (map_reduce_summary Python/JSON-Zweige, rerun_failed JSON-Array, export_finetune Outdir-Fallback, /404 Header). Suite grün, Scripts-Coverage ~78%.
 2025-10-19 15:50 | Copilot | Tests: 3+1-Runde III (fine_tune_pipeline fp16 & KeyboardInterrupt, export_finetune openai_chat include_failures, /chat/stream Fehler als SSE). Suite grün, Scripts-Coverage ~78%.
 2025-10-19 16:10 | Copilot | Tests: 3+1-Runde IV (migrate_dataset_schemas Happy-Path, openai_ft_status Snapshot & Follow). Suite grün, Scripts-Coverage ~79%.
+2025-10-19 16:28 | Copilot | Tests: 3+1-Runde V (audit_workspace Fallback, curate_dataset_from_latest Minimal-Flow, open_context_notes Happy, /chat Fehlerpfad). Suite grün, Scripts-Coverage ~79%.
