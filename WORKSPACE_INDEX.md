@@ -168,10 +168,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/openai_ft_status.py`](scripts/openai_ft_status.py) - Statusabfrage
 - [`scripts/train_lora.py`](scripts/train_lora.py) - LoRA-Training (TRL/PEFT)
 - [`scripts/fine_tune_pipeline.py`](scripts/fine_tune_pipeline.py) - Mini-Pipeline fürs Fine-Tuning/LoRA
-- [`scripts/rerun_failed.py`](scripts/rerun_failed.py) - JSONL mit fehlgeschlagenen Items
-- [`scripts/todo_gather.py`](scripts/todo_gather.py) - Sammelt Metriken/Status und erzeugt Markdown
-- [`scripts/rerun_from_results.py`](scripts/rerun_from_results.py) - Profile-aware Reruns auf Basis
-  von results_*.jsonl (unterstützt `--all` und `--ids`)
+- [`scripts/rerun_from_results.py`](scripts/rerun_from_results.py) - Profile-aware Reruns auf Basis von results_*.jsonl (Flags: --all, --ids)
 - [`scripts/map_reduce_summary.py`](scripts/map_reduce_summary.py) - Heuristische Workspace-Zusammenfassung
 - [`scripts/map_reduce_summary_llm.py`](scripts/map_reduce_summary_llm.py) - LLM-gestützte Zusammenfassung via /chat
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata

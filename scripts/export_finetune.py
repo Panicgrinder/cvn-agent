@@ -41,7 +41,11 @@ def _load_results(path: str) -> List[Dict[str, Any]]:
             line = line.strip()
             if not line:
                 continue
-            raw = json.loads(line)
+            try:
+                raw = json.loads(line)
+            except Exception:
+                # Überspringe nicht-JSON-Zeilen robust
+                continue
             if not isinstance(raw, dict):
                 continue
             data: Dict[str, Any] = cast(Dict[str, Any], raw)

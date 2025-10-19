@@ -37,3 +37,12 @@ Dieser Leitfaden zeigt den minimalen End‑to‑End‑Ablauf mit vorhandenen Skr
 - Synonyme/Checks: `eval/config/{synonyms.json,synonyms.local.json}`
 - Doku: `docs/CONTEXT_ARCH.md`, `docs/AGENT_PROMPT.md`
 - Optional: VS‑Code‑Tasks für die Schritte vorhanden.
+
+### Reruns (Profile-aware)
+
+- Skript: `scripts/rerun_from_results.py <results.jsonl>`
+- Flags:
+  - `--all` (nicht nur Fehlfälle, sondern alle Items erneut ausführen)
+  - `--ids eval-foo,eval-bar` (gezielt bestimmte IDs rerunnen)
+- Nutzt Meta/Overrides aus der Results-Datei (Profil, Modell, Host, Temperatur, Checks).
+- Tipp: Mit `--cache` in `scripts/run_eval.py` lassen sich identische Antworten cachen und teure Aufrufe sparen.

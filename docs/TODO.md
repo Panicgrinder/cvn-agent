@@ -77,13 +77,18 @@ Kurzfristige Ziele (Heute)
       - `tests/scripts/test_map_reduce_summary_llm_smoke.py` → scripts/map_reduce_summary_llm.py (jetzt ~62%)
       - `tests/scripts/test_open_latest_summary_smoke.py` → scripts/open_latest_summary.py (Happy-Path, Print)
       - `tests/scripts/test_fine_tune_pipeline_smoke.py` → scripts/fine_tune_pipeline.py (Free‑Modell, --no-check, kurzer Pfad)
-    - Ergebnis: Scripts-Zeilenabdeckung insgesamt ~67% (vorher ~60–65%).
+    - Ergebnis: Scripts-Zeilenabdeckung zuletzt ~67% (vorher ~60–65%);
+      weitere Runden erhöht (letzte Messung 69% mit Branch-Coverage,
+      erneute Messung steht an).
     - Zusätzlich: Beispiel‑Test `tests/test_chai_checks.py` prüft `check_term_inclusion`
       inkl. Synonym‑Erkennung.
   - Nächste Schritte:
-    - Weitere Smokes für verbleibende Low-Coverage-Skripte
-    - Export→Prepare→Pack: Randfälle abgedeckt (alpaca/openai_chat, Near‑Dup, min_output)
-    - Gesamtabdeckung erneut messen und iterativ anheben
+    - [x] Integrationstest: alpaca Export→Prepare
+      - Test: `tests/scripts/test_export_and_prepare_pipeline_alpaca.py` (Export alpaca → Prepare-Pack; Train/Val erzeugt)
+    - [x] Weitere Edge-Tests ergänzt (export_finetune, open_context_notes, rerun_failed, fine_tune_pipeline)
+    - [ ] Scripts-Coverage erneut messen und gezielt ≥80% anstreben
+      (weitere kleine Smokes bei customize_prompts/map_reduce_summary/quick_eval
+      bei Bedarf)
 
 - [x] Pre-commit-Hook für DONELOG
   - Ziel: Commit verhindern, wenn Code unter `app/|scripts/|utils/` geändert wurde,
