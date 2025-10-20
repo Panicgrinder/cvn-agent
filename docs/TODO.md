@@ -260,3 +260,47 @@ Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)
   Label-Bypass. Falls nötig, zuvor `docs/DONELOG.txt` aktualisieren.
 - VS Code Task: "Append DONELOG entry" fragt nach einer Kurzbeschreibung und ruft
   `scripts/append_done.py` mit dem aktiven Python-Interpreter auf.
+
+## Roadmap Nächste Schritte (Agent-Funktionen)
+
+- [ ] Session‑Memory (Kurz/Mittelfrist)
+  - Ziel: Gesprächskontext je `session_id` persistieren (In‑Memory + optional JSONL/SQLite),
+    Fenster/Trunkierung (Token/Chars), konfigurierbar über Settings.
+  - Akzeptanzkriterien:
+    - `ChatRequest.options.session_id` wird akzeptiert.
+    - Vorherige Turns werden geladen und in die Messages eingebettet (Budget‑basiert).
+    - Tests: Happy‑Path + Trunkierung + „No Memory“ Fallback.
+
+- [ ] Policy/Rules‑Engine („eigene Regeln statt externer“)
+  - Ziel: Pre‑/Post‑Prompt‑Hook mit Policies (ENV/policy.json), Umschaltung per Modus/Profil
+    (eval/unrestricted/profile_id).
+  - Akzeptanzkriterien:
+    - Hook in `process_chat_request`/`stream_chat_request` aktiv.
+    - Policies anwendbar (Allow‑All/Rewrite/Verbote); Ereignisse werden geloggt.
+    - Tests: Policy wirkt (Rewrite/Block), Protokollierung vorhanden.
+
+- [ ] Tool‑Use/Function‑Calling (Basis)
+  - Ziel: 2–3 sichere Tools (z. B. Rechnen, lokale Datei‑Lesen in Sandbox, einfache Suche im Korpus)
+    mit ReAct‑Prompting, per Policy freischaltbar.
+  - Akzeptanzkriterien:
+    - Tool‑Katalog (registriert, Whitelist), Aufrufe werden protokolliert.
+    - Tests: mindestens ein Tool End‑to‑End (Stub/Offline), Policy Off/On.
+
+- [ ] RAG (lokal, optional)
+  - Ziel: Einfaches Retrieval (FAISS oder Qdrant), Indizierung für Markdown/Text, Query‑Augmentation.
+  - Akzeptanzkriterien:
+    - Indexer‑Script + Retrieval‑Hook; konfigurierbar und offline lauffähig.
+    - Tests: deterministischer kleiner Index, Treffer/Kein‑Treffer Fälle.
+
+- [ ] Profile/Personas
+  - Ziel: Profile als JSON (Prompts/Policies/Options), Auswahl via Header/Token/Session.
+  - Akzeptanzkriterien:
+    - Profile werden geladen, validiert und angewandt.
+    - Tests: Profilwechsel beeinflusst Prompt/Optionen/Policy.
+
+- [ ] Erweiterte LLM‑Options
+  - Ziel: num_ctx, repeat_penalty, presence/frequency_penalty etc. per `ChatRequest.options`
+    validiert und weitergereicht.
+  - Akzeptanzkriterien:
+    - Pydantic‑Schema + Validation‑Tests.
+    - Durchreichung an Ollama Payload + Smoke‑Test.
