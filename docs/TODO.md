@@ -178,6 +178,22 @@ Hinweise:
 - [x] Dokumentation Training/Feinabstimmung
   - Status: Done — `docs/training.md` (Minimalablauf, Optionen, Hinweise).
 
+### Kurzfristig (nächste Iterationen)
+
+- [ ] Policy‑Hook & Content‑Management verdrahten
+  - Ziel: `core/content_management.py` im Chat‑Flow aktivieren (Pre‑/Post‑Prompt),
+    Policies aus ENV/policy.json, Modus‑Schalter (eval/unrestricted/profile).
+  - Akzeptanz: Hook in `process_chat_request` und `stream_chat_request`; Log/Audit pro Eingriff;
+    Tests: Rewrite/Allow‑All/Block.
+
+- [ ] Session‑Memory (Basis)
+  - Ziel: `session_id` unterstützen, In‑Memory Store + Trunkierungs‑Heuristik (Token/Chars).
+  - Akzeptanz: Einbettung relevanter Turns in Messages; Settings für Limits; Tests: Happy‑Path, Trunkierung, Fallback.
+
+- [ ] Erweiterte LLM‑Options
+  - Ziel: num_ctx, repeat_penalty, presence/frequency_penalty etc. via `ChatRequest.options` validiert durchreichen.
+  - Akzeptanz: Pydantic‑Schema/Validation, Payload‑Durchreichung, Smoke‑Tests.
+
 Neu (Backups & Releases)
 
 - [x] Backup-Repo (Release-Assets) erstellen und initial befüllen
@@ -237,6 +253,53 @@ Später
 
 - Packaging & Deployability
   - Ziel: Dockerfile/Compose (lokal/offline-freundlich), Healthchecks, Produktionshinweise.
+
+### Mittelfristig
+
+- [ ] Tool‑Use/Function‑Calling (Basis)
+  - Ziel: 2–3 sichere Tools (Rechnen, lokale Datei‑Sandbox, einfache Korpus‑Suche) per ReAct‑Prompting,
+    Policy‑basiert freischaltbar; Protokollierung.
+  - Akzeptanz: Tool‑Katalog/Whitelist, Aufrufe protokolliert, Tests: mind. 1 Tool E2E (Stub), Policy Off/On.
+
+- [ ] RAG (lokal)
+  - Ziel: FAISS oder Qdrant; Indexer für Markdown/Text; Query‑Augmentation; konfigurierbar offline.
+  - Akzeptanz: Indexer‑Script + Retrieval‑Hook; deterministische Tests (Treffer/Kein‑Treffer).
+
+- [ ] Profile/Personas
+  - Ziel: Profile/JSON (Prompts/Policies/Options), Auswahl via Header/Token/Session.
+  - Akzeptanz: Validierung + Anwendungslogik; Tests: Profilwechsel wirkt.
+
+- [ ] Evaluierung & Telemetrie
+  - Ziel: Policy‑Coverage‑Tests; Metriken (Latenz p50/p95, Länge, RAG‑HitRate); strukturierte Logs.
+  - Akzeptanz: Berichte in eval/results/reports/metrics/<ts>; mind. 3 Kennzahlen.
+
+### Langfristig
+
+- [ ] Admin‑UI/Settings
+  - Ziel: UI zur Steuerung von Policies/Profilen/Sessions; Live‑Logs/Health; Schutz (AuthN/Z optional).
+  - Akzeptanz: Minimal‑UI mit 2–3 Screens; Read/Write Policies; Tests (smoke).
+
+- [ ] Persistenter Memory‑Store & DSGVO‑Löschung
+  - Ziel: SQLite/Postgres Speicherung + „Right to be forgotten“‑Routinen; Export/Pruning.
+  - Akzeptanz: CRUD + Purge; Tests für Löschpfade.
+
+- [ ] Skalierung/Resilienz
+  - Ziel: Worker/Queue, Retry/Timeout‑Policies, Backpressure; Limits observabel.
+  - Akzeptanz: Stresstest‑Skript + Metriken.
+
+### Kleine Auffälligkeiten / Verbesserungen
+
+- [ ] Einheitliches Message‑Schema
+  - Ziel: `ChatRequest.messages` konsistent auf `ChatMessage` heben; Abwärtskompatibilität wahren.
+  - Akzeptanz: Pydantic‑Konvertierung + Tests (dict/obj beide möglich).
+
+- [ ] Streaming‑Meta/Fehler-Modell
+  - Ziel: Ersten SSE‑Meta‑Event (Params/Mode/RID) senden; Fehler zusätzlich protokollieren.
+  - Akzeptanz: Tests prüfen Meta‑Event + Error‑Event.
+
+- [ ] Settings/Options erweitern
+  - Ziel: Mehr Ollama‑Optionen exponieren, klar dokumentieren; Defaults in Settings.
+  - Akzeptanz: Doku + Validation‑Tests.
 
 Metriken
 
