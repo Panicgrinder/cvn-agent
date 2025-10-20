@@ -22,6 +22,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Run tests with coverage (xml)
+        run: |
+          pytest -q --maxfail=1 --disable-warnings --cov=. --cov-report=xml
+
       - name: Run audit_workspace (stdout)
         run: |
           python scripts/audit_workspace.py > audit_workspace.txt || true
