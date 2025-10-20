@@ -54,7 +54,7 @@ def open_file(path: str) -> None:
     if system.startswith("win"):
         startfile = getattr(os, "startfile", None)
         if callable(startfile):
-            startfile(path)  # type: ignore[misc]
+            startfile(path)
             return
         # Fallback über rundll32 (seltener nötig)
         os.system(f'rundll32 url.dll,FileProtocolHandler "{path}"')

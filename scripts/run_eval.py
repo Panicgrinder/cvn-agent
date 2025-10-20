@@ -19,9 +19,65 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple, Union, cast
 from dataclasses import dataclass, field, asdict
 import httpx
-from rich.console import Console
-from rich.table import Table
-from rich.progress import Progress
+try:
+    from rich.console import Console as _RichConsole
+    from rich.table import Table as _RichTable
+    from rich.progress import Progress as _RichProgress
+    Console = _RichConsole
+    Table = _RichTable
+    Progress = _RichProgress
+except Exception:
+    # Fallbacks, falls 'rich' nicht installiert ist (z. B. in CI/Minimalumgebung)
+    class _Console:
+        def print(self, *args: Any, **kwargs: Any) -> None:  # noqa: ARG002
+            print(*args)
+
+    class _Table:
+        def __init__(self, title: Optional[str] = None) -> None:
+            self.title = title or ""
+            self._rows: List[List[str]] = []
+            self._cols: List[str] = []
+
+        def add_column(self, name: str, style: Optional[str] = None) -> None:  # noqa: ARG002
+            self._cols.append(name)
+
+        def add_row(self, *cols: Any) -> None:
+            self._rows.append([str(c) for c in cols])
+
+        def __str__(self) -> str:
+            lines: List[str] = []
+            if self.title:
+                lines.append(self.title)
+            if self._cols:
+                lines.append(" | ".join(self._cols))
+                lines.append("-" * len(lines[-1]))
+            lines.extend(" | ".join(r) for r in self._rows)
+            return "\n".join(lines)
+
+    class _Progress:
+        def __init__(self, transient: bool = False) -> None:  # noqa: ARG002
+            self._total = 0
+            self._current = 0
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):  # noqa: ANN001, D401
+            return False
+
+        def add_task(self, *_args: Any, total: int = 0, **_kwargs: Any) -> int:
+            self._total = total
+            self._current = 0
+            return 1
+
+        def update(self, _task_id: int, advance: int = 0, total: Optional[int] = None) -> None:
+            if total is not None:
+                self._total = total
+            self._current += advance
+
+    Console = _Console
+    Table = _Table
+    Progress = _Progress
 import warnings
 
 # Füge das Hauptverzeichnis zum Python-Pfad hinzu
@@ -1153,7 +1209,7 @@ async def run_evaluation(
                         rd = asdict(r)
                         rd["response"] = truncate(rd.get("response", ""), 500)
                         f.write(json.dumps(rd, ensure_ascii=False) + "\n")
-                    progress.update(task, advance=1)
+                    progress.update(cast(Any, task), advance=1)
 
             # Falls kein Sweep definiert, einfacher Durchlauf (unterstützt num_predict_override)
             if not sweep:
@@ -1167,7 +1223,7 @@ async def run_evaluation(
                     nums = sweep.get("max_tokens") or sweep.get("num_predict")
                 # Anzahl Tasks im Progress anpassen (grob): pro Item * Kombis
                 combos = max(1, (len(temps) if temps else 1) * (len(tops) if tops else 1) * (len(nums) if nums else 1))
-                progress.update(task, total=len(items) * combos)
+                progress.update(cast(Any, task), total=len(items) * combos)
                 # Iteriere über Kombinationen
                 if temps or tops or nums:
                     temps_list = temps or [None]

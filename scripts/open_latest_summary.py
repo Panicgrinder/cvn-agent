@@ -34,7 +34,7 @@ def open_file(path: Path) -> None:
     if system.startswith("win"):
         startfile = getattr(os, "startfile", None)
         if callable(startfile):
-            startfile(str(path))  # type: ignore[misc]
+            startfile(str(path))
             return
         os.system(f'rundll32 url.dll,FileProtocolHandler "{path}"')
     elif system == "darwin":
