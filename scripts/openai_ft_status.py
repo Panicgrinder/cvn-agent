@@ -12,7 +12,7 @@ from __future__ import annotations
 import os
 import time
 import argparse
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional, Callable
 
 try:
     from dotenv import load_dotenv  # type: ignore
@@ -20,10 +20,13 @@ try:
 except Exception:
     pass
 
-try:
-    from openai import OpenAI  # type: ignore
-except Exception as e:  # pragma: no cover
-    raise SystemExit("Bitte 'openai' installieren: pip install openai") from e
+# Optionaler Import: In CI/Tests wird OpenAI oft gemockt/monkeypatched.
+# Daher beim Modulimport NICHT beenden, sondern nur beim tatsächlichen Aufruf prüfen.
+try:  # pragma: no cover - Importpfad wird in Tests meist ersetzt
+    from openai import OpenAI as _OpenAI  # type: ignore
+    OpenAI: Optional[Callable[..., Any]] = _OpenAI
+except Exception:  # pragma: no cover
+    OpenAI = None  # type: ignore[assignment]
 
 
 def fetch_status_and_events(client: Any, job_id: str, limit: int = 25) -> Tuple[Dict[str, Any], List[Dict[str, Any]]]:
@@ -59,7 +62,9 @@ def follow(job_id: str, interval: int = 10, show_events: bool = True, events_lim
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise SystemExit("OPENAI_API_KEY fehlt (in .env setzen)")
-    client = OpenAI(api_key=api_key)
+    if OpenAI is None:
+        raise SystemExit("Bitte 'openai' installieren: pip install openai")
+    client = OpenAI(api_key=api_key)  # type: ignore[operator]
 
     seen_event_ids: set[str] = set()
     terminal_states = {"succeeded", "failed", "cancelled"}
@@ -91,7 +96,9 @@ def main() -> None:
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise SystemExit("OPENAI_API_KEY fehlt (in .env setzen)")
-        client = OpenAI(api_key=api_key)
+        if OpenAI is None:
+            raise SystemExit("Bitte 'openai' installieren: pip install openai")
+        client = OpenAI(api_key=api_key)  # type: ignore[operator]
         job, events = fetch_status_and_events(client, args.job_id, limit=args.events_limit)
         print_snapshot(job, events if not args.no_events else [], show_events=not args.no_events)
     else:
