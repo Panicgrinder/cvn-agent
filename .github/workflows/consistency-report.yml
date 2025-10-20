@@ -1,0 +1,43 @@
+name: Consistency & Reports
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run audit_workspace (stdout)
+        run: |
+          python scripts/audit_workspace.py > audit_workspace.txt || true
+
+      - name: Generate dependencies report
+        run: |
+          python scripts/reports/generate_dependencies_report.py
+
+      - name: Generate coverage report (if coverage.xml present)
+        run: |
+          python scripts/reports/generate_coverage_report.py
+
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: consistency-reports
+          path: |
+            eval/results/reports/**
+            audit_workspace.txt

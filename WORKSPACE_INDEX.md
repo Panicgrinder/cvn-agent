@@ -49,7 +49,6 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`app/api/chat.py`](app/api/chat.py) - Chat-Request-Processing
 - [`app/api/models.py`](app/api/models.py) - API-Datenmodelle
 - [`app/api/chat_helpers.py`](app/api/chat_helpers.py) - Legacy/Geparkt (historische Helper)
-- [`app/api/endpoints/`](app/api/endpoints/) - Legacy/Geparkt (historische Endpunktmodule)
 
 #### app/core
 
@@ -107,14 +106,14 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`eval/.gitignore`](eval/.gitignore) - Eval-spezifische Git-Ignorier-Regeln
 - [`eval/README.md`](eval/README.md) - Hinweise zu Eval
 - [`eval/DEPRECATIONS.md`](eval/DEPRECATIONS.md) - Deprecations/Altpfade (Eval)
-- [`eval/eval-21-40_demo_v1.0.jsonl`](eval/eval-21-40_demo_v1.0.jsonl) - JSONL-Variante (zusätzliche Kopie)
+<!-- Top-Level Duplikat entfernt; maßgeblich sind Dateien unter eval/datasets/ -->
 
 #### eval/datasets
 
 - [`eval/datasets/eval-01-20_prompts_v1.0.json`](eval/datasets/eval-01-20_prompts_v1.0.json) -
   Sachliche Prompts (eval-001 bis eval-020)
-- [`eval/datasets/eval-21-40_demo_v1.0.json`](eval/datasets/eval-21-40_demo_v1.0.json) -
-  Demo-/Fantasy-Prompts (eval-021 bis eval-040)
+- [`eval/datasets/eval-21-40_fantasy_v1.0.json`](eval/datasets/eval-21-40_fantasy_v1.0.json) -
+  Fantasy-Prompts (eval-021 bis eval-040)
 - [`eval/datasets/eval-41-60_dialog_prompts_v1.0.json`](eval/datasets/eval-41-60_dialog_prompts_v1.0.json)
   - Dialog-Prompts (eval-041 bis eval-060)
 - [`eval/datasets/eval-61-80_szenen_prompts_v1.0.json`](eval/datasets/eval-61-80_szenen_prompts_v1.0.json)
@@ -197,7 +196,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-10-19
+Letzte Aktualisierung: 2025-10-20
 
 Hinweise:
 

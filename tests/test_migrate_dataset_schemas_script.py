@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import json
-import importlib
 from typing import Any, Dict, List
 
 import pytest
@@ -15,7 +14,7 @@ def test_migrate_dataset_schemas_happy_path(tmp_path: "os.PathLike[str]") -> Non
     project_root = tmp_path
     eval_dir = os.path.join(project_root, "eval", "datasets")
     os.makedirs(eval_dir, exist_ok=True)
-    src = os.path.join(eval_dir, "eval-21-40_demo_v1.0.json")
+    src = os.path.join(eval_dir, "eval-21-40_fantasy_v1.0.json")
 
     # JSON-Array mit prompt und must_include
     data: List[Dict[str, Any]] = [

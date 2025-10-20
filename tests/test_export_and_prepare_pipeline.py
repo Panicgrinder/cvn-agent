@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import os
-import io
 import json
-import tempfile
 import asyncio
 from typing import Any, Dict
 
@@ -20,7 +18,7 @@ def _write_results_jsonl(path: str) -> None:
             "checks_passed": {"must_include": True},
             "success": True,
             "failed_checks": [],
-            "source_file": "eval-21-40_demo_v1.0.jsonl",
+            "source_file": "eval-21-40_fantasy_v1.0.jsonl",
             "source_package": "general",
             "duration_ms": 10
         }, ensure_ascii=False)+"\n")

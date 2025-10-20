@@ -114,7 +114,7 @@ def ensure_eval_files_exist() -> None:
     os.makedirs(eval_dir, exist_ok=True)
     pattern: str = run_eval.DEFAULT_FILE_PATTERN
     if not any(glob.glob(os.path.join(eval_dir, pattern))):
-        example_file = os.path.join(eval_dir, "eval-21-40_demo_v1.0.jsonl")
+        example_file = os.path.join(eval_dir, "eval-21-40_fantasy_v1.0.jsonl")
         print("Keine Eval-Dateien gefunden – erstelle Demo-Paket …")
         run_eval.create_example_eval_file(example_file, 21, 20)
 

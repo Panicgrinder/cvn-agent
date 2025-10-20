@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Migriert eval-21-40_demo auf neues Schema (prompt -> messages, must_include -> checks.must_include)
+Migriert eval-21-40_fantasy (ehem. demo) auf neues Schema (prompt -> messages, must_include -> checks.must_include)
 """
 import json
 import os
@@ -8,8 +8,8 @@ import sys
 from typing import Any, Dict, List
 
 def migrate_demo_dataset():
-    """Migriert das Demo-Dataset auf das neue Schema."""
-    path = os.path.join("eval", "datasets", "eval-21-40_demo_v1.0.json")
+    """Migriert das Fantasy-Dataset (ehem. Demo) auf das neue Schema."""
+    path = os.path.join("eval", "datasets", "eval-21-40_fantasy_v1.0.json")
     
     if not os.path.exists(path):
         print(f"Datei nicht gefunden: {path}")

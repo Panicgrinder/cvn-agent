@@ -13,8 +13,7 @@ $targets = @(
     "app/routers/chat.py",
     "app/routers/health.py",
     "app/routers/roll.py",
-    "app/routers/state.py",
-    "app/api/endpoints/chat.py"
+    "app/routers/state.py"
 )
 
 Write-Host 'Cleanup Phase 4 - Ziel-Dateien:' -ForegroundColor Cyan

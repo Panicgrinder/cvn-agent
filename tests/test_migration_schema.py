@@ -30,7 +30,7 @@ class TestMigrationSchema(unittest.TestCase):
             os.makedirs(datasets_dir, exist_ok=True)
 
             # Schreibe alte Datei
-            old_file = os.path.join(datasets_dir, "eval-21-40_demo_v1.0.json")
+            old_file = os.path.join(datasets_dir, "eval-21-40_fantasy_v1.0.json")
             with open(old_file, "w", encoding="utf-8") as f:
                 for item in old_data:
                     f.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -82,7 +82,7 @@ class TestMigrationSchema(unittest.TestCase):
             datasets_dir = os.path.join(tmp_dir, "eval", "datasets")
             os.makedirs(datasets_dir, exist_ok=True)
 
-            new_file = os.path.join(datasets_dir, "eval-21-40_demo_v1.0.json")
+            new_file = os.path.join(datasets_dir, "eval-21-40_fantasy_v1.0.json")
             with open(new_file, "w", encoding="utf-8") as f:
                 for item in new_data:
                     f.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -112,7 +112,7 @@ class TestMigrationSchema(unittest.TestCase):
             os.makedirs(datasets_dir, exist_ok=True)
             
             # Erstelle leere Datei
-            empty_file = os.path.join(datasets_dir, "eval-21-40_demo_v1.0.json")
+            empty_file = os.path.join(datasets_dir, "eval-21-40_fantasy_v1.0.json")
             with open(empty_file, "w", encoding="utf-8") as f:
                 _ = f.write("")  # Leere Datei bewusst
             

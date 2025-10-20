@@ -15,7 +15,7 @@ def test_migrate_dataset_schemas_empty_and_missing(tmp_path: Path) -> None:
     eval_dir = proj / "eval" / "datasets"
     eval_dir.mkdir(parents=True, exist_ok=True)
     # Erzeuge leere Datei am Default-Pfad
-    target = eval_dir / "eval-21-40_demo_v1.0.json"
+    target = eval_dir / "eval-21-40_fantasy_v1.0.json"
     target.write_text("\n", encoding="utf-8")
 
     cwd_before = os.getcwd()
@@ -39,7 +39,7 @@ def test_migrate_dataset_schemas_jsonl_no_entries(tmp_path: Path) -> None:
     proj = tmp_path
     eval_dir = proj / "eval" / "datasets"
     eval_dir.mkdir(parents=True, exist_ok=True)
-    target = eval_dir / "eval-21-40_demo_v1.0.json"
+    target = eval_dir / "eval-21-40_fantasy_v1.0.json"
     # Schreibe JSONL mit nur Leerzeilen
     target.write_text("\n\n\n", encoding="utf-8")
 

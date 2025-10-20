@@ -83,3 +83,8 @@ Dieses Dokument beschreibt, wie die Zusammenarbeit zwischen dir (Developer), Git
 - Öffne relevante Dateien im Editor, bevor du Fragen stellst (besserer Kontext).
 - Nutze Copilot für Code, den Assistant für Planung/Reviews/Doku.
 - Bevor du pusht: Tests lokal laufen lassen; PR erst erstellen, wenn grün.
+
+## Reports & Artefakte
+
+- Standard für Berichte: siehe `docs/REPORTS.md`.
+- Automatisierte Reports (Dependencies/Coverage/Konsistenz) werden unter `eval/results/reports/<topic>/<timestamp>` abgelegt und per CI als Artefakte hochgeladen.

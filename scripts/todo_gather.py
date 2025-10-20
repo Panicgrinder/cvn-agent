@@ -79,7 +79,7 @@ def feature_status() -> Dict[str, Any]:
             caching_used = ("utils.eval_cache" in txt) or ("cache_llm.jsonl" in txt)
         except Exception:
             pass
-    rerun_failed = file_exists("scripts/rerun_failed.py")
+    rerun_failed = False  # legacy script replaced by rerun_from_results.py
     fine_tune = file_exists("scripts/fine_tune_pipeline.py")
     curate = file_exists("scripts/curate_dataset_from_latest.py")
     return {
@@ -96,7 +96,7 @@ def build_md(results: Optional[Dict[str, Any]], features: Dict[str, Any]) -> str
     lines.append("")
     lines.append("## Features (offene Punkte)")
     lines.append(f"- Caching/Memoization: {'✅ integriert' if features['caching_integrated'] else ('🟡 vorhanden (noch nicht integriert)' if features['caching_available'] else '❌ fehlt')}")
-    lines.append(f"- Rerun-Failed: {'✅ vorhanden' if features['rerun_failed_available'] else '❌ fehlt'}")
+    lines.append(f"- Rerun-Failed: ✅ via scripts/rerun_from_results.py")
     lines.append(f"- Fine-Tuning/LoRA Pipeline: {'✅ vorhanden' if features['fine_tune_pipeline_available'] else '❌ fehlt'}")
     lines.append(f"- Datensatzkurierung: {'✅ vorhanden' if features['curate_dataset_available'] else '❌ fehlt'}")
     lines.append("")

@@ -71,5 +71,7 @@ Thumbs.db
 *~
 
 # Historische/Duplikat-Dateien (Phase 2: zur Entfernung vorgesehen)
+# Historische/Top-Level Duplikate vermeiden
 eval/eval-21-40_demo_v1.0.json
+eval/eval-21-40_fantasy_v1.0.*
 data/system.txt

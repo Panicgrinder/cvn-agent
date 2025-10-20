@@ -1476,7 +1476,7 @@ if __name__ == "__main__":
     if args.create_example:
         # Erstelle ein Beispiel-Eval-Paket
         os.makedirs(eval_dir, exist_ok=True)
-        example_file = os.path.join(eval_dir, "eval-21-40_demo_v1.0.jsonl")
+        example_file = os.path.join(eval_dir, "eval-21-40_fantasy_v1.0.jsonl")
         create_example_eval_file(example_file, 21, 20)
         sys.exit(0)
     
@@ -1522,7 +1522,7 @@ if __name__ == "__main__":
     # Prüfe, ob Eval-Dateien existieren
     if not any(glob.glob(pattern) for pattern in patterns):
         logging.warning("Keine Eval-Dateien gefunden. Erstelle ein Beispiel-Eval-Paket...")
-        example_file = os.path.join(eval_dir, "eval-21-40_demo_v1.0.jsonl")
+        example_file = os.path.join(eval_dir, "eval-21-40_fantasy_v1.0.jsonl")
         create_example_eval_file(example_file, 21, 20)
         # Nach Erstellung: beide Masken prüfen
         base_mask = os.path.join(eval_dir, DEFAULT_FILE_PATTERN)

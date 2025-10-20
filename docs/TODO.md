@@ -203,13 +203,18 @@ Kurz-Update (2025-10-20)
 
 Offene Punkte (Kurzfristig)
 
-- [ ] Integrationstest „alpaca Export→Prepare“
+- [x] Integrationstest „alpaca Export→Prepare“
   - Ziel: End-to-End (Results → Export alpaca → Prepare-Pack)
-  - Status: Offen (Testdatei fehlt). Anknüpfen an vorhandene Tests: [`tests/scripts/test_export_finetune_more_edges.py`](tests/scripts/test_export_finetune_more_edges.py), [`tests/test_prepare_finetune_pack_nodedupe.py`](tests/test_prepare_finetune_pack_nodedupe.py)
-- [ ] Cleanup: harte Laufwerks-Pfade entfernen
-  - Datei: [`scripts/cleanup_phase3.ps1`](scripts/cleanup_phase3.ps1) nutzt absolute F:\-Pfade → relativ/`${workspaceFolder}` umstellen
-- [ ] Doku-Drift bereinigen
-  - [`cleanup_recommendations.md`](cleanup_recommendations.md) meldet entfernten Chat-Endpunkt; tatsächlich aktiv in [`app/main.py`](app/main.py)
+  - Status: Done — Test vorhanden: [`tests/scripts/test_export_and_prepare_pipeline_alpaca.py`](../tests/scripts/test_export_and_prepare_pipeline_alpaca.py)
+    sowie ergänzend: [`tests/scripts/test_export_finetune_more_edges.py`](../tests/scripts/test_export_finetune_more_edges.py),
+    [`../tests/test_prepare_finetune_pack_nodedupe.py`](../tests/test_prepare_finetune_pack_nodedupe.py)
+- [x] Cleanup: harte Laufwerks-Pfade entfernen
+  - Status: Done — [`scripts/cleanup_phase3.ps1`](../scripts/cleanup_phase3.ps1)
+    verwendet `Join-Path $ProjectRoot` (keine festen F:\-Pfade mehr)
+- [x] Doku-Drift bereinigen
+  - Status: Done — `cleanup_recommendations.md` und `README.md` sind konsistent;
+    zentrale Endpunkte in [`app/main.py`](../app/main.py): `/`, `/health`, `/version`,
+    `POST /chat`, `POST /chat/stream`
 
 Neu: Reports-Standard
 

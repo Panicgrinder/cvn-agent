@@ -13,11 +13,11 @@ import pytest
 def test_migrate_demo_dataset_happy(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     mod = importlib.import_module("scripts.migrate_dataset_schemas")
 
-    # Baue Projektstruktur im tmp nach: eval/datasets/eval-21-40_demo_v1.0.json
+    # Baue Projektstruktur im tmp nach: eval/datasets/eval-21-40_fantasy_v1.0.json
     proj = tmp_path / "proj"
     datasets = proj / "eval" / "datasets"
     datasets.mkdir(parents=True)
-    src = datasets / "eval-21-40_demo_v1.0.json"
+    src = datasets / "eval-21-40_fantasy_v1.0.json"
     # Mische JSON-Array mit prompt und must_include
     entries: list[dict[str, object]] = [
         {"id": "eval-1", "prompt": "Hi", "must_include": ["x"]},

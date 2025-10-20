@@ -4,6 +4,20 @@
 
 Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwendet.
 
+## Neuigkeiten (2025-10-20)
+
+- Demo→Fantasy: Datensatz-Bezeichnungen vereinheitlicht (`eval-21-40_fantasy_v1.0.*`).
+   Maßgeblich sind die Dateien unter `eval/datasets/`.
+- Reports: Drei Skripte erzeugen reproduzierbare Berichte unter
+   `eval/results/reports/<topic>/<timestamp>/`:
+   - `scripts/reports/generate_dependencies_report.py`
+   - `scripts/reports/generate_coverage_report.py`
+   - `scripts/reports/generate_consistency_report.py`
+- CI: Ein Workflow erzeugt die Reports automatisch bei Push und lädt sie als
+   Artefakte hoch.
+- Legacy-Bereinigung: Unbenutzte Legacy-Endpunkte unter `app/api/endpoints/`
+   entfernt; doppelte Exporte in `app/services/__init__.py` bereinigt.
+
 ## Repository-Info
 
 - Standard-Branch: `main`
@@ -113,25 +127,35 @@ Aus Eval-Ergebnissen Trainingspakete erzeugen:
 - Skript: `scripts/fine_tune_pipeline.py`
 - Voraussetzungen: passende PyTorch-Installation und optionale Pakete aus `requirements-train.txt`.
 - Beispiel (CPU/GPU abhängig):
-   - python scripts/fine_tune_pipeline.py --finetune-dir eval/results/finetune --epochs 1 --per-device-train-batch-size 1 --bf16
+   - python scripts/fine_tune_pipeline.py \
+      --finetune-dir eval/results/finetune \
+      --epochs 1 \
+      --per-device-train-batch-size 1 \
+      --bf16
 
 ## Eval: Synonyme mit privatem Overlay
 
 Für die Keyword-Checks in der Evaluierung können Synonyme aus `eval/config/synonyms.json` geladen werden.
-Zusätzlich können lokale, private Ergänzungen in `eval/config/synonyms.local.json` abgelegt werden. Diese Datei ist git-ignoriert und wird automatisch mit der Basisdatei gemerged.
+Zusätzlich können lokale, private Ergänzungen in
+`eval/config/synonyms.local.json` abgelegt werden.
+Diese Datei ist git-ignoriert und wird automatisch mit der Basisdatei gemerged.
 
 - Beispiel: `eval/config/synonyms.local.sample.json` kopieren zu `synonyms.local.json` und anpassen.
 
 ## Lokale Kontext-Notizen (optional)
 
-Der Server kann optionale, lokale Kontext-Notizen als zusätzliche System-Nachricht injizieren. Das ist nützlich für projektspezifisches Wissen oder interne Begriffe.
+Der Server kann optionale, lokale Kontext-Notizen als zusätzliche
+System-Nachricht injizieren. Das ist nützlich für projektspezifisches Wissen
+oder interne Begriffe.
 
 - Beispieldatei: `eval/config/context.local.sample.md` → kopieren zu `context.local.md` und Inhalte ergänzen.
 - Aktivierung via Settings/ENV:
    - `CONTEXT_NOTES_ENABLED=true`
-   - Optional Pfade anpassen: `CONTEXT_NOTES_PATHS=["eval/config/context.local.md", "eval/config/context.local.jsonl", ...]`
+   - Optional Pfade anpassen:
+      `CONTEXT_NOTES_PATHS=["eval/config/context.local.md", "eval/config/context.local.jsonl", ...]`
    - Optional Größe begrenzen: `CONTEXT_NOTES_MAX_CHARS=4000`
-- Die Notizen werden als zweite System-Nachricht eingefügt (nach dem gewählten System-Prompt), sowohl im normalen als auch im Streaming-Endpunkt.
+- Die Notizen werden als zweite System-Nachricht eingefügt (nach dem gewählten
+   System-Prompt), sowohl im normalen als auch im Streaming-Endpunkt.
 - Fehlende Overlay-Datei wird stillschweigend ignoriert.
 
 ## Copilot @workspace / #codebase (Code-Suche)
