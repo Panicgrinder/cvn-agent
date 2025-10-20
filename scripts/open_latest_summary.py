@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
-import sys
+import platform
 from pathlib import Path
 from typing import Optional
 import webbrowser
@@ -22,16 +22,22 @@ def find_latest_summary(dir_path: Path = SUMMARY_DIR) -> Optional[Path]:
 
 
 def open_file(path: Path) -> None:
+    """Öffne Datei plattformneutral mit sinnvollen Fallbacks."""
     # Try default browser first (works for markdown viewers too)
     try:
-        webbrowser.open(path.as_uri())
-        return
+        if webbrowser.open(path.as_uri()):
+            return
     except Exception:
         pass
-    # Fallback: OS-specific open
-    if sys.platform.startswith("win"):
-        os.startfile(str(path))
-    elif sys.platform == "darwin":
+
+    system = platform.system().lower()
+    if system.startswith("win"):
+        startfile = getattr(os, "startfile", None)
+        if callable(startfile):
+            startfile(str(path))  # type: ignore[misc]
+            return
+        os.system(f'rundll32 url.dll,FileProtocolHandler "{path}"')
+    elif system == "darwin":
         os.system(f"open '{path}'")
     else:
         os.system(f"xdg-open '{path}'")

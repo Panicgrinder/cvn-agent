@@ -1,6 +1,7 @@
 import os
 import json
 import platform
+import webbrowser
 from typing import List
 
 from app.core.settings import settings
@@ -33,9 +34,30 @@ def pick_target(paths: List[str]) -> str:
 
 
 def open_file(path: str) -> None:
+    """Öffne Datei plattformneutral mit sinnvollen Fallbacks.
+
+    Reihenfolge:
+    - Versuche Standardbrowser (funktioniert auch für Markdown-Viewer/Editoren)
+    - OS-spezifische Fallbacks (open/xdg-open)
+    - Windows: startfile nur aufrufen, wenn vorhanden
+    """
+    # 1) Standardbrowser versuchen
+    try:
+        # webbrowser.open akzeptiert auch Dateipfade
+        if webbrowser.open(path):
+            return
+    except Exception:
+        pass
+
+    # 2) OS-spezifische Fallbacks
     system = platform.system().lower()
     if system.startswith("win"):
-        os.startfile(path)
+        startfile = getattr(os, "startfile", None)
+        if callable(startfile):
+            startfile(path)  # type: ignore[misc]
+            return
+        # Fallback über rundll32 (seltener nötig)
+        os.system(f'rundll32 url.dll,FileProtocolHandler "{path}"')
     elif system == "darwin":
         os.system(f"open '{path}'")
     else:
