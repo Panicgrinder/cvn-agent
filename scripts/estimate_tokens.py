@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os, sys, json
-from typing import Dict, Set, TYPE_CHECKING, Protocol
+from typing import Dict, Set, Protocol
 
 class _EncoderLike(Protocol):
     def encode(self, text: str) -> list[int]: ...
@@ -9,13 +9,9 @@ TRY_TIKTOKEN = True
 enc: _EncoderLike | None = None
 if TRY_TIKTOKEN:
     try:
-        if TYPE_CHECKING:
-            import tiktoken  # type: ignore[import-not-found]
-            enc = tiktoken.get_encoding("cl100k_base")  # type: ignore[reportUnknownVariableType]
-        else:
-            import importlib
-            tiktoken = importlib.import_module("tiktoken")
-            enc = tiktoken.get_encoding("cl100k_base")
+        import importlib
+        tiktoken = importlib.import_module("tiktoken")  # dynamic import
+        enc = tiktoken.get_encoding("cl100k_base")
     except Exception:
         enc = None
 

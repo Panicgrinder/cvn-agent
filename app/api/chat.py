@@ -6,6 +6,8 @@ from typing import Dict, Any, List, Optional
 
 from ..core.settings import settings
 from ..core.prompts import EVAL_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT, UNRESTRICTED_SYSTEM_PROMPT
+from ..core.content_management import modify_prompt_for_freedom
+from ..utils.session_memory import session_memory
 from utils.context_notes import load_context_notes
 from .models import ChatRequest, ChatResponse
 
@@ -38,14 +40,33 @@ async def stream_chat_request(
     if eval_mode:
         logger.info(f"Eval-Modus aktiv (stream): Ersetze Systemprompt rid={request_id}")
         messages = [msg for msg in messages if msg.get("role") != "system"]
-        messages.insert(0, {"role": "system", "content": EVAL_SYSTEM_PROMPT})
+        sys_prompt = EVAL_SYSTEM_PROMPT
+        # Optional: Policy-Hook anwenden
+        if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+            try:
+                sys_prompt = modify_prompt_for_freedom(sys_prompt)
+            except Exception:
+                pass
+        messages.insert(0, {"role": "system", "content": sys_prompt})
     elif unrestricted_mode:
         logger.info(f"Uneingeschränkter Modus aktiv (stream): Ersetze Systemprompt rid={request_id}")
         messages = [msg for msg in messages if msg.get("role") != "system"]
-        messages.insert(0, {"role": "system", "content": UNRESTRICTED_SYSTEM_PROMPT})
+        sys_prompt = UNRESTRICTED_SYSTEM_PROMPT
+        if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+            try:
+                sys_prompt = modify_prompt_for_freedom(sys_prompt)
+            except Exception:
+                pass
+        messages.insert(0, {"role": "system", "content": sys_prompt})
     else:
         if not any(msg.get("role") == "system" for msg in messages):
-            messages.insert(0, {"role": "system", "content": DEFAULT_SYSTEM_PROMPT})
+            sys_prompt = DEFAULT_SYSTEM_PROMPT
+            if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+                try:
+                    sys_prompt = modify_prompt_for_freedom(sys_prompt)
+                except Exception:
+                    pass
+            messages.insert(0, {"role": "system", "content": sys_prompt})
 
     # Optionale Kontext-Notizen injizieren (als zusätzliche System-Nachricht)
     try:
@@ -86,6 +107,27 @@ async def stream_chat_request(
         top_p: Optional[float] = float(top_p_val) if top_p_val is not None else None
     except Exception:
         top_p = None
+
+    # Session Memory: optional bestehenden Verlauf voranstellen
+    try:
+        if getattr(settings, "SESSION_MEMORY_ENABLED", False):
+            from typing import Optional as _Optional, Dict as _Dict, Any as _Any
+            opts: _Optional[_Dict[str, _Any]] = getattr(request, "options", None)
+            sess_id: _Optional[str] = None
+            if isinstance(opts, dict):
+                _val = opts.get("session_id")
+                sess_id = _val if isinstance(_val, str) else None
+            if isinstance(sess_id, str) and sess_id:
+                prior = session_memory.get(sess_id)
+                if prior:
+                    # Systemprompt möglichst an erster Stelle behalten
+                    sys_msgs = [m for m in messages if m.get("role") == "system"]
+                    non_sys = [m for m in messages if m.get("role") != "system"]
+                    # prior sind Mappings[str,str]; in Dict[str,str] kopieren
+                    prior_cast = [{"role": str(m.get("role", "user")), "content": str(m.get("content", ""))} for m in prior]
+                    messages = sys_msgs + prior_cast + non_sys
+    except Exception:
+        pass
 
     ollama_payload: Dict[str, Any] = {
         "model": req_model or settings.MODEL_NAME,
@@ -198,14 +240,32 @@ async def process_chat_request(
         if eval_mode:
             logger.info(f"Eval-Modus aktiv: Ersetze Systemprompt rid={request_id}")
             messages = [msg for msg in messages if msg.get("role") != "system"]
-            messages.insert(0, {"role": "system", "content": EVAL_SYSTEM_PROMPT})
+            sys_prompt = EVAL_SYSTEM_PROMPT
+            if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+                try:
+                    sys_prompt = modify_prompt_for_freedom(sys_prompt)
+                except Exception:
+                    pass
+            messages.insert(0, {"role": "system", "content": sys_prompt})
         elif unrestricted_mode:
             logger.info(f"Uneingeschränkter Modus aktiv: Ersetze Systemprompt rid={request_id}")
             messages = [msg for msg in messages if msg.get("role") != "system"]
-            messages.insert(0, {"role": "system", "content": UNRESTRICTED_SYSTEM_PROMPT})
+            sys_prompt = UNRESTRICTED_SYSTEM_PROMPT
+            if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+                try:
+                    sys_prompt = modify_prompt_for_freedom(sys_prompt)
+                except Exception:
+                    pass
+            messages.insert(0, {"role": "system", "content": sys_prompt})
         else:
             if not any(msg.get("role") == "system" for msg in messages):
-                messages.insert(0, {"role": "system", "content": DEFAULT_SYSTEM_PROMPT})
+                sys_prompt = DEFAULT_SYSTEM_PROMPT
+                if getattr(settings, "CONTENT_POLICY_ENABLED", False):
+                    try:
+                        sys_prompt = modify_prompt_for_freedom(sys_prompt)
+                    except Exception:
+                        pass
+                messages.insert(0, {"role": "system", "content": sys_prompt})
 
         # Optionale Kontext-Notizen injizieren (als zusätzliche System-Nachricht)
         try:
@@ -245,6 +305,25 @@ async def process_chat_request(
             top_p: Optional[float] = float(top_p_val) if top_p_val is not None else None
         except Exception:
             top_p = None
+
+        # Session Memory (optional): bisherigen Verlauf voranstellen
+        try:
+            if getattr(settings, "SESSION_MEMORY_ENABLED", False):
+                from typing import Optional as _Optional, Dict as _Dict, Any as _Any
+                opts2: _Optional[_Dict[str, _Any]] = getattr(request, "options", None)
+                sess_id2: _Optional[str] = None
+                if isinstance(opts2, dict):
+                    _val2 = opts2.get("session_id")
+                    sess_id2 = _val2 if isinstance(_val2, str) else None
+                if isinstance(sess_id2, str) and sess_id2:
+                    prior2 = session_memory.get(sess_id2)
+                    if prior2:
+                        sys_msgs2 = [m for m in messages if m.get("role") == "system"]
+                        non_sys2 = [m for m in messages if m.get("role") != "system"]
+                        prior2_cast = [{"role": str(m.get("role", "user")), "content": str(m.get("content", ""))} for m in prior2]
+                        messages = sys_msgs2 + prior2_cast + non_sys2
+        except Exception:
+            pass
 
         ollama_payload: Dict[str, Any] = {
             "model": req_model or settings.MODEL_NAME,
@@ -317,6 +396,30 @@ async def process_chat_request(
                 logger.info(f"Antwort von Ollama erhalten. {duration_ms} ms rid={request_id} Inhalt: {preview}")
             else:
                 logger.info(f"Antwort von Ollama erhalten. rid={request_id} Inhalt: {preview}")
+
+        # Session Memory (optional): neuen Nutzer-Input und Modell-Antwort ablegen
+        try:
+            if getattr(settings, "SESSION_MEMORY_ENABLED", False):
+                from typing import Optional as _Optional, Dict as _Dict, Any as _Any
+                opts3: _Optional[_Dict[str, _Any]] = getattr(request, "options", None)
+                sess_id3: _Optional[str] = None
+                if isinstance(opts3, dict):
+                    _val3 = opts3.get("session_id")
+                    sess_id3 = _val3 if isinstance(_val3, str) else None
+                if isinstance(sess_id3, str) and sess_id3:
+                    # Nur die letzten Benutzer- und Assistenten-Nachrichten persistieren
+                    new_msgs = [m for m in messages if m.get("role") in ("user", "assistant")]
+                    # Antwort ebenfalls hinzufügen
+                    new_msgs.append({"role": "assistant", "content": generated_content})
+                    # parameter erwartet List[Mapping[str,str]]; Dicts sind kompatibel
+                    session_memory.put_and_trim(
+                        sess_id3,
+                        new_msgs,  # type: ignore[arg-type]
+                        max_messages=int(getattr(settings, "SESSION_MEMORY_MAX_MESSAGES", 20)),
+                        max_chars=int(getattr(settings, "SESSION_MEMORY_MAX_CHARS", 12000)),
+                    )
+        except Exception:
+            pass
 
         return ChatResponse(content=generated_content, model=settings.MODEL_NAME)
     except Exception as e:

@@ -31,12 +31,19 @@ sys.path.insert(0, project_root)
 
 # Importiere die Utility-Funktionen
 from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms
+from typing import Callable, Optional as _Optional, Any as _Any
 try:
     # Optionaler Cache für Antworten (lokal JSONL-basiert)
-    from utils.eval_cache import EvalCache, make_key  # type: ignore
+    from utils.eval_cache import make_key  # Funktion direkt importieren
+    try:
+        from utils.eval_cache import EvalCache as _EvalCache
+        # Fabriktyp: nimmt Pfad (str) und gibt eine Instanz mit get/put zurück
+        EvalCacheType: _Optional[Callable[[str], _Any]] = _EvalCache
+    except Exception:
+        EvalCacheType = None
 except Exception:
-    EvalCache = None  # type: ignore
-    def make_key(obj: Any) -> str:  # type: ignore
+    EvalCacheType = None
+    def make_key(obj: Any) -> str:
         return json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
 # Versuche, die Anwendungseinstellungen zu importieren
@@ -540,7 +547,7 @@ async def evaluate_item(
     num_predict_override: Optional[int] = None,
     request_id: Optional[str] = None,
     retries: int = 0,
-    cache: Optional["EvalCache"] = None,
+    cache: Optional[Any] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -1102,10 +1109,10 @@ async def run_evaluation(
 
             # Optional: Cache vorbereiten
             eval_cache = None
-            if use_cache and EvalCache is not None:
+            if use_cache and EvalCacheType is not None:
                 try:
                     cache_path = os.path.join(DEFAULT_RESULTS_DIR, "cache_eval.jsonl")
-                    eval_cache = EvalCache(cache_path)  # type: ignore
+                    eval_cache = EvalCacheType(cache_path)
                     logging.info(f"Eval-Cache aktiv: {cache_path}")
                 except Exception:
                     eval_cache = None

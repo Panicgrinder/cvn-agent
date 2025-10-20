@@ -69,6 +69,16 @@ class Settings(BaseSettings):
     ]
     CONTEXT_NOTES_MAX_CHARS: int = 4000
 
+    # Inhalts-Policy/Regeln (optional)
+    # Wenn aktiviert, werden optionale Hooks aus content_management verwendet (z.B. für "unrestricted mode").
+    CONTENT_POLICY_ENABLED: bool = False
+
+    # Session Memory (optional)
+    # Wenn aktiviert und eine session_id in der Anfrage vorhanden ist, wird ein kurzer Verlauf pro Sitzung gespeichert.
+    SESSION_MEMORY_ENABLED: bool = False
+    SESSION_MEMORY_MAX_MESSAGES: int = 20
+    SESSION_MEMORY_MAX_CHARS: int = 12000
+
     @staticmethod
     def _to_nonempty_str(obj: Any) -> Optional[str]:
         s = str(obj).strip()

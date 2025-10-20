@@ -26,12 +26,18 @@ def migrate_demo_dataset():
         # Lade Einträge (sowohl JSON-Array als auch JSONL-Format unterstützen)
         with open(path, "r", encoding="utf-8") as f:
             content = f.read().strip()
+            entries: List[Dict[str, Any]] = []
             if content.startswith('['):
                 # JSON-Array Format
-                entries: List[Dict[str, Any]] = json.loads(content)
+                try:
+                    raw = json.loads(content)
+                    if isinstance(raw, list):
+                        from typing import cast
+                        entries = cast(List[Dict[str, Any]], raw)
+                except Exception:
+                    entries = []
             else:
                 # JSONL Format
-                entries = []  # type: List[Dict[str, Any]]
                 for line in content.split('\n'):
                     if not line.strip():
                         continue
