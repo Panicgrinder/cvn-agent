@@ -189,6 +189,37 @@ Neu (Backups & Releases)
     um Restore-Anleitung (Parts zusammenfügen, Verifikation) ergänzt.
   - Hinweis: Optional Verschlüsselung (7‑Zip AES‑256) für sensible Artefakte vorbereiten.
 
+Kurz-Update (2025-10-20)
+
+- [x] Reruns vereinheitlicht (Profile-aware)
+  - Skript: [`scripts/rerun_from_results.py`](scripts/rerun_from_results.py)
+  - Task: VS Code „Eval: rerun from results“
+- [x] Checksums & Restore
+  - Skript: [`scripts/generate_checksums.py`](scripts/generate_checksums.py)
+  - Doku: [`docs/RESTORE.md`](docs/RESTORE.md)
+- [x] Workspace-Index/Tasks konsolidiert
+  - Datei: [`WORKSPACE_INDEX.md`](WORKSPACE_INDEX.md)
+  - Tasks: normalisiert
+
+Offene Punkte (Kurzfristig)
+
+- [ ] Integrationstest „alpaca Export→Prepare“
+  - Ziel: End-to-End (Results → Export alpaca → Prepare-Pack)
+  - Status: Offen (Testdatei fehlt). Anknüpfen an vorhandene Tests: [`tests/scripts/test_export_finetune_more_edges.py`](tests/scripts/test_export_finetune_more_edges.py), [`tests/test_prepare_finetune_pack_nodedupe.py`](tests/test_prepare_finetune_pack_nodedupe.py)
+- [ ] Cleanup: harte Laufwerks-Pfade entfernen
+  - Datei: [`scripts/cleanup_phase3.ps1`](scripts/cleanup_phase3.ps1) nutzt absolute F:\-Pfade → relativ/`${workspaceFolder}` umstellen
+- [ ] Doku-Drift bereinigen
+  - [`cleanup_recommendations.md`](cleanup_recommendations.md) meldet entfernten Chat-Endpunkt; tatsächlich aktiv in [`app/main.py`](app/main.py)
+
+Neu: Reports-Standard
+
+- [x] Bericht-Ordner festlegen
+  - Struktur: `eval/results/reports/<topic>/<YYYYMMDD_HHMM>/`
+  - Inhalte pro Run:
+    - `report.md` (Ergebnisse)
+    - `params.txt` (Testparameter/Scope)
+  - Vorteil: reproduzierbare Audits; klare Trennung von Artefakten
+
 Später
 
 - Narrativspeicher (Session Memory)

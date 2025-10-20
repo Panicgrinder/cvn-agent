@@ -35,7 +35,7 @@ Dieser Leitfaden zeigt den minimalen End‑to‑End‑Ablauf mit vorhandenen Skr
 
 - Pfade/Konfiguration: `app/core/settings.py` (Eval‑Dirs, Patterns)
 - Synonyme/Checks: `eval/config/{synonyms.json,synonyms.local.json}`
-- Doku: `docs/CONTEXT_ARCH.md`, `docs/AGENT_PROMPT.md`
+- Doku: `docs/CONTEXT_ARCH.md`, `docs/AGENT_PROMPT.md`, `docs/REPORTS.md`
 - Optional: VS‑Code‑Tasks für die Schritte vorhanden.
 
 ### Reruns (Profile-aware)

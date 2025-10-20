@@ -4,9 +4,13 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Basis: aktuelles Skriptverzeichnis → Projektwurzel ist dessen Elternordner
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = Split-Path -Parent $ScriptDir
+
 $targets = @(
-    "f:\cvn-agent\eval\eval-21-40_demo_v1.0.json",
-    "f:\cvn-agent\data\system.txt"
+    Join-Path $ProjectRoot 'eval\eval-21-40_demo_v1.0.json',
+    Join-Path $ProjectRoot 'data\system.txt'
 )
 
 foreach ($t in $targets) {
