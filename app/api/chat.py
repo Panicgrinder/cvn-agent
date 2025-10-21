@@ -12,6 +12,7 @@ from ..utils.session_memory import session_memory
 from utils.context_notes import load_context_notes
 from .models import ChatRequest, ChatResponse
 from ..core.memory import compose_with_memory, get_memory_store
+from .chat_helpers import normalize_ollama_options
 
 # Logger konfigurieren
 logger = logging.getLogger(__name__)
@@ -133,26 +134,11 @@ async def stream_chat_request(
         # fail-open
         pass
 
-    # Optionen
+    # Optionen normalisieren
     from typing import Dict as _Dict, Any as _Any
     req_model = getattr(request, "model", None)
-    req_options: _Dict[str, _Any] = getattr(request, "options", None) or {}
-    temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
-    base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
-    # num_predict Alias: max_tokens zulassen (Kompatibilität zu CLI)
-    try:
-        requested_tokens_raw = req_options.get("num_predict", req_options.get("max_tokens", settings.REQUEST_MAX_TOKENS))
-        requested_tokens = int(requested_tokens_raw)
-    except Exception:
-        requested_tokens = settings.REQUEST_MAX_TOKENS
-    num_predict = max(1, min(requested_tokens, settings.REQUEST_MAX_TOKENS))
-    if eval_mode:
-        temperature = min(temperature, 0.25)
-    top_p_val = req_options.get("top_p")
-    try:
-        top_p: Optional[float] = float(top_p_val) if top_p_val is not None else None
-    except Exception:
-        top_p = None
+    raw_opts: _Dict[str, _Any] = getattr(request, "options", None) or {}
+    norm_opts, base_host = normalize_ollama_options(raw_opts, eval_mode=eval_mode)
 
     # Session Memory: optional bestehenden Verlauf voranstellen
     try:
@@ -179,10 +165,8 @@ async def stream_chat_request(
         "model": req_model or settings.MODEL_NAME,
         "messages": messages,
         "stream": True,
-        "options": {"temperature": temperature, "num_predict": num_predict},
+        "options": norm_opts,
     }
-    if top_p is not None:
-        ollama_payload["options"]["top_p"] = top_p
 
     ollama_url = f"{base_host}/api/chat"
 
@@ -479,24 +463,8 @@ async def process_chat_request(
         # Options/Overrides
         from typing import Dict as _Dict, Any as _Any
         req_model = getattr(request, "model", None)
-        req_options: _Dict[str, _Any] = getattr(request, "options", None) or {}
-        temperature: float = float(req_options.get("temperature", settings.TEMPERATURE))
-        base_host: str = str(req_options.get("host", settings.OLLAMA_HOST))
-        # num_predict Alias: max_tokens zulassen (Kompatibilität zu CLI)
-        try:
-            requested_tokens_raw = req_options.get("num_predict", req_options.get("max_tokens", settings.REQUEST_MAX_TOKENS))
-            requested_tokens = int(requested_tokens_raw)
-        except Exception:
-            requested_tokens = settings.REQUEST_MAX_TOKENS
-        num_predict = max(1, min(requested_tokens, settings.REQUEST_MAX_TOKENS))
-        if eval_mode:
-            temperature = min(temperature, 0.25)
-        # Optional: top_p aus Optionen übernehmen, wenn gesetzt
-        top_p_val = req_options.get("top_p")
-        try:
-            top_p: Optional[float] = float(top_p_val) if top_p_val is not None else None
-        except Exception:
-            top_p = None
+        raw_opts2: _Dict[str, _Any] = getattr(request, "options", None) or {}
+        norm_opts2, base_host = normalize_ollama_options(raw_opts2, eval_mode=eval_mode)
 
         # Session Memory (optional): bisherigen Verlauf voranstellen
         try:
@@ -521,11 +489,8 @@ async def process_chat_request(
             "model": req_model or settings.MODEL_NAME,
             "messages": messages,
             "stream": False,
-            "options": {"temperature": temperature, "num_predict": num_predict},
+            "options": norm_opts2,
         }
-        if top_p is not None:
-            # Nur setzen, wenn sinnvoller Wert
-            ollama_payload["options"]["top_p"] = top_p
 
         ollama_url = f"{base_host}/api/chat"
 

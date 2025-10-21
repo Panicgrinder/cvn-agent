@@ -148,6 +148,41 @@ Hinweise:
 - Branch-Coverage ist in `.coveragerc` aktiviert; schwere/interactive Skripte sind ausgeschlossen.
 - Zielwerte werden sukzessive angehoben, sobald Teilbereiche stabil darüber liegen.
 
+## Cleanup-Kandidaten (aus Konsistenz-Report 20251021_1446)
+
+Quelle: `eval/results/reports/consistency/20251021_1446/report.md`.
+
+Ziel: Offensichtliche Altlasten/Beispiele sichten, entweder (a) einbinden, (b) nach `examples/` verschieben/archivieren oder (c) entfernen. Bitte jeweils kurz verifizieren (Referenzen/Tests) und mit DONELOG erfassen.
+
+API/Nahbereich:
+
+- [ ] `app/schemas.py` — Legacy-Schema; Modelle liegen unter `app/api/models.py`. Prüfen, ob noch importiert; wahrscheinlich entfernen.
+- [ ] `app/api/chat_helpers.py` — Helfer aus früheren Versionen; prüfen, ob Referenzen existieren.
+- [ ] `app/core/content_management.py` — Nur nötig, wenn Content-Filter aktiv genutzt wird; sonst archivieren.
+- [ ] `app/utils/convlog.py` — Wird aktuell nur begrenzt genutzt; prüfen (jetzt `now_iso()` integriert).
+- [ ] `app/utils/summarize.py` — Obsolet? Nutzung prüfen; ggf. in Beispiele verschieben.
+- [ ] `app/utils/session_memory.py` — Feature-Stub; entweder verdrahten (Tests hinzufügen) oder parken/archivieren.
+- [ ] `app/utils/examples/**` — Beispielcode; nach `examples/` konsolidieren oder archivieren.
+- [ ] `examples/rpg/*` — Beispiel-RPG; separat dokumentieren/archivieren oder entfernen.
+
+Skripte (CLI/Tools – teils „potenziell ungenutzt“ aus App-Perspektive):
+
+- [ ] `scripts/customize_prompts.py`, `scripts/estimate_tokens.py`, `scripts/open_context_notes.py` — behalten oder als „optional tools“ markieren; README-Hinweis ergänzen.
+- [ ] `scripts/openai_finetune.py`, `scripts/openai_ft_status.py`, `scripts/train_lora.py`, `scripts/fine_tune_pipeline.py` — CLI-Only; behalten, aber in Doku referenzieren; ggf. mit `--help`-Tests absichern.
+- [ ] `scripts/reports/generate_*` — jetzt repariert; behalten. Optional: Task/README ergänzen (siehe unten).
+- [ ] `scripts/audit_workspace.py` — behalten (liefert diese Liste); README-Querverweis setzen.
+
+Nicht‑Python‑Artefakte (Referenzen vorhanden, aber Pflege prüfen):
+
+- [ ] `eval/config/profiles.json` — aktuell; Doku konsolidieren.
+- [ ] `eval/config/synonyms.json` (+ `synonyms.local.json`) — gepflegt; README aktualisieren.
+- [ ] `app/prompt/system.txt` — Altlast; zentrale Prompts sind `app/core/prompts.py`. Entfernen, wenn nicht mehr referenziert.
+
+Hinweise:
+
+- Die Heuristik meldet auch legitime CLI‑Skripte als „potenziell ungenutzt“, da sie nicht von `app/main.py` referenziert werden. Diese bitte nicht vorschnell löschen, sondern als Tools dokumentieren und ggf. mit leichten Smoke‑Tests abdecken.
+- Vollständige Liste siehe Report unter obigem Pfad.
+
 3–7 Tage
 
 - Datensatzkurierung aus Logs (Train/Val-Pack)

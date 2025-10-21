@@ -49,8 +49,9 @@ def test_policy_stream_post_rewrite(monkeypatch):
     def fake_apply_post(text: str, *, mode: str = "default", profile_id=None):
         class R:
             action = "rewrite"
-            text = text.upper()
-        return R()
+            def __init__(self, t: str) -> None:
+                self.text = t.upper()
+        return R(text)
     monkeypatch.setattr(chat_module, "apply_post", fake_apply_post)
 
     req = ChatRequest(messages=[{"role": "user", "content": "hi"}])

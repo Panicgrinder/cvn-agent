@@ -25,6 +25,7 @@ import glob
 import json
 import os
 from datetime import datetime
+from utils.time_utils import now_compact
 from typing import Any, Dict, Optional, List, cast
 
 # Modulpfade vorbereiten
@@ -209,7 +210,7 @@ def main() -> int:
 
     report: Dict[str, Any] = {
         "ok": True,
-        "timestamp": datetime.now().strftime("%Y%m%d_%H%M"),
+        "timestamp": now_compact(),
     "results": chosen,
         "export": exported_path,
         "train": pack.get("train"),

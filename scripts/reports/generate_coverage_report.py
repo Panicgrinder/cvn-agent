@@ -9,18 +9,23 @@ from __future__ import annotations
 import os
 import json
 import datetime as dt
+import sys
 from typing import Any, Dict, List, TypedDict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REPORTS_ROOT = os.path.join(ROOT, "eval", "results", "reports", "coverage")
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
+from utils.time_utils import now_compact  # noqa: E402
+
+REPORTS_ROOT = os.path.join(ROOT, "eval", "results", "reports", "coverage")
 
 def ensure_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
 def timestamp() -> str:
-    return dt.datetime.now().strftime("%Y%m%d_%H%M")
+    return now_compact()
 
 
 class PkgSummary(TypedDict, total=False):

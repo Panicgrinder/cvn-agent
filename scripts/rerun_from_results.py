@@ -6,6 +6,7 @@ import json
 from typing import Any, Dict, List, Optional, cast
 import asyncio
 from datetime import datetime
+from utils.time_utils import now_compact
 
 
 def _load_results_with_meta(path: str) -> tuple[Dict[str, Any], List[Dict[str, Any]]]:
@@ -80,7 +81,7 @@ async def rerun_from_results(
     num_predict_override = overrides.get("num_predict")
     retries = int(meta.get("retries") or 0)
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M")
+    ts = now_compact()
     out_dir = getattr(run_eval, "DEFAULT_RESULTS_DIR", os.path.join("eval", "results"))
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"results_{ts}_rerun.jsonl")

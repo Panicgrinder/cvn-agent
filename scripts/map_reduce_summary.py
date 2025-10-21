@@ -22,6 +22,7 @@ import sys
 import json
 import argparse
 import datetime as _dt
+from utils.time_utils import now_compact
 from typing import List, Dict, Any, Tuple, Optional, cast
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -254,7 +255,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--out-dir", type=str, default=DEFAULT_OUT_DIR)
     args = ap.parse_args(argv)
 
-    timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M")
+    timestamp = now_compact()
     scopes = [s.strip() for s in args.scopes.split(",") if s.strip()]
 
     scope_files: List[str] = []

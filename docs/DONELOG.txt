@@ -44,8 +44,8 @@ Beispiel:
 2025-10-19 16:28 | Copilot | Tests: 3+1-Runde V (audit_workspace Fallback, curate_dataset_from_latest Minimal-Flow, open_context_notes Happy, /chat Fehlerpfad). Suite grün, Scripts-Coverage ~79%.
 2025-10-19 17:05 | Copilot | Tests: 3+1-Runde VI (curate_dataset_from_latest Filter-Exit-5; audit_workspace Referenzsuche; / Root Request-ID Header). Suite grün; Scripts-Coverage jetzt 80% (Branch-Coverage aktiv).
 2025-10-20 09:10 | Copilot | Tests: 3+1-Runde VII (curate positive Filterpfad, audit Reachability-Graph, open_latest_summary open-Path, App Rate-Limit-Header). Neue Pfade abgedeckt; Schnelllauf grün.
-2025-10-20 10:20 | Copilot | Re-Check Konsistenz nach Löschungen: cleanup_recommendations.md aktualisiert; cleanup_phase3.ps1 portabel gemacht; REPORTS.md erstellt; Report abgelegt unter eval/results/reports/consistency/20251020_1015/.
 2025-10-20 10:00 | Copilot | TODO/DONELOG aktualisiert; Konsistenzprüfung Runde 1 durchgeführt; Reports-Standard vorgeschlagen (eval/results/reports/<topic>/<ts> mit report.md und params.txt).
+2025-10-20 10:20 | Copilot | Re-Check Konsistenz nach Löschungen: cleanup_recommendations.md aktualisiert; cleanup_phase3.ps1 portabel gemacht; REPORTS.md erstellt; Report abgelegt unter eval/results/reports/consistency/20251020_1015/.
 2025-10-20 20:45 | Copilot | Demo→Fantasy-Umstellung konsolidiert (Code/Tests/Docs); Reporting-Skripte (Dependencies/Coverage/Consistency) ergänzt; CI-Workflow für Reports hinzugefügt; Legacy-Bereinigung: doppelten Re-Import in app/services/__init__.py entfernt, Rerun-Failed-Status in todo_gather vereinheitlicht, WORKSPACE_INDEX um Top-Level-Duplikat bereinigt.
 2025-10-20 21:10 | Copilot | Endpoints final bereinigt (app/api/endpoints/* entfernt), README/WORKSPACE_INDEX aktualisiert, TODO-Drift korrigiert; Reports-Skripte lokal erfolgreich ausgeführt (dependencies/coverage placeholder/consistency).
 2025-10-21 09:25 | Copilot | Pyright Linux-Fix: `scripts/open_context_notes.py` und `scripts/open_latest_summary.py` plattformneutral (webbrowser/open/xdg-open), `os.startfile` nur noch guarded; ungenutzte type: ignore entfernt.
@@ -53,3 +53,9 @@ Beispiel:
 2025-10-21 09:31 | Copilot | `scripts/openai_ft_status.py`: Import von `openai` optional; Fehlerausgabe nur bei tatsächlicher Nutzung, Tests können `OpenAI` stubben.
 2025-10-21 09:34 | Copilot | Synonyme erweitert: Eintrag für „empathisch“ (einfühlsam, zugewandt, mitfühlend, verständnisvoll, empathie) ergänzt; `tests/test_chai_checks.py` besteht.
 2025-10-21 09:38 | Copilot | CI: `workflow_dispatch` zur CI hinzugefügt (manuelle Runs möglich); alle Checks grün (CI/build-test, Enforce DONELOG, Consistency & Reports).
+2025-10-21 12:00 | Copilot | Chat-Options zentral normalisiert (normalize_ollama_options) und in Stream/Non-Stream verdrahtet; Policy-Stream-Tests (Pyright) stabilisiert; Copilot-Anleitung (PR-Checkliste/Marker/Pitfalls) geschärft.
+2025-10-21 12:15 | Copilot | .gitignore: Kontext-Notizen konsolidiert (eval/config/context.local.* statt Einzellisten); keine weiteren Änderungen.
+2025-10-21 13:29 | Copilot | Zeitstempel vereinheitlicht: utils/time_utils.py eingeführt; convlog nutzt now_iso(); append_done nutzt now_human(); schnelle Tests grün.
+2025-10-21 13:35 | Copilot | Kompakte Timestamps zentralisiert: Scripts auf now_compact() umgestellt (export_finetune, map_reduce_summary[_llm], run_eval, rerun_from_results, reports/*, eval_ui, fine_tune_pipeline, todo_gather); Scripts-Tests grün.
+2025-10-21 12:47 | Panicgrinder | Reports: Konsistenz/Dependencies/Coverage Generatoren repariert (sys.path + now_compact); Reports erzeugt.
+2025-10-21 12:54 | Panicgrinder | TODO: Cleanup-Kandidaten-Sektion basierend auf Konsistenz-Report ergänzt; CLI-Tools markiert.

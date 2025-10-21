@@ -79,7 +79,8 @@ def main() -> int:
         print({"ok": False, "error": f"Keine Train-Datei gefunden in {args.finetune_dir}"})
         return 2
 
-    out_dir = args.output or os.path.join("outputs", f"lora-{datetime.now().strftime('%Y%m%d_%H%M')}")
+    from utils.time_utils import now_compact
+    out_dir = args.output or os.path.join("outputs", f"lora-{now_compact()}")
     os.makedirs(out_dir, exist_ok=True)
 
     # Optionaler Free-Model-Guard

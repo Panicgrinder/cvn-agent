@@ -16,6 +16,7 @@ import time
 import argparse
 import logging
 from datetime import datetime
+from utils.time_utils import now_compact
 from typing import Dict, List, Any, Optional, Tuple, Union, cast
 from dataclasses import dataclass, field, asdict
 import httpx
@@ -1139,7 +1140,7 @@ async def run_evaluation(
         logging.info("Evaluierung wird im Eval-Modus durchgeführt (RPG-Modus deaktiviert)")
     
     # Aktuelle Zeit für Ergebnis-Dateiname (in results/ ablegen)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    timestamp = now_compact()
     # Run-ID für Korrelation/Logs
     try:
         import uuid as _uuid

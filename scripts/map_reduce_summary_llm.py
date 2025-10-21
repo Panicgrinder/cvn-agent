@@ -18,6 +18,7 @@ import json
 import argparse
 import asyncio
 import datetime as _dt
+from utils.time_utils import now_compact
 from typing import List, Dict, Any, Tuple, Optional, TYPE_CHECKING, Protocol, cast
 """Cache/Key Utilities (robust gegen fehlende utils.eval_cache)."""
 # Cache für LLM-Summaries (EvalCache dynamisch geladen in _get_llm_cache)
@@ -264,7 +265,7 @@ async def amain(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--temperature", type=float, default=0.2)
     args = ap.parse_args(argv)
 
-    timestamp = _dt.datetime.now().strftime("%Y%m%d_%H%M")
+    timestamp = now_compact()
     run_id = f"summary-{timestamp}"
 
     # leere Angabe ("--llm-scopes" ohne Wert) ergibt eine leere Liste → nur Heuristik verwenden

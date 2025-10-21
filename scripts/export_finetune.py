@@ -15,6 +15,7 @@ import sys
 import json
 from typing import Any, Dict, List, Optional, Tuple, cast
 from datetime import datetime
+from utils.time_utils import now_compact
 
 
 def _load_run_eval_module():
@@ -151,7 +152,7 @@ async def export_from_results(
     if not include_failures:
         rows = [r for r in rows if r.get("success")]
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    timestamp = now_compact()
     base = os.path.splitext(os.path.basename(results_path))[0]
     out_path: str = os.path.join(out_dir_str, f"finetune_{format}_{base}_{timestamp}.jsonl")
 

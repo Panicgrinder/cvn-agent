@@ -13,7 +13,12 @@ import datetime as dt
 from typing import Any, Dict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 REPORTS_ROOT = os.path.join(ROOT, "eval", "results", "reports", "consistency")
+
+# Import erst NACH dem sys.path-Patch, sonst schlägt der Import in direkter Ausführung fehl
+from utils.time_utils import now_compact  # noqa: E402
 
 
 def ensure_dir(path: str) -> None:
@@ -21,7 +26,7 @@ def ensure_dir(path: str) -> None:
 
 
 def timestamp() -> str:
-    return dt.datetime.now().strftime("%Y%m%d_%H%M")
+    return now_compact()
 
 
 def run_audit_workspace() -> str:

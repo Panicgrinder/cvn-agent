@@ -52,9 +52,7 @@ eval/*.jsonl
 ########################################
 # Private lokale Kontext-Notizen
 ########################################
-eval/config/context.local.md
-eval/config/context.local.json
-eval/config/context.local.jsonl
+eval/config/context.local.*
 
 ########################################
 # Editors / OS

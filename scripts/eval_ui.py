@@ -523,7 +523,8 @@ async def _evaluate_specific_items(items: List[EvalItem]) -> List[EvalResult]:
     """Evaluiert die übergebenen Items (ASGI, Eval-Modus) und schreibt eine neue results_*.jsonl-Datei."""
     # Ergebnis-Dateiname (results-Verzeichnis)
     results_dir: str = getattr(run_eval, "DEFAULT_RESULTS_DIR", run_eval.DEFAULT_EVAL_DIR)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    from utils.time_utils import now_compact
+    timestamp = now_compact()
     os.makedirs(results_dir, exist_ok=True)
     out_path = os.path.join(results_dir, f"results_{timestamp}.jsonl")
 

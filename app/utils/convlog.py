@@ -6,6 +6,7 @@ Die Logs werden als JSONL-Dateien in data/logs/ gespeichert.
 import os
 import json
 import datetime
+from utils.time_utils import now_iso
 from typing import Dict, List, Optional, Any
 
 
@@ -29,7 +30,8 @@ def create_log_record(
     Returns:
         Ein Dictionary mit dem Logeintrag
     """
-    timestamp = datetime.datetime.now().isoformat()
+    # Einheitlicher ISO-Zeitstempel (lokale Zeit, mit Offset falls gesetzt)
+    timestamp = now_iso()
     
     log_record: Dict[str, Any] = {
         "timestamp": timestamp,

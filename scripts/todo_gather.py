@@ -121,7 +121,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(md)
     if args.write_md:
         os.makedirs(SUMMARIES_DIR, exist_ok=True)
-        ts = dt.datetime.now().strftime("%Y%m%d_%H%M")
+        from utils.time_utils import now_compact
+        ts = now_compact()
         out = os.path.join(SUMMARIES_DIR, f"todo_status_{ts}.md")
         with open(out, "w", encoding="utf-8") as f:
             f.write(md + "\n")
