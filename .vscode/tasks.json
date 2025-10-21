@@ -580,6 +580,31 @@
 			"group": "test"
 		},
 		{
+			"label": "Eval: overnight (auto report)",
+			"type": "shell",
+			"windows": {
+				"command": "powershell",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"$tag = 'overnight-' + (Get-Date -Format 'yyyyMMdd_HHmm'); \u0026 ${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --profile eval --checks rpg_style,term_inclusion --quiet --retries 1 --tag $tag; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; \u0026 ${config:python.interpreterPath} '${workspaceFolder}/scripts/summarize_eval_results.py' --tag $tag"
+				]
+			},
+			"group": "test",
+			"presentation": { "reveal": "always" }
+		},
+		{
+			"label": "Eval: summarize (by tag)",
+			"type": "process",
+			"command": "${config:python.interpreterPath}",
+			"args": [
+				"${workspaceFolder}/scripts/summarize_eval_results.py",
+				"--tag",
+				"${input:evalTag}"
+			],
+			"options": { "cwd": "${workspaceFolder}" }
+		},
+		{
 			"label": "pytest-scripts-coverage",
 			"type": "shell",
 			"command": "F:/cvn-agent/.venv/Scripts/python.exe",
@@ -596,6 +621,12 @@
 		}
 	],
 	"inputs": [
+		{
+			"id": "evalTag",
+			"type": "promptString",
+			"description": "Tag der results_*_TAG.jsonl (z. B. overnight-20251022)",
+			"default": "overnight-20251022"
+		},
 		{
 			"id": "openaiTrain",
 			"type": "promptString",
