@@ -21,6 +21,10 @@ from typing import Dict, List, Any, Optional, Tuple, Union, cast
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
 import httpx
+# Typannotation für dynamische Konsolen-/Tabellen-Typen (rich oder Fallback)
+Console: Any
+Table: Any
+Progress: Any
 try:
     from rich.console import Console as _RichConsole
     from rich.table import Table as _RichTable
@@ -1915,7 +1919,7 @@ if __name__ == "__main__":
     diags: List[Dict[str, Any]] = []
     try:
         from scripts.eval_loader import load_packages as _load_pkgs
-        combine_path = Path(args.combine_out) if args.combine_out else None  # type: ignore[arg-type]
+        combine_path: Optional[Path] = Path(args.combine_out) if isinstance(args.combine_out, str) and args.combine_out else None
         items_loaded, diags = _load_pkgs(patterns, combine_out=combine_path)
         # Zusammenfassungstabelle (eine Bildschirmseite)
         # Aggregate

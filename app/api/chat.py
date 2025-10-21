@@ -95,8 +95,10 @@ async def stream_chat_request(
     try:
         # top-level session_id oder options.session_id
         sid_top = getattr(request, "session_id", None)
-        opts = getattr(request, "options", None) or {}
-        sid_opt = opts.get("session_id") if isinstance(opts, dict) else None
+        opts_any0 = getattr(request, "options", None)
+        opts0: Dict[str, Any] = dict(cast(Mapping[str, Any], opts_any0)) if isinstance(opts_any0, Mapping) else {}
+        _sid_val0 = opts0.get("session_id")
+        sid_opt = _sid_val0 if isinstance(_sid_val0, str) else None
         sid_val = sid_top or sid_opt
         session_id = str(sid_val) if isinstance(sid_val, str) and sid_val else None
     except Exception:
@@ -125,7 +127,17 @@ async def stream_chat_request(
                 yield "event: done\ndata: {}\n\n"
             return _blocked_gen()
         if pre and getattr(pre, "action", "allow") == "rewrite" and getattr(pre, "messages", None):
-            messages = list(pre.messages)  # type: ignore[assignment]
+            # Sichere Neuzusammenstellung der Nachrichten mit expliziter Typform
+            pre_msgs = getattr(pre, "messages", None)
+            if pre_msgs:
+                messages = [
+                    {
+                        "role": str((cast(Mapping[str, Any], m)).get("role", "user")),
+                        "content": str((cast(Mapping[str, Any], m)).get("content", "")),
+                    }
+                    for m in pre_msgs
+                    if isinstance(m, Mapping)
+                ]
             if getattr(settings, "LOG_JSON", False):
                 logger.info(_json.dumps({"event": "policy_pre", "action": "rewrite", "mode": mode, "request_id": request_id}, ensure_ascii=False))
             else:
@@ -144,10 +156,10 @@ async def stream_chat_request(
     try:
         if getattr(settings, "SESSION_MEMORY_ENABLED", False):
             from typing import Optional as _Optional, Dict as _Dict, Any as _Any
-            opts: _Optional[_Dict[str, _Any]] = getattr(request, "options", None)
+            opts_mem: _Optional[_Dict[str, _Any]] = getattr(request, "options", None)
             sess_id: _Optional[str] = None
-            if isinstance(opts, dict):
-                _val = opts.get("session_id")
+            if isinstance(opts_mem, dict):
+                _val = opts_mem.get("session_id")
                 sess_id = _val if isinstance(_val, str) else None
             if isinstance(sess_id, str) and sess_id:
                 prior = session_memory.get(sess_id)
@@ -240,7 +252,7 @@ async def stream_chat_request(
                                 prev_val = g.get(text_key)
                                 g[text_key] = final_text
                                 try:
-                                    post = fn(final_text, mode=mode, profile_id=profile_id)  # type: ignore[misc]
+                                    post = fn(final_text, mode=mode, profile_id=profile_id)
                                     action = getattr(post, "action", "allow")
                                     if action == "rewrite" and getattr(post, "text", None):
                                         effective_text = str(post.text)
@@ -425,9 +437,10 @@ async def process_chat_request(
             from typing import Dict as _Dict, Any as _Any
             opts_any = getattr(request, "options", None)
             opts0: _Dict[str, _Any] = {}
-            if isinstance(opts_any, dict):
+            # Sichere Übernahme, nur wenn Mapping-artig
+            if isinstance(opts_any, Mapping):
                 try:
-                    opts0 = dict(opts_any)  # type: ignore[arg-type]
+                    opts0 = dict(cast(Mapping[str, _Any], opts_any))
                 except Exception:
                     opts0 = {}
             sid_opt = opts0.get("session_id")
@@ -452,7 +465,16 @@ async def process_chat_request(
                 # 400 mit Policy-Block-Detail
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="policy_block")
             if pre and getattr(pre, "action", "allow") == "rewrite" and getattr(pre, "messages", None):
-                messages = list(pre.messages)  # type: ignore[assignment]
+                pre_msgs = getattr(pre, "messages", None)
+                if pre_msgs:
+                    messages = [
+                        {
+                            "role": str((cast(Mapping[str, Any], m)).get("role", "user")),
+                            "content": str((cast(Mapping[str, Any], m)).get("content", "")),
+                        }
+                        for m in pre_msgs
+                        if isinstance(m, Mapping)
+                    ]
                 if getattr(settings, "LOG_JSON", False):
                     logger.info(_json.dumps({"event": "policy_pre", "action": "rewrite", "mode": mode, "request_id": request_id}, ensure_ascii=False))
                 else:
@@ -595,13 +617,13 @@ async def process_chat_request(
             sid_top = getattr(request, "session_id", None)
             from typing import Dict as _Dict, Any as _Any
             opts_any = getattr(request, "options", None)
-            opts0: _Dict[str, _Any] = {}
-            if isinstance(opts_any, dict):
+            opts_err: _Dict[str, _Any] = {}
+            if isinstance(opts_any, Mapping):
                 try:
-                    opts0 = dict(opts_any)  # type: ignore[arg-type]
+                    opts_err = dict(cast(Mapping[str, _Any], opts_any))
                 except Exception:
-                    opts0 = {}
-            sid_opt = opts0.get("session_id")
+                    opts_err = {}
+            sid_opt = opts_err.get("session_id")
             sid_val = sid_top or sid_opt
             session_id = str(sid_val) if isinstance(sid_val, str) and sid_val else None
             if session_id and getattr(settings, "MEMORY_ENABLED", True):

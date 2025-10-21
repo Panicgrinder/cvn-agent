@@ -116,11 +116,12 @@ def create_unrestricted_prompt(scenario_type: str) -> str:
 from typing import Any, Dict, List, Mapping, Optional
 import re
 
+# Laufzeitimport, um zyklische Imports zu vermeiden
+settings: Any
 try:
-    # Laufzeitimport, um zyklische Imports zu vermeiden
-    from .settings import settings  # type: ignore
+    from .settings import settings
 except Exception:
-    settings = None  # type: ignore
+    settings = None
 
 
 class PreResult:
