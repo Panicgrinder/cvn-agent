@@ -311,6 +311,68 @@ def get_synonyms(term: str) -> List[str]:
     return list(set(synonyms))  # Entferne Duplikate
 
 
+# --- Neu: Checks-Normalisierung und Profil-Presets ---------------------------------
+def normalize_checks(checks: Optional[List[str]]) -> Optional[List[str]]:
+    """Normalisiert die vom CLI kommende Checks-Liste.
+
+    - Unterstützt Komma-separierte Eingaben (z. B. ["rpg_style,term_inclusion"]).
+    - Ersetzt den Alias "term_inclusion" durch die konkreten Check-Typen
+      (must_include, keywords_any, keywords_at_least).
+    - Duplikate werden entfernt und Reihenfolge stabilisiert.
+    """
+    if checks is None:
+        return None
+    items: List[str] = []
+    for part in checks:
+        # Split an Kommas und trimmen
+        for token in str(part).split(","):
+            t = token.strip()
+            if not t:
+                continue
+            items.append(t)
+    # Alias-Expansion
+    expanded: List[str] = []
+    for t in items:
+        if t == "term_inclusion":
+            expanded.extend(["must_include", "keywords_any", "keywords_at_least"])
+        else:
+            expanded.append(t)
+    # Dedupe stabil
+    seen: set[str] = set()
+    out: List[str] = []
+    for t in expanded:
+        if t not in seen:
+            seen.add(t)
+            out.append(t)
+    return out
+
+
+def resolve_profile_overrides(
+    profile: Optional[str],
+    temperature: Optional[float],
+    top_p: Optional[float],
+    max_tokens: Optional[int],
+) -> Tuple[Optional[float], Optional[float], Optional[int], bool]:
+    """Wendet Profil-Defaults an.
+
+    Gibt (temperature, top_p, max_tokens, eval_mode) zurück. Nur fehlende Werte werden
+    mit Presets befüllt. Für profile=="eval" wird eval_mode auf True gesetzt.
+    """
+    eval_mode = False
+    if (profile or "").lower() == "eval":
+        eval_mode = True
+        if temperature is None:
+            temperature = 0.2
+        if top_p is None:
+            top_p = 0.1
+        if max_tokens is None:
+            max_tokens = 128
+    elif (profile or "").lower() == "unrestricted":
+        eval_mode = False
+    # default: keine Änderungen
+    return temperature, top_p, max_tokens, eval_mode
+
+
 async def load_prompts(patterns: Optional[List[str]] = None) -> List[Dict[str, Any]]:
     """
     Lädt Evaluierungseinträge aus allen passenden JSON/JSONL-Dateien.
@@ -1351,6 +1413,93 @@ def print_results(results: List[EvaluationResult]) -> None:
     console.print(package_table)
 
 
+def compute_failure_summary(results: List[EvaluationResult]) -> Dict[str, Any]:
+    """Aggregiert Fehlerinformationen für einen kompakten Bericht.
+
+    Ermittelt u. a. Top-Failure-Kategorien (rpg_style, term_inclusion) und häufige fehlende Begriffe.
+    """
+    total = len(results)
+    successes = sum(1 for r in results if r.success)
+    rpg_hits = sum(1 for r in results if check_rpg_mode(r.response))
+
+    # Zähler
+    fail_counts: Dict[str, int] = {
+        "rpg_style": 0,
+        "term_inclusion": 0,
+    }
+    missing_terms: Dict[str, int] = {}
+    per_package_fails: Dict[str, List[Tuple[str, List[str]]]] = {}
+
+    miss_re = re.compile(r"Erforderlicher Begriff nicht gefunden: '([^']+)'")
+
+    for r in results:
+        if r.success:
+            continue
+        pkg = (r.source_package or "unbekannt")
+        per_package_fails.setdefault(pkg, []).append((r.item_id, list(r.failed_checks)))
+
+        # RPG-Fehler heuristisch erkennen anhand der failure messages
+        if any("RPG-Stil" in s or "Antwort im RPG-Modus" in s for s in r.failed_checks):
+            fail_counts["rpg_style"] += 1
+
+        # Term-Inklusionsfehler zählen und Begriffe sammeln
+        counted_term_failure = False
+        for msg in r.failed_checks:
+            m = miss_re.search(msg)
+            if m:
+                counted_term_failure = True
+                term = m.group(1).strip().lower()
+                missing_terms[term] = missing_terms.get(term, 0) + 1
+        if counted_term_failure:
+            fail_counts["term_inclusion"] += 1
+
+    # Top missing terms sortieren
+    top_missing = sorted(missing_terms.items(), key=lambda kv: kv[1], reverse=True)[:5]
+
+    return {
+        "total": total,
+        "successes": successes,
+        "rpg_hits": rpg_hits,
+        "fail_counts": fail_counts,
+        "top_missing_terms": top_missing,
+        "per_package_fails": per_package_fails,
+    }
+
+
+def print_failure_report(results: List[EvaluationResult]) -> None:
+    """Druckt einen kompakten Fehlerbericht (eine Bildschirmseite)."""
+    summary = compute_failure_summary(results)
+    total = summary["total"]
+    successes = summary["successes"]
+    rpg_hits = summary["rpg_hits"]
+    fail_counts = summary["fail_counts"]
+    top_missing = summary["top_missing_terms"]
+    per_pkg = summary["per_package_fails"]
+
+    print("")
+    print(f"Summary: success {successes}/{total}, RPG hits {rpg_hits}/{total}")
+    print("Top failures:")
+    print(f"  - rpg_style: {fail_counts.get('rpg_style', 0)}")
+    if top_missing:
+        miss_preview = ", ".join([f"{t}({n})" for t, n in top_missing])
+        print(f"  - term_inclusion: {fail_counts.get('term_inclusion', 0)} (top missing: {miss_preview})")
+    else:
+        print(f"  - term_inclusion: {fail_counts.get('term_inclusion', 0)}")
+
+    # Erste 5 fehlgeschlagene IDs pro Paket
+    print("First 5 failed IDs per package:")
+    for pkg, items in sorted(per_pkg.items()):
+        if not items:
+            continue
+        print(f"  {pkg}:")
+        for iid, reasons in items[:5]:
+            # Gründe kompakt
+            short = "; ".join(reasons)
+            if len(short) > 160:
+                short = short[:157] + "..."
+            print(f"    - {iid}: {short}")
+
+
 def run_evaluation_with_retry(
     file_pattern: str, 
     api_url: str = "http://localhost:8000/chat",
@@ -1499,7 +1648,8 @@ if __name__ == "__main__":
     parser.add_argument("--eval-mode", "-e", action="store_true", help="Deaktiviert den RPG-Modus für die Evaluierung")
     parser.add_argument("--skip-preflight", "-s", action="store_true", help="Überspringt den Preflight-Check (nützlich, wenn der Server nicht läuft)")
     parser.add_argument("--asgi", action="store_true", help="ASGI-In-Process: Evaluierung direkt gegen FastAPI-App ohne laufenden Server-Port")
-    parser.add_argument("--checks", nargs="*", help="Aktiviere nur diese Check-Typen (must_include, keywords_any, keywords_at_least, not_include, regex, rpg_style)")
+    parser.add_argument("--profile", type=str, choices=["eval", "default", "unrestricted"], help="Profil-Preset: eval, default, unrestricted")
+    parser.add_argument("--checks", nargs="*", help="Aktiviere Check-Typen; unterstützt Komma-Liste und Alias 'term_inclusion'")
     parser.add_argument("--quiet", action="store_true", help="Unterdrückt Logausgaben lauter Logger während der Progress-Anzeige")
     parser.add_argument("--log-json", action="store_true", help="Log-Ausgabe als JSON-Linien")
     parser.add_argument("--combine-out", type=str, help="Optionaler Pfad für zusammengeführte JSONL der geladenen Datensätze")
@@ -1639,6 +1789,21 @@ if __name__ == "__main__":
     except Exception as e:
         logging.getLogger("eval_loader").warning(f"Dataset-Preload übersprungen: {e}")
 
+    # Profil-Defaults anwenden (nur fehlende Werte überschreiben)
+    # eval_mode wird später bei run_evaluation berücksichtigt
+    t_final, p_final, n_final, eval_mode_flag = resolve_profile_overrides(
+        getattr(args, "profile", None),
+        args.temperature,
+        args.top_p,
+        args.max_tokens,
+    )
+    # Falls explizites --eval-mode gesetzt, gewinnt dies über Profil
+    if args.eval_mode:
+        eval_mode_flag = True
+
+    # Checks normalisieren
+    checks_final = normalize_checks(args.checks)
+
     # Führe Evaluierung durch
     console = Console()
     console.print(f"[bold]CVN Agent Evaluierung[/bold]")
@@ -1653,12 +1818,12 @@ if __name__ == "__main__":
     if args.asgi:
         console.print(f"[bold green]ASGI-Modus:[/bold green] In-Process gegen FastAPI-App (kein HTTP-Port erforderlich)")
     console.print("")
-    if args.top_p is not None:
-        console.print(f"top_p Override: {args.top_p}")
-    if args.max_tokens is not None:
-        console.print(f"num_predict Override: {args.max_tokens}")
-    if args.temperature is not None:
-        console.print(f"temperature Override: {args.temperature}")
+    if p_final is not None:
+        console.print(f"top_p Override: {p_final}")
+    if n_final is not None:
+        console.print(f"num_predict Override: {n_final}")
+    if t_final is not None:
+        console.print(f"temperature Override: {t_final}")
     if args.model:
         console.print(f"Model Override: {args.model}")
     if args.host:
@@ -1697,23 +1862,25 @@ if __name__ == "__main__":
         patterns=patterns,
         api_url=api_url,
         limit=args.limit,
-        eval_mode=args.eval_mode,
+        eval_mode=eval_mode_flag,
         skip_preflight=args.skip_preflight,
         asgi=args.asgi,
-        enabled_checks=args.checks,
-    model_override=args.model,
-    temperature_override=args.temperature,
-    host_override=args.host,
-    top_p_override=args.top_p,
-    num_predict_override=args.max_tokens,
+        enabled_checks=checks_final,
+        model_override=args.model,
+        temperature_override=t_final,
+        host_override=args.host,
+        top_p_override=p_final,
+        num_predict_override=n_final,
         sweep=sweep_cfg,
         tag=args.tag,
-    quiet=quiet_final,
-    retries=args.retries,
-    use_cache=(args.use_cache and not args.no_cache),
+        quiet=quiet_final,
+        retries=args.retries,
+        use_cache=(args.use_cache and not args.no_cache),
     ))
     
     if results:
         print_results(results)
+        # Kompakter Fehlerbericht
+        print_failure_report(results)
     else:
         console.print("[bold red]Keine Ergebnisse. Die Evaluierung wurde abgebrochen oder keine Einträge gefunden.[/bold red]")
