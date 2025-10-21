@@ -60,3 +60,4 @@ Beispiel:
 2025-10-21 12:47 | Panicgrinder | Reports: Konsistenz/Dependencies/Coverage Generatoren repariert (sys.path + now_compact); Reports erzeugt.
 2025-10-21 12:54 | Panicgrinder | TODO: Cleanup-Kandidaten-Sektion basierend auf Konsistenz-Report ergänzt; CLI-Tools markiert.
 2025-10-21 20:53 | Panicgrinder | Docs: removed remaining Docker/Compose mention in TODO (superproject and submodule). Also restored VS Code settings from backup to undo catch-all auto-approve.
+2025-10-21 20:57 | Panicgrinder | Tests: add pytest norecursedirs to ignore nested submodule; fix import mismatch and restore stable test runs (api, streaming, unit passing).
