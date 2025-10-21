@@ -64,3 +64,5 @@ Beispiel:
 2025-10-21 22:00 | Panicgrinder | Docs: add docs-only history purge plan and helper script; wording cleanup in DONELOG.
 2025-10-21 22:50 | Panicgrinder | Types: fix mypy errors in chat.py, content_management.py, and run_eval.py; no runtime behavior change.
 2025-10-21 23:36 | Panicgrinder | Docs: add BEHAVIOR.md (Projektverhalten) und WORKSPACE_INDEX.md aktualisiert.
+2025-10-22 00:41 | Panicgrinder | Eval: start overnight run (ASGI) tag=overnight-20251022; results will be summarized after completion.
+2025-10-22 00:53 | Panicgrinder | Eval: Teilrun 50/136 (ASGI) saved to results_20251022_0042_overnight-20251022.jsonl; report at docs/reports/overnight-20251022.md.
