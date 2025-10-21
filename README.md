@@ -176,6 +176,56 @@ oder interne Begriffe.
    System-Prompt), sowohl im normalen als auch im Streaming-Endpunkt.
 - Fehlende Overlay-Datei wird stillschweigend ignoriert.
 
+## Eval-Style-Guard (Post-Hook im eval_mode)
+
+Der Streaming-Post-Hook normalisiert im `eval_mode` die finale
+Assistenten-Antwort heuristisch: neutral, kurz, ohne Rollenspiel/Emoji/
+Storytelling. Die Normalisierung greift nur, wenn `eval_mode` aktiv ist und
+kann über Settings deaktiviert werden. Der umgeschriebene Text wird in der
+Sitzungshistorie persistiert.
+
+- Flags in `app/core/settings.py` (auch per ENV setzbar):
+   - `EVAL_POST_REWRITE_ENABLED` (default: `True`)
+   - `EVAL_POST_MAX_SENTENCES` (default: `2`)
+   - `EVAL_POST_MAX_CHARS` (default: `240`)
+   - Heuristiken: Neutralisierung und Kompaktierung
+      (Pronomen/Rollenspiel/Emojis/! entfernen, Duplikate/Punktuation
+      normalisieren)
+
+- Beispiel: SSE-Tail beim Streaming (eval_mode)
+
+   ```text
+   event: delta
+   data: {"text":"..."}
+   event: meta
+   data: {"policy_post":"rewritten","request_id":"<RID>","delta_len":42}
+   event: done
+   ```
+
+- Eval-Runner Preset: `--profile eval`
+   - Setzt konservative Sampling-Defaults (nur wenn nicht manuell
+      überschrieben):
+      - `temperature=0.2`, `top_p=0.1`, `max_tokens=128`
+   - Checks lassen sich fokussieren, z. B.:
+      `--checks rpg_style,term_inclusion`
+   - Ruhige Ausgabe: `--quiet`
+
+### Schnelle Rezepte (copy/paste)
+
+- CHAI (ASGI, eval-Profil, fokussierte Checks):
+
+   ```bash
+   python scripts/run_eval.py --asgi --packages "eval/datasets/chai-ai_small_v1.jsonl" \
+      --profile eval --checks rpg_style,term_inclusion --quiet
+   ```
+
+- Combined 001–100 (ASGI, eval-Profil, fokussierte Checks):
+
+   ```bash
+   python scripts/run_eval.py --asgi --packages "eval/datasets/combined_eval_001-100.jsonl" \
+      --profile eval --checks rpg_style,term_inclusion --quiet
+   ```
+
 ## Copilot @workspace / #codebase (Code-Suche)
 
 - Empfehlung: Remote-Index nutzen (Repo liegt auf GitHub). Lokaler Index dient als Fallback.

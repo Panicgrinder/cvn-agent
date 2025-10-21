@@ -414,6 +414,22 @@
     "ergebnis",
     "folge"
   ],
+  "vene": [
+    "vene",
+    "venen"
+  ],
+  "venen": [
+    "vene",
+    "venen"
+  ],
+  "transaktion": [
+    "transaktion",
+    "transaktionen"
+  ],
+  "transaktionen": [
+    "transaktion",
+    "transaktionen"
+  ],
   "konsistenz": [
     "consistency"
   ],

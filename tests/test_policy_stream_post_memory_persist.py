@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Callable
+from types import SimpleNamespace
+from typing import Callable, List
 
 import pytest
 
@@ -48,19 +49,16 @@ def test_policy_stream_post_memory_persist(monkeypatch):
 
     # Monkeypatch post-policy to force rewrite to uppercase
     def fake_apply_post(text: str, *, mode: str = "default", profile_id=None):
-        class R:
-            action = "rewrite"
-            def __init__(self, t: str) -> None:
-                self.text = t.upper()
-        return R(text)
+        # Return object with attributes expected by the handler
+        return SimpleNamespace(action="rewrite", text=text.upper())
     monkeypatch.setattr(chat_module, "apply_post", fake_apply_post)
 
     sid = "mem-check-1"
     req = ChatRequest(messages=[{"role": "user", "content": "hi"}], session_id=sid)
     agen = asyncio.run(chat_module.stream_chat_request(req))
 
-    async def _consume():
-        out = []
+    async def _consume() -> List[str]:
+        out: List[str] = []
         async for s in agen:
             out.append(s)
         return out

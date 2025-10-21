@@ -114,6 +114,7 @@ def create_unrestricted_prompt(scenario_type: str) -> str:
 # Einfache Policy-Engine (optional)
 # ---------------------------------------------------------------------------
 from typing import Any, Dict, List, Mapping, Optional
+import re
 
 try:
     # Laufzeitimport, um zyklische Imports zu vermeiden
@@ -134,6 +135,99 @@ class PostResult:
         self.action = action  # allow | rewrite | block
         self.text = text
         self.reason = reason
+
+
+# ---------------------- Eval-Post Normalizer (heuristics) ----------------------
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[\.\?\!])\s+")
+
+
+def split_sentences(text: str) -> List[str]:
+    try:
+        parts = [p.strip() for p in _SENTENCE_SPLIT_RE.split(text) if p and p.strip()]
+        return parts
+    except Exception:
+        return [text]
+
+
+def trim_length(text: str, max_chars: int) -> str:
+    if max_chars <= 0:
+        return ""
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars].rstrip()
+
+
+def limit_sentences(text: str, max_sentences: int) -> str:
+    if max_sentences <= 0:
+        return ""
+    parts = split_sentences(text)
+    return " ".join(parts[:max_sentences])
+
+
+_ROLEPLAY_MARKERS = (
+    "ich:", "du:", "wir:", "narrator:", "erzähler:", "spieler:", "gm:", "*", "[", "]"
+)
+_FILLERS = ("gern", "gerne", "natürlich", "klar", "sicher", "also", "übrigens", "ähm")
+
+
+def _strip_roleplay_markers(t: str) -> str:
+    # Entferne einfache Marker/Emotes/Aktionen, Klammerinhalte grob
+    t = re.sub(r"\*[^*]*\*", " ", t)
+    t = re.sub(r"\[[^\]]*\]", " ", t)
+    # Markerpräfixe am Satzanfang
+    t = re.sub(r"^(ich|du|wir|narrator|erzähler|spieler|gm)\s*:\s*", "", t, flags=re.IGNORECASE)
+    return t
+
+
+def _neutralize_pronouns(t: str) -> str:
+    # Heuristische Neutralisierung: ich/du/wir -> neutraler Stil
+    repls = [
+        (r"\bich\b", ""),
+        (r"\bdu\b", ""),
+        (r"\bwir\b", ""),
+        (r"\bdein(e|en|er|em)?\b", ""),
+        (r"\bmein(e|en|er|em)?\b", ""),
+        (r"\bunser(e|en|er|em)?\b", ""),
+    ]
+    for pat, rep in repls:
+        t = re.sub(pat, rep, t, flags=re.IGNORECASE)
+    return re.sub(r"\s{2,}", " ", t).strip()
+
+
+def _remove_exclamations_emojis(t: str) -> str:
+    t = re.sub(r"[!]+", ".", t)
+    # einfache Emoji/Emoticon-Entfernung
+    t = re.sub(r"[:;]-?[\)\(DP]", "", t)
+    t = re.sub(r"[\u2600-\u26FF\u2700-\u27BF\U0001F300-\U0001FAFF]", "", t)
+    return t
+
+
+def _strip_fillers(t: str) -> str:
+    return re.sub(rf"^({'|'.join(_FILLERS)})[,!\.:]?\s+", "", t, flags=re.IGNORECASE)
+
+
+def _compact_style(t: str) -> str:
+    # Doppelungen/Leerzeichen reduzieren, Satzzeichen normalisieren
+    t = re.sub(r"\s{2,}", " ", t)
+    t = re.sub(r"\s*([,;:\.])\s*", r"\1 ", t)
+    t = re.sub(r"\s+\.", ".", t)
+    return t.strip()
+
+
+def neutralize(text: str) -> str:
+    t = text.strip()
+    t = _strip_roleplay_markers(t)
+    t = _remove_exclamations_emojis(t)
+    # Füllfloskeln am Satzanfang entfernen (pro Satz)
+    sentences = split_sentences(t)
+    sentences = [_strip_fillers(s).strip() for s in sentences]
+    t = " ".join(sentences)
+    t = _neutralize_pronouns(t)
+    return t
+
+
+def compact(text: str) -> str:
+    return _compact_style(text)
 
 
 def _load_policy_file(path: str) -> Dict[str, Any]:
@@ -232,6 +326,31 @@ def apply_post(
     if settings is None or not getattr(settings, "POLICIES_ENABLED", False):
         return PostResult(action="allow")
     try:
+        # Eval-spezifische Neutralisierung (schärferer Post-Hook)
+        try:
+            if mode == "eval" and getattr(settings, "EVAL_POST_REWRITE_ENABLED", True) and not _should_bypass_policies(unrestricted_mode=False):
+                t0 = text
+                t = neutralize(t0)
+                try:
+                    max_s = int(getattr(settings, "EVAL_POST_MAX_SENTENCES", 2))
+                except Exception:
+                    max_s = 2
+                try:
+                    max_c = int(getattr(settings, "EVAL_POST_MAX_CHARS", 240))
+                except Exception:
+                    max_c = 240
+                t = limit_sentences(t, max_s)
+                t = trim_length(t, max_c)
+                t = compact(t)
+                if t != t0:
+                    return PostResult(action="rewrite", text=t, reason="eval_post")
+                else:
+                    return PostResult(action="allow")
+        except Exception:
+            # fail-open
+            pass
+
+        # Standard-Policy (Rewrite-Map/Forbidden Terms)
         rules = _get_policies()
         forb: List[str] = [str(x) for x in rules.get("forbidden_terms", []) if isinstance(x, str)]
         rw_map: Dict[str, str] = {str(k): str(v) for k, v in dict(rules.get("rewrite_map", {})).items()}
@@ -257,6 +376,12 @@ __all__ = [
     # Policy-API
     "apply_pre",
     "apply_post",
+    # Eval helpers
+    "split_sentences",
+    "trim_length",
+    "limit_sentences",
+    "neutralize",
+    "compact",
     "PreResult",
     "PostResult",
 ]

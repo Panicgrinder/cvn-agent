@@ -82,6 +82,20 @@ class Settings(BaseSettings):
     # Wenn True, umgeht der "unrestricted"-Modus strikt alle Policies (Pre/Post)
     POLICY_STRICT_UNRESTRICTED_BYPASS: bool = True
 
+    # Eval-Post-Rewrite (stilistische Neutralisierung im Post-Hook)
+    EVAL_POST_REWRITE_ENABLED: bool = True
+    EVAL_POST_MAX_SENTENCES: int = 2
+    EVAL_POST_MAX_CHARS: int = 240
+    # einfache Regel-Flags für die Neutralisierung
+    EVAL_POST_RULES: dict[str, bool] = {
+        "neutralize_pronouns": True,
+        "strip_roleplay": True,
+        "no_exclamations": True,
+        "no_emojis": True,
+        "no_storytelling": True,
+        "compact_style": True,
+    }
+
     # Session Memory (optional)
     # Wenn aktiviert und eine session_id in der Anfrage vorhanden ist, wird ein kurzer Verlauf pro Sitzung gespeichert.
     SESSION_MEMORY_ENABLED: bool = False

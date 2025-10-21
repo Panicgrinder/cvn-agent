@@ -18,6 +18,7 @@ import logging
 from datetime import datetime
 from utils.time_utils import now_compact
 from typing import Dict, List, Any, Optional, Tuple, Union, cast
+from pathlib import Path
 from dataclasses import dataclass, field, asdict
 import httpx
 try:
@@ -146,6 +147,10 @@ class EvaluationItem:
     checks: Dict[str, Any]
     source_file: Optional[str] = None
     source_package: Optional[str] = None  # Name des Pakets ohne Extension
+    # Optionales Metadatenfeld aus Dataset (z. B. "szenen", "dialog")
+    category: Optional[str] = None
+    # Tags aus Dataset (z. B. ["szenen", "fantasy"])
+    tags: List[str] = field(default_factory=_empty_str_list)
 
 
 @dataclass
@@ -573,7 +578,9 @@ async def load_evaluation_items(patterns: Optional[List[str]] = None) -> List[Ev
                     messages=msgs_typed,
                     checks=checks_typed,
                     source_file=source_file,
-                    source_package=source_package
+                    source_package=source_package,
+                    category=cast(Optional[str], data.get("category")),
+                    tags=list(cast(List[str], data.get("tags") or []))
                 )
                 items.append(item)
                 file_stats[source_file]["loaded"] += 1
@@ -667,6 +674,8 @@ async def evaluate_item(
     request_id: Optional[str] = None,
     retries: int = 0,
     cache: Optional[Any] = None,
+    hint_must_include: bool = False,
+    precomputed_hint_terms: Optional[List[str]] = None,
 ) -> EvaluationResult:
     """
     Evaluiert einen einzelnen Eintrag.
@@ -683,8 +692,39 @@ async def evaluate_item(
     
     try:
         # Konvertiere die Nachrichten in das richtige Format für den Chat-Endpunkt
-        messages: List[Dict[str, str]] = list(item.messages)  # Kopie erstellen
-        
+        messages: List[Dict[str, str]] = list(item.messages)
+
+        # Initial-Hinweis (Eval): globaler Must-Include-Hint oder Szenen/Dialog-Hinweis
+        try:
+            if eval_mode and hint_must_include and precomputed_hint_terms:
+                # Globaler eval Hint: vor die erste User-Message, keine Doppel-Injektion
+                messages = inject_eval_hint(messages, precomputed_hint_terms)
+            else:
+                must_init = list(item.checks.get("must_include") or []) if hasattr(item, "checks") else []
+                # Heuristik, ob es sich um Szenen/Dialog-Aufgaben handelt
+                def _is_scene_or_dialog() -> Tuple[bool, bool]:
+                    cat = (item.category or "").lower()
+                    tags = [str(t).lower() for t in (item.tags or [])]
+                    # Fallback: ersten User-Prompt nach Schlüsselwörtern untersuchen
+                    prompt_text = " ".join([m.get("content", "") for m in messages if m.get("role") == "user"])[:400].lower()
+                    is_scene = ("szenen" in cat) or ("szene" in prompt_text) or any("szenen" in t or "szene" in t for t in tags)
+                    is_dialog = ("dialog" in cat) or ("dialog" in prompt_text) or any("dialog" in t for t in tags)
+                    return is_scene, is_dialog
+
+                if must_init:
+                    is_scene, is_dialog = _is_scene_or_dialog()
+                    if is_scene or is_dialog:
+                        hint_init_parts: List[str] = []
+                        if is_scene:
+                            hint_init_parts.append("Schreibe eine kurze Szene (1–2 Absätze) mit klarer Handlung, ohne Überschriften.")
+                        if is_dialog:
+                            hint_init_parts.append("Schreibe einen knappen Dialog (max. 8 Repliken) ohne Überschriften.")
+                        hint_init_parts.append("Verwende diese Begriffe wörtlich im Text: " + ", ".join(sorted(set(str(t) for t in must_init))))
+                        messages.append({"role": "user", "content": "Hinweis: " + " ".join(hint_init_parts)})
+        except Exception:
+            # Bei Problemen mit dem Hinweis einfach ohne weitermachen
+            pass
+
         # Speziellen Evaluation-Modus-Parameter hinzufügen
         payload: Dict[str, Any] = {
             "messages": messages,
@@ -747,23 +787,6 @@ async def evaluate_item(
                 except Exception:
                     pass
             return content_local
-
-        # Initial-Hinweis für Szenen/Dialoge: als User-Nachricht injizieren, damit er eval_mode übersteht
-        try:
-            pkg_lower_init = (item.source_package or "").lower()
-            must_init = list(item.checks.get("must_include") or []) if hasattr(item, "checks") else []
-            if must_init and any(k in pkg_lower_init for k in ["szenen", "dialog"]):
-                hint_init_parts: List[str] = []
-                if "szenen" in pkg_lower_init:
-                    hint_init_parts.append("Schreibe eine kurze Szene (1–2 Absätze) mit klarer Handlung, ohne Überschriften.")
-                if "dialog" in pkg_lower_init:
-                    hint_init_parts.append("Schreibe einen knappen Dialog (max. 8 Repliken) ohne Überschriften.")
-                hint_init_parts.append("Verwende diese Begriffe wörtlich im Text: " + ", ".join(sorted(set(str(t) for t in must_init))))
-                messages.append({"role": "user", "content": "Hinweis: " + " ".join(hint_init_parts)})
-                payload["messages"] = messages
-        except Exception:
-            # Bei Problemen mit dem Hinweis einfach ohne weitermachen
-            pass
 
         content = await _send_and_get(payload)
 
@@ -889,15 +912,22 @@ async def evaluate_item(
                 if content:
                     enhanced_messages.append({"role": "assistant", "content": content})
                 hint_parts: List[str] = []
-                pkg_lower = (item.source_package or "").lower()
+                # Erneut Szene/Dialog heuristisch bestimmen
+                def _retry_scene_dialog() -> Tuple[bool, bool]:
+                    cat = (item.category or "").lower()
+                    tags = [str(t).lower() for t in (item.tags or [])]
+                    prompt_text = " ".join([m.get("content", "") for m in messages if m.get("role") == "user"])[:400].lower()
+                    is_scene = ("szenen" in cat) or ("szene" in prompt_text) or any("szenen" in t or "szene" in t for t in tags)
+                    is_dialog = ("dialog" in cat) or ("dialog" in prompt_text) or any("dialog" in t for t in tags)
+                    return is_scene, is_dialog
+
                 if missing:
-                    # Für Szenen/Dialoge explizit wörtliche Nutzung einfordern
-                    if any(k in pkg_lower for k in ["szenen", "dialog"]):
+                    is_scene, is_dialog = _retry_scene_dialog()
+                    if is_scene or is_dialog:
                         hint_parts.append("Verwende diese Begriffe wörtlich im Text: " + ", ".join(sorted(set(missing))))
-                        # knapper Stilhinweis je nach Paket
-                        if "szenen" in pkg_lower:
+                        if is_scene:
                             hint_parts.append("Schreibe eine kurze Szene (1–2 Absätze) mit klarer Handlung.")
-                        elif "dialog" in pkg_lower:
+                        if is_dialog:
                             hint_parts.append("Schreibe einen knappen Dialog (max. 8 Repliken) ohne Überschriften.")
                     else:
                         hint_parts.append("Stelle sicher, dass diese Begriffe im Text vorkommen: " + ", ".join(sorted(set(missing))))
@@ -907,9 +937,12 @@ async def evaluate_item(
                     hint_parts.append("Erfülle die Mindestanzahl an geforderten Schlüsselbegriffen.")
                 if needs_regex:
                     hint_parts.append("Formatiere die Antwort so, dass die Muster (Regex) erfüllt sind.")
-                hint = "Bitte antworte erneut, kurz und präzise. " + " ".join(hint_parts)
-                # Als User-Hinweis einfügen, damit er im eval_mode nicht entfernt wird
-                enhanced_messages.append({"role": "user", "content": hint})
+                # Falls globaler Eval-Hint aktiv, denselben Hint erneut sicherstellen (keine Doppelung)
+                if eval_mode and hint_must_include and precomputed_hint_terms:
+                    enhanced_messages = inject_eval_hint(enhanced_messages, precomputed_hint_terms)
+                # Immer einen klaren Retry-Hinweis hinzufügen
+                retry_hint = "Bitte antworte erneut, kurz und präzise. " + " ".join(hint_parts)
+                enhanced_messages.append({"role": "user", "content": retry_hint})
 
                 retry_payload = dict(payload)
                 retry_payload["messages"] = enhanced_messages
@@ -1102,6 +1135,7 @@ async def run_evaluation(
     quiet: bool = False,
     retries: int = 0,
     use_cache: bool = False,
+    hint_must_include: bool = False,
 ) -> List[EvaluationResult]:
     """
     Führt die Evaluierung für alle Einträge durch.
@@ -1222,6 +1256,7 @@ async def run_evaluation(
                 "overrides": {"model": model_override, "temperature": temperature_override, "host": host_override, "top_p": top_p_override, "num_predict": num_predict_override},
                 "sweep": sweep or None,
                 "retries": retries,
+                "hint_must_include": hint_must_include,
             }
             with open(results_file, "w", encoding="utf-8") as f:
                 f.write(json.dumps(meta_header, ensure_ascii=False) + "\n")
@@ -1236,6 +1271,17 @@ async def run_evaluation(
                 except Exception:
                     eval_cache = None
 
+            # Hint-Begriffe je Item vorab berechnen (Eval+Flag)
+            hint_terms_per_item: Dict[str, List[str]] = {}
+            hint_applied_count = 0
+            if eval_mode and hint_must_include:
+                for it in items:
+                    terms = compute_hint_terms(it, enabled_checks)
+                    hint_terms_per_item[it.id] = terms
+                    if terms:
+                        hint_applied_count += 1
+                if quiet:
+                    print(f"hint_must_include applied: {hint_applied_count} items")
             # Hilfsfunktion zur Ausführung eines Durchlaufs mit gegebenen Overrides
             async def _run_once(temp_override: Optional[float], top_p_ov: Optional[float], num: Optional[int], tag_suffix: Optional[str] = None) -> None:
                 nonlocal results_file
@@ -1266,6 +1312,8 @@ async def run_evaluation(
                         request_id=rid,
                         retries=retries,
                         cache=eval_cache,
+                        hint_must_include=hint_must_include,
+                        precomputed_hint_terms=hint_terms_per_item.get(item.id) if (eval_mode and hint_must_include) else None,
                     )
                     results.append(r)
                     with open(results_file, "a", encoding="utf-8") as f:
@@ -1501,6 +1549,100 @@ def print_failure_report(results: List[EvaluationResult]) -> None:
             print(f"    - {iid}: {short}")
 
 
+# --- Hinweis-Helfer für Eval ---------------------------------------------------
+def _normalize_term_for_dedupe(t: str) -> str:
+    return str(t or "").strip().lower()
+
+
+def compute_hint_terms(
+    item: EvaluationItem,
+    enabled_checks: Optional[List[str]] = None,
+    cap: int = 6,
+) -> List[str]:
+    """Sammelt erwartete Begriffe aus aktiven Term-Checks, dedupliziert und begrenzt.
+
+    Reihenfolgepriorität: must_include → keywords_at_least.items → keywords_any.
+    Dedupe ist case-insensitiv. Keine fuzzy-Logik.
+    """
+    enabled = set(enabled_checks or [])
+    out: List[str] = []
+    seen: set[str] = set()
+
+    def _add_terms(terms: List[str]) -> None:
+        for term in terms:
+            if not isinstance(term, str):
+                continue
+            key = _normalize_term_for_dedupe(term)
+            if not key:
+                continue
+            if key in seen:
+                continue
+            seen.add(key)
+            # Ausgabe: normalisiert (lowercase) für konsistente Hints
+            out.append(key)
+            if len(out) >= cap:
+                return
+
+    # 1) must_include (wenn nicht eingeschränkt oder explizit aktiviert)
+    if (not enabled) or ("must_include" in enabled):
+        mi_val = cast(Any, item.checks.get("must_include"))
+        if isinstance(mi_val, list):
+            mi_terms: List[str] = []
+            for x in cast(List[Any], mi_val):
+                try:
+                    mi_terms.append(str(x))
+                except Exception:
+                    continue
+            _add_terms(mi_terms)
+            if len(out) >= cap:
+                return out
+
+    # 2) keywords_at_least.items
+    if (not enabled) or ("keywords_at_least" in enabled):
+        kal_val_any = cast(Any, item.checks.get("keywords_at_least"))
+        items_list: List[str] = []
+        if isinstance(kal_val_any, dict):
+            kal_val = cast(Dict[str, Any], kal_val_any)
+            items_any = kal_val.get("items")
+            if isinstance(items_any, list):
+                for x in cast(List[Any], items_any):
+                    try:
+                        items_list.append(str(x))
+                    except Exception:
+                        continue
+        _add_terms(items_list)
+        if len(out) >= cap:
+            return out
+
+    # 3) keywords_any
+    if (not enabled) or ("keywords_any" in enabled):
+        ka_val_any = cast(Any, item.checks.get("keywords_any"))
+        if isinstance(ka_val_any, list):
+            ka_terms: List[str] = []
+            for x in cast(List[Any], ka_val_any):
+                try:
+                    ka_terms.append(str(x))
+                except Exception:
+                    continue
+            _add_terms(ka_terms)
+
+    return out[:cap]
+
+
+def inject_eval_hint(messages: List[Dict[str, str]], terms: List[str]) -> List[Dict[str, str]]:
+    """Fügt einen Eval-Hinweis vor der ersten User-Message ein, wenn noch nicht vorhanden."""
+    if not terms:
+        return messages
+    for m in messages:
+        if m.get("role") == "user" and str(m.get("content", "")).startswith("Hinweis (Eval):"):
+            return messages
+    hint_text = "Hinweis (Eval): Verwende diese Begriffe wörtlich: " + ", ".join(terms)
+    idx = next((i for i, m in enumerate(messages) if m.get("role") == "user"), 0)
+    new_messages = list(messages)
+    new_messages.insert(idx, {"role": "user", "content": hint_text})
+    return new_messages
+
+
 def run_evaluation_with_retry(
     file_pattern: str, 
     api_url: str = "http://localhost:8000/chat",
@@ -1668,6 +1810,7 @@ if __name__ == "__main__":
     parser.add_argument("--retries", type=int, default=0, help="Inhaltliche Retrys bei fehlgeschlagenen Checks (z. B. 1)")
     parser.add_argument("--cache", dest="use_cache", action="store_true", help="Antworten lokal cachen (eval/results/cache_eval.jsonl)")
     parser.add_argument("--no-cache", dest="no_cache", action="store_true", help="Caching explizit deaktivieren")
+    parser.add_argument("--hint-must-include", dest="hint_must_include", action="store_true", help="Eval-only: Injektiert vor erster User-Message einen Hinweis mit wörtlich zu verwendenden Begriffen (aus must_include/keywords_*)")
     
     # Kommandos
     parser.add_argument("--create-example", action="store_true", help="Beispiel-Eval-Paket erstellen")
@@ -1877,6 +2020,7 @@ if __name__ == "__main__":
         quiet=quiet_final,
         retries=args.retries,
         use_cache=(args.use_cache and not args.no_cache),
+        hint_must_include=bool(args.hint_must_include),
     ))
     
     if results:

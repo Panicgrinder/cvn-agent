@@ -41,18 +41,17 @@ def _make_fake_stream_client(chunks: list[str]):
 
 
 @pytest.mark.streaming
-def test_policy_stream_post_rewrite(monkeypatch):
-    # Fake LLM stream producing two chunks
-    fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["foo", "bar"])  
+def test_policy_stream_post_eval_rewrite(monkeypatch):
+    # Fake LLM stream producing one overly expressive chunk (RPG-ish)
+    fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["Ich: *nickt* Gerne helfe ich! :)"])  
     monkeypatch.setattr(chat_module.httpx, "AsyncClient", fake_factory)
 
-    # Monkeypatch post-policy to force rewrite
-    def fake_apply_post(text: str, *, mode: str = "default", profile_id=None):
-        return SimpleNamespace(action="rewrite", text=text.upper())
-    monkeypatch.setattr(chat_module, "apply_post", fake_apply_post)
+    # Force policies enabled and eval settings for the test
+    monkeypatch.setattr(chat_module.settings, "POLICIES_ENABLED", True, raising=False)
+    monkeypatch.setattr(chat_module.settings, "EVAL_POST_REWRITE_ENABLED", True, raising=False)
 
-    req = ChatRequest(messages=[{"role": "user", "content": "hi"}])
-    agen = asyncio.run(chat_module.stream_chat_request(req))
+    req = ChatRequest(messages=[{"role": "user", "content": "hi"}], options={"temperature": 0.1}, eval_mode=True)
+    agen = asyncio.run(chat_module.stream_chat_request(req, eval_mode=True))
 
     collected: List[str] = []
     async def _consume() -> None:
@@ -60,10 +59,10 @@ def test_policy_stream_post_rewrite(monkeypatch):
             collected.append(s)
     asyncio.run(_consume())
 
-    # Expect original chunks "foo" and "bar"
-    assert any("data: foo" in s for s in collected)
-    assert any("data: bar" in s for s in collected)
-    # Expect meta with rewritten and a delta with the uppercase
+    # Expect meta with rewritten
     assert any(s.startswith("event: meta") and '"policy_post": "rewritten"' in s for s in collected)
-    assert any(s.startswith("event: delta") and '"text": "FOOBAR"' in s for s in collected)
-    assert any(s.startswith("event: done") for s in collected)
+    # Expect a final delta line with a neutralized version (no role markers/emoji/exclamation)
+    deltas = [s for s in collected if s.startswith("event: delta")]
+    assert deltas, f"No delta event found: {collected}"
+    assert ":)" not in deltas[-1] and "!" not in deltas[-1]
+    assert "Ich:" not in deltas[-1] and "*nickt*" not in deltas[-1]
