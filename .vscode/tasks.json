@@ -499,6 +499,60 @@
 			}
 		},
 		{
+			"label": "Eval: run (ASGI, quiet)",
+			"type": "shell",
+			"windows": {
+				"command": "powershell",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"& ${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --quiet"
+				]
+			},
+			"linux": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --quiet"
+				]
+			},
+			"osx": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --quiet"
+				]
+			},
+			"group": "test"
+		},
+		{
+			"label": "Eval: run (ASGI, debug)",
+			"type": "shell",
+			"windows": {
+				"command": "powershell",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"& ${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --debug --log-json"
+				]
+			},
+			"linux": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --debug --log-json"
+				]
+			},
+			"osx": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"${config:python.interpreterPath} '${workspaceFolder}/scripts/run_eval.py' --asgi --packages 'eval/datasets/*.json*' --debug --log-json"
+				]
+			},
+			"group": "test"
+		},
+		{
 			"label": "pytest-scripts-coverage",
 			"type": "shell",
 			"command": "F:/cvn-agent/.venv/Scripts/python.exe",

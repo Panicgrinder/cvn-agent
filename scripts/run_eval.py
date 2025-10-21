@@ -1501,6 +1501,8 @@ if __name__ == "__main__":
     parser.add_argument("--asgi", action="store_true", help="ASGI-In-Process: Evaluierung direkt gegen FastAPI-App ohne laufenden Server-Port")
     parser.add_argument("--checks", nargs="*", help="Aktiviere nur diese Check-Typen (must_include, keywords_any, keywords_at_least, not_include, regex, rpg_style)")
     parser.add_argument("--quiet", action="store_true", help="Unterdrückt Logausgaben lauter Logger während der Progress-Anzeige")
+    parser.add_argument("--log-json", action="store_true", help="Log-Ausgabe als JSON-Linien")
+    parser.add_argument("--combine-out", type=str, help="Optionaler Pfad für zusammengeführte JSONL der geladenen Datensätze")
     parser.add_argument("--no-quiet", action="store_true", help="Quiet-Mode deaktivieren (setzt sich gegen --quiet durch)")
     # Overrides & Sweeps
     parser.add_argument("--host", type=str, dest="host", help="Override für OLLAMA_HOST (z. B. http://localhost:11434)")
@@ -1523,13 +1525,28 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # Konfiguriere Logging
+    # Konfiguriere Logging (JSON optional)
     log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%H:%M:%S"
-    )
+    if args.log_json:
+        class JsonFormatter(logging.Formatter):
+            def format(self, record: logging.LogRecord) -> str:
+                payload = {
+                    "ts": datetime.now().isoformat(timespec="seconds"),
+                    "level": record.levelname,
+                    "logger": record.name,
+                    "msg": record.getMessage(),
+                }
+                return json.dumps(payload, ensure_ascii=False)
+        handler = logging.StreamHandler()
+        handler.setFormatter(JsonFormatter())
+        logging.basicConfig(level=log_level, handlers=[handler])
+        os.environ["LOG_JSON"] = "true"
+    else:
+        logging.basicConfig(
+            level=log_level,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%H:%M:%S"
+        )
     if not args.debug:
         # Unterdrücke gewöhnliche Deprecation/Resource-Warnungen im CLI-Betrieb
         warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -1570,7 +1587,7 @@ if __name__ == "__main__":
     os.makedirs(config_dir, exist_ok=True)
     
     # Bestimme die zu ladenden Dateien; ergänze Schwestermaske automatisch
-    patterns: List[str] = args.packages if args.packages else [default_pattern]
+    patterns: List[str] = args.packages if args.packages else [os.path.join(DEFAULT_DATASET_DIR, "*.json*")]
     def _sibling_mask(p: str) -> Optional[str]:
         if p.endswith(".jsonl"):
             return p[:-1]  # .jsonl -> .json
@@ -1592,6 +1609,36 @@ if __name__ == "__main__":
         sib = _sibling_mask(base_mask)
         patterns = [base_mask] + ([sib] if sib else [])
     
+    # Vor-Evaluierung: Synonyme und Datensätze laden (neuer Loader)
+    try:
+        from scripts.syn_loader import load_synonyms as _syn_load
+        syn, syn_count = _syn_load()
+        # Notwendig? Der eigentliche Evaluator lädt Synonyme intern, daher hier nur Logging
+        logging.getLogger("syn_loader").info(f"synonyms merged: {syn_count}")
+    except Exception as e:
+        logging.getLogger("syn_loader").warning(f"Synonyme nicht vorab geladen: {e}")
+
+    diags: List[Dict[str, Any]] = []
+    try:
+        from scripts.eval_loader import load_packages as _load_pkgs
+        combine_path = Path(args.combine_out) if args.combine_out else None  # type: ignore[arg-type]
+        items_loaded, diags = _load_pkgs(patterns, combine_out=combine_path)
+        # Zusammenfassungstabelle (eine Bildschirmseite)
+        # Aggregate
+        total_loaded = sum(d.get("loaded_count", 0) for d in diags)
+        total_gen = sum(d.get("generated_id_count", 0) for d in diags)
+        total_skipped = sum(d.get("skipped_count", 0) for d in diags)
+        total_errors = sum(len(d.get("parse_errors", []) or []) for d in diags)
+        # Drucke kompakte Tabelle (Textmodus)
+        if not args.log_json:
+            print("file".ljust(38), "loaded".rjust(6), "gen_id".rjust(6), "skipped".rjust(8), "errors".rjust(7))
+            for d in diags[:50]:
+                name = os.path.basename(d.get("file", ""))
+                print(name.ljust(38)[:38], str(d.get("loaded_count", 0)).rjust(6), str(d.get("generated_id_count", 0)).rjust(6), str(d.get("skipped_count", 0)).rjust(8), str(len(d.get("parse_errors", []) or [])).rjust(7))
+            print("TOTAL".ljust(38), str(total_loaded).rjust(6), str(total_gen).rjust(6), str(total_skipped).rjust(8), str(total_errors).rjust(7))
+    except Exception as e:
+        logging.getLogger("eval_loader").warning(f"Dataset-Preload übersprungen: {e}")
+
     # Führe Evaluierung durch
     console = Console()
     console.print(f"[bold]CVN Agent Evaluierung[/bold]")

@@ -1,0 +1,909 @@
+{
+  "abenteuer": [
+    "abenteuerlich",
+    "quest",
+    "reise"
+  ],
+  "abstraktion": [
+    "abstrahierung",
+    "abstraktionsschicht"
+  ],
+  "adresse": [
+    "address",
+    "ip-adresse"
+  ],
+  "alternativen": [
+    "ausweichmöglichkeiten",
+    "ersatz",
+    "optionen"
+  ],
+  "ambivalenz": [
+    "doppelbödigkeit",
+    "mehrdeutigkeit",
+    "zwiespalt"
+  ],
+  "andeutung": [
+    "andeuten",
+    "hinweis",
+    "implikation"
+  ],
+  "antagonist": [
+    "gegenspieler",
+    "gegner",
+    "widersacher"
+  ],
+  "artefakt": [
+    "gegenstand",
+    "objekt",
+    "relikt"
+  ],
+  "assistent": [
+    "assistant",
+    "assistenten",
+    "assistentin",
+    "assistenz",
+    "assistenz-system",
+    "assistenzsystem",
+    "assistive",
+    "berater",
+    "chatbot",
+    "helfer",
+    "hilfe",
+    "ki-assistent",
+    "support",
+    "unterstützer",
+    "virtueller assistent"
+  ],
+  "auflösung": [
+    "abschluss",
+    "lösung",
+    "schluss"
+  ],
+  "aufmuntern": [
+    "erheitern",
+    "ermutigen",
+    "trösten"
+  ],
+  "ausführung": [
+    "durchführen",
+    "execution",
+    "lauf"
+  ],
+  "aushandlung": [
+    "aushandeln",
+    "verhandlung"
+  ],
+  "ausweichen": [
+    "ausflucht",
+    "ausweichend",
+    "meiden"
+  ],
+  "backpropagation": [
+    "back-prop",
+    "fehler rückführung",
+    "gradientenrückfluss"
+  ],
+  "bedeutung": [
+    "gehalt",
+    "sinn",
+    "tragweite"
+  ],
+  "begründung": [
+    "erklärung",
+    "rechtfertigung",
+    "warum"
+  ],
+  "beispiel": [
+    "demo",
+    "exempel",
+    "muster"
+  ],
+  "charakterisierung": [
+    "beschreibung",
+    "profilierung",
+    "zeichnung"
+  ],
+  "compiler": [
+    "kompilierer",
+    "kompilierung",
+    "übersetzer"
+  ],
+  "daten": [
+    "datenpunkte",
+    "datensätze",
+    "samples"
+  ],
+  "deadline": [
+    "abgabetermin",
+    "frist"
+  ],
+  "deeskalation": [
+    "abkühlen",
+    "beruhigung",
+    "entschärfung"
+  ],
+  "detail": [
+    "aspekt",
+    "einzelheit",
+    "nuance"
+  ],
+  "diagnose": [
+    "befund",
+    "diagnostik",
+    "feststellung"
+  ],
+  "dialog": [
+    "austausch",
+    "gespräch",
+    "unterredung"
+  ],
+  "dilemma": [
+    "klemme",
+    "zwickmühle",
+    "zwiespalt"
+  ],
+  "docker": [
+    "container",
+    "containerisierung",
+    "docker-engine"
+  ],
+  "dokumente": [
+    "docs",
+    "documents",
+    "unterlagen"
+  ],
+  "domain": [
+    "domain-name",
+    "domäne"
+  ],
+  "druck": [
+    "druck machen",
+    "druckaufbau",
+    "press"
+  ],
+  "einfühlsam": [
+    "empathisch",
+    "mitfühlend",
+    "verständnisvoll",
+    "zugewandt",
+    "zuwendend"
+  ],
+  "einsicht": [
+    "begreifen",
+    "erkenntnis",
+    "verständnis"
+  ],
+  "einwand": [
+    "einwandbehandlung",
+    "einwendungen",
+    "einwände"
+  ],
+  "emotion": [
+    "affekt",
+    "gefühl",
+    "gefühle"
+  ],
+  "empathie": [
+    "einfühlungsvermögen",
+    "mitgefühl"
+  ],
+  "empathisch": [
+    "einfühlsam",
+    "mitfühlend",
+    "verständnisvoll",
+    "zugewandt"
+  ],
+  "entdeckung": [
+    "aufspüren",
+    "erkundung",
+    "fund"
+  ],
+  "entscheidung": [
+    "beschluss",
+    "entschluss",
+    "wahl"
+  ],
+  "eskalation": [
+    "eskalieren",
+    "steigerung",
+    "zuspitzung"
+  ],
+  "ethik": [
+    "moral",
+    "werte"
+  ],
+  "fairness": [
+    "fair",
+    "gerechtigkeit"
+  ],
+  "falle": [
+    "fallenstelle",
+    "hinterhalt",
+    "tücke"
+  ],
+  "feedback": [
+    "kommentar",
+    "resonanz",
+    "rückmeldung"
+  ],
+  "festplatten": [
+    "hdds",
+    "laufwerke",
+    "speicherplatten"
+  ],
+  "flexibel": [
+    "adaptiv",
+    "beweglich"
+  ],
+  "fokus": [
+    "aufmerksamkeit",
+    "konzentration",
+    "schwerpunkt"
+  ],
+  "folgen": [
+    "auswirkungen",
+    "konsequenzen",
+    "resultate"
+  ],
+  "foreshadowing": [
+    "andeutung",
+    "vorahnung",
+    "vorausdeutung"
+  ],
+  "freundlich": [
+    "freundschaftlich",
+    "herzlich",
+    "liebevoll",
+    "nett",
+    "warmherzig",
+    "zuvorkommend"
+  ],
+  "freundschaft": [
+    "freund",
+    "kameradschaft",
+    "verbundenheit"
+  ],
+  "geheimnis": [
+    "mysterium",
+    "rätsel"
+  ],
+  "gespräch": [
+    "austausch",
+    "dialog",
+    "unterhaltung"
+  ],
+  "gewichte": [
+    "gewichtungen",
+    "parameter",
+    "weights"
+  ],
+  "graph": [
+    "gerichtet",
+    "kanten",
+    "knoten",
+    "netzwerk",
+    "ungerichtet"
+  ],
+  "grenzen": [
+    "begrenzung",
+    "limits",
+    "trennlinie"
+  ],
+  "handshake": [
+    "aushandlung",
+    "hand-shake",
+    "negotiation"
+  ],
+  "hashfunktion": [
+    "hash-funktion",
+    "hashing"
+  ],
+  "haushalt": [
+    "hausarbeit",
+    "putzplan"
+  ],
+  "heap": [
+    "max-heap",
+    "min-heap",
+    "priority queue"
+  ],
+  "herz": [
+    "herzmuskel",
+    "kardial",
+    "pumpe"
+  ],
+  "hindernis": [
+    "barriere",
+    "hemmnis",
+    "hürde"
+  ],
+  "hinweis": [
+    "andeutung",
+    "spur",
+    "tipp"
+  ],
+  "hobby": [
+    "freizeitbeschäftigung",
+    "interesse",
+    "leidenschaft"
+  ],
+  "http": [
+    "http-protokoll",
+    "hypertext transfer protocol"
+  ],
+  "höflichkeit": [
+    "freundlichkeit",
+    "respekt",
+    "zuvorkommenheit"
+  ],
+  "höhle": [
+    "grotte",
+    "höhlen"
+  ],
+  "ich-botschaft": [
+    "ich aussage",
+    "ich form",
+    "ich-nachricht"
+  ],
+  "illusion": [
+    "schein",
+    "trugbild",
+    "vortäuschung"
+  ],
+  "innere stimme": [
+    "innere führung",
+    "innerer monolog",
+    "selbstgespräch"
+  ],
+  "interpreter": [
+    "ausführer",
+    "interpretation",
+    "interpretiert"
+  ],
+  "irrtum": [
+    "fehlannahme",
+    "fehler",
+    "verkennung"
+  ],
+  "isolation": [
+    "abgrenzung",
+    "abschottung",
+    "sandbox"
+  ],
+  "kampf": [
+    "duell",
+    "gefecht",
+    "streit"
+  ],
+  "klar": [
+    "gern",
+    "natürlich",
+    "selbstverständlich"
+  ],
+  "kompatibilität": [
+    "abwärtskompatibilität",
+    "compatibility",
+    "verträglichkeit"
+  ],
+  "komplexität": [
+    "aufwand",
+    "platzkomplexität",
+    "zeitkomplexität"
+  ],
+  "kompromiss": [
+    "einigung",
+    "mittelweg",
+    "zugeständnis"
+  ],
+  "konflikt": [
+    "gegensatz",
+    "spannung",
+    "streit"
+  ],
+  "konfliktlösung": [
+    "deeskalation",
+    "lösung des konflikts",
+    "schlichtung"
+  ],
+  "konsens": [
+    "mehrheitsentscheid",
+    "zustimmung"
+  ],
+  "konsequenz": [
+    "auswirkung",
+    "ergebnis",
+    "folge"
+  ],
+  "konsistenz": [
+    "consistency"
+  ],
+  "kontrast": [
+    "absetzung",
+    "gegensatz",
+    "gegenüberstellung"
+  ],
+  "kryptographie": [
+    "crypto",
+    "kryptografie",
+    "verschlüsselung"
+  ],
+  "kurz": [
+    "knapp",
+    "kompakt",
+    "prägnant"
+  ],
+  "körpersprache": [
+    "gestik",
+    "haltung",
+    "mimik"
+  ],
+  "laufzeit": [
+    "zeitaufwand",
+    "zeitkomplexität"
+  ],
+  "lektion": [
+    "belehrung",
+    "lehre",
+    "lerninhalt"
+  ],
+  "länge": [
+    "bitlänge",
+    "größe",
+    "längenfeld"
+  ],
+  "lösung": [
+    "antwort",
+    "auflösung",
+    "behebung"
+  ],
+  "magie": [
+    "magisch",
+    "zauber",
+    "zauberei"
+  ],
+  "mark and sweep": [
+    "gc",
+    "mark-and-sweep",
+    "markieren und räumen"
+  ],
+  "maßnahme": [
+    "aktion",
+    "intervention",
+    "schritt"
+  ],
+  "missverständnis": [
+    "fehlinterpretation",
+    "missverstehen"
+  ],
+  "mittel": [
+    "ansätze",
+    "methoden",
+    "wege"
+  ],
+  "moderation": [
+    "führung",
+    "leitung",
+    "steuern"
+  ],
+  "motiv": [
+    "absicht",
+    "antrieb",
+    "beweggrund"
+  ],
+  "motivation": [
+    "antrieb",
+    "beweggrund",
+    "impuls"
+  ],
+  "mut": [
+    "beherztheit",
+    "courage",
+    "tapferkeit"
+  ],
+  "nachfrage": [
+    "gegenfrage",
+    "nachhaken",
+    "rückfrage"
+  ],
+  "namensauflösung": [
+    "auflösen",
+    "lösen",
+    "name resolution"
+  ],
+  "natur": [
+    "landschaft",
+    "umwelt"
+  ],
+  "nebenfigur": [
+    "nebenrolle",
+    "sekundärfigur",
+    "unterfigur"
+  ],
+  "nächste schritte": [
+    "folgeschritte",
+    "next steps",
+    "weiteres vorgehen"
+  ],
+  "offene frage": [
+    "offene fragen",
+    "open question",
+    "w-frage"
+  ],
+  "orientierung": [
+    "ausrichtung",
+    "einsortierung",
+    "navigation"
+  ],
+  "ortswechsel": [
+    "szenenwechsel",
+    "verlagerung",
+    "wechsel des ortes"
+  ],
+  "parallelität": [
+    "concurrency",
+    "gleichzeitigkeit",
+    "nebenläufigkeit"
+  ],
+  "parität": [
+    "kontrollbit",
+    "parity",
+    "prüfsumme"
+  ],
+  "partitionstoleranz": [
+    "partition tolerance"
+  ],
+  "pitch": [
+    "präsentation",
+    "vorstellung"
+  ],
+  "pivot": [
+    "drehpunkt",
+    "pivot-element"
+  ],
+  "portabilität": [
+    "plattformunabhängigkeit",
+    "portability",
+    "übertragbarkeit"
+  ],
+  "priorisierung": [
+    "gewichtung",
+    "prioritäten",
+    "reihenfolge"
+  ],
+  "priorität": [
+    "dringlichkeit",
+    "rang",
+    "wichtigkeit"
+  ],
+  "prioritäten": [
+    "dringlichkeit",
+    "reihenfolge",
+    "wichtungen"
+  ],
+  "prioritätswarteschlange": [
+    "max-heap",
+    "min-heap",
+    "priority queue"
+  ],
+  "prophezeiung": [
+    "orakel",
+    "prophetie",
+    "voraussage"
+  ],
+  "rabatt": [
+    "nachlass",
+    "preisnachlass"
+  ],
+  "redeanteil": [
+    "anteil am reden",
+    "redezeit",
+    "sprechzeit"
+  ],
+  "reflexion": [
+    "nachdenken",
+    "rückblick",
+    "selbstreflexion"
+  ],
+  "reframing": [
+    "neu einordnen",
+    "neu rahmen",
+    "umdeutung"
+  ],
+  "regelbruch": [
+    "regelverstoß",
+    "verstoß",
+    "übertretung"
+  ],
+  "rekursion": [
+    "divide and conquer",
+    "rekursiv",
+    "selbstaufruf"
+  ],
+  "relevanz": [
+    "bedeutsamkeit",
+    "gewicht",
+    "wichtigkeit"
+  ],
+  "respekt": [
+    "achtung",
+    "wertschätzung"
+  ],
+  "respektvoll": [
+    "achtsam",
+    "höflich",
+    "wertschätzend"
+  ],
+  "rettung": [
+    "bergen",
+    "hilfe",
+    "retten"
+  ],
+  "rhythmus": [
+    "fluss",
+    "schwung",
+    "takt"
+  ],
+  "risiko": [
+    "gefahr",
+    "unsicherheit",
+    "wagnis"
+  ],
+  "ritual": [
+    "beschwörung",
+    "ritualistisch",
+    "zeremonie"
+  ],
+  "rollen": [
+    "rollenverteilung",
+    "zuständigkeiten"
+  ],
+  "roter faden": [
+    "kohärenz",
+    "linie",
+    "zusammenhang"
+  ],
+  "scheduling": [
+    "prozessplanung",
+    "scheduler",
+    "zeitplanung"
+  ],
+  "schema": [
+    "modell",
+    "schemata",
+    "struktur"
+  ],
+  "schlussbild": [
+    "abschlussbild",
+    "letztes bild",
+    "schluss"
+  ],
+  "schlüssel": [
+    "key",
+    "schluessel"
+  ],
+  "server": [
+    "dienst",
+    "dienstrechner",
+    "server-system"
+  ],
+  "setting": [
+    "ort",
+    "schauplatz",
+    "umgebung"
+  ],
+  "sicher": [
+    "harmlos",
+    "risikolos",
+    "unbedenklich"
+  ],
+  "sinneseindruck": [
+    "eindruck",
+    "sensorik",
+    "wahrnehmung"
+  ],
+  "smalltalk": [
+    "plaudern",
+    "small talk"
+  ],
+  "sonne": [
+    "sol",
+    "solar",
+    "sonnenenergie",
+    "sonnenlicht",
+    "sonnenstrahlung",
+    "sonnig",
+    "stern"
+  ],
+  "spannung": [
+    "dichte",
+    "nervenkitzel",
+    "tension"
+  ],
+  "spiegelung": [
+    "mirror",
+    "mirroring",
+    "raid 1"
+  ],
+  "sprecherwechsel": [
+    "abwechselnd",
+    "rollenwechsel",
+    "wechsel der sprecher"
+  ],
+  "stateless": [
+    "ohne zustand",
+    "zustandslos"
+  ],
+  "stimmung": [
+    "befinden",
+    "gefühl",
+    "laune"
+  ],
+  "subtext": [
+    "unausgesprochenes",
+    "zwischenzeilen"
+  ],
+  "symbol": [
+    "ikon",
+    "metapher",
+    "zeichen"
+  ],
+  "tabellen": [
+    "relationen",
+    "table"
+  ],
+  "taktik": [
+    "manöver",
+    "strategie",
+    "vorgehen"
+  ],
+  "teilen": [
+    "aufteilen",
+    "partitionieren",
+    "splitten"
+  ],
+  "tempo": [
+    "geschwindigkeit",
+    "takt",
+    "zug"
+  ],
+  "themenwechsel": [
+    "neues thema",
+    "umschwung",
+    "wechsel des themas"
+  ],
+  "tiefe": [
+    "gehalt",
+    "substanz",
+    "tiefgang"
+  ],
+  "timing": [
+    "abstimmung",
+    "taktung",
+    "zeitpunkt"
+  ],
+  "unterstützen": [
+    "assistieren",
+    "beistehen",
+    "helfen"
+  ],
+  "verantwortung": [
+    "accountability",
+    "pflicht",
+    "zuständigkeit"
+  ],
+  "verbündeter": [
+    "alliiert",
+    "helfer",
+    "mitstreiter"
+  ],
+  "vereinbarung": [
+    "abmachung",
+    "deal",
+    "vereinbaren"
+  ],
+  "verfügbarkeit": [
+    "availability"
+  ],
+  "verhandlung": [
+    "gehaltsgespräch",
+    "verhandeln",
+    "verhandlungsrunde"
+  ],
+  "verkettung": [
+    "chaining",
+    "kette",
+    "listenverkettung"
+  ],
+  "vermeiden": [
+    "meiden",
+    "nicht tun",
+    "unterlassen"
+  ],
+  "verrat": [
+    "betrug",
+    "treuebruch"
+  ],
+  "vertraulichkeit": [
+    "confidentiality",
+    "geheimhaltung"
+  ],
+  "wendepunkt": [
+    "turning point",
+    "umschwung",
+    "wendung"
+  ],
+  "werte": [
+    "maßstäbe",
+    "normen",
+    "prinzipien"
+  ],
+  "wertschätzung": [
+    "achtung",
+    "anerkennung",
+    "respekt"
+  ],
+  "wetter": [
+    "regen",
+    "sonnig",
+    "sturm"
+  ],
+  "worst case": [
+    "schlimmsten fall",
+    "schlimmstenfalls"
+  ],
+  "zerstörung": [
+    "ruin",
+    "vernichtung",
+    "zerfall"
+  ],
+  "zertifikat": [
+    "certificate",
+    "tls-zertifikat",
+    "zertifikate"
+  ],
+  "ziel": [
+    "absicht",
+    "intention",
+    "vorhaben"
+  ],
+  "zielklärung": [
+    "ziel konkretisieren",
+    "zieldefinition",
+    "zielschärfung"
+  ],
+  "zielkonflikt": [
+    "interessenkonflikt",
+    "konfligierende ziele",
+    "zielkonflikte"
+  ],
+  "zusammenfassung": [
+    "fassung",
+    "kurzfassung",
+    "resümee"
+  ],
+  "zuwenden": [
+    "auf jemanden eingehen",
+    "aufmerksam zuwenden",
+    "zugewandt",
+    "zuwendend"
+  ],
+  "zweifel": [
+    "bedenken",
+    "skepsis",
+    "unsicherheit"
+  ],
+  "zwischenruf": [
+    "einwurf",
+    "unterbrechung",
+    "zwischenbemerkung"
+  ],
+  "öffentlich": [
+    "public",
+    "öffentlichkeit"
+  ],
+  "übergang": [
+    "transition",
+    "wechsel",
+    "überleitung"
+  ]
+}
