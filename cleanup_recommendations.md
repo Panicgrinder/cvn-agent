@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # Empfehlungen zur weiteren Bereinigung des Projekts
 
 ## Abgeschlossene Maßnahmen

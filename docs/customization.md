@@ -29,13 +29,13 @@ Um den CVN Agent ohne Einschränkungen zu verwenden, können Sie:
    ```
 
 2. Eigene Regeln definieren:
-   
+
    ```bash
    python scripts/customize_prompts.py --create-rules
    ```
 
 3. Den uneingeschränkten Modus beim Aufruf aktivieren:
-   
+
    ```bash
    curl -X POST http://localhost:8000/chat -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Deine Anfrage"}],"unrestricted_mode":true}'
    ```

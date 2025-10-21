@@ -4,7 +4,7 @@ Dieses Dokument beschreibt, wie die Zusammenarbeit zwischen dir (Developer), Git
 
 ## Überblick (Kontextfluss)
 
-```
+```text
 [Developer]
    │  formuliert Aufgaben, priorisiert, bewertet
    ▼
@@ -46,13 +46,13 @@ Dieses Dokument beschreibt, wie die Zusammenarbeit zwischen dir (Developer), Git
 - Developer beschreibt Ziel (z. B. „Chai‑Checks vereinfachen“).
 - Assistant konkretisiert ToDos, schlägt Tests/Scope vor.
 
-2) Code‑Änderung
+1) Code‑Änderung
 - Copilot generiert/ergänzt Code (z. B. Tests, Skript‑Refactor), Assistant liefert Begleittexte/Begründungen.
 
-3) Verifikation
+1) Verifikation
 - Lokale Tests/Lint/Typecheck (Assistant kann Tasks/Kommandos vorschlagen; Developer führt aus oder autorisiert).
 
-4) Review & PR
+1) Review & PR
 - Assistant erzeugt PR‑Beschreibung/CHANGELOG‑Hinweise.
 - Developer prüft/merged. CI läuft in GitHub Actions.
 

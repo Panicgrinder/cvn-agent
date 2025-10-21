@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # Agent System-Prompt (CVN Agent)
 
 Dieser Prompt speichert den Arbeitskontext und die Arbeitsprinzipien. Füge ihn als System-/Anfangsprompt in neuen Sessions ein.
@@ -30,9 +31,9 @@ Technik/Repo-Stand:
 - DONELOG: docs/DONELOG.txt; Helper: scripts/append_done.py (fügt Zeitstempel + Autor hinzu).
 - Optional lokal: .githooks/pre-commit blockt Commits ohne aktuellen DONELOG, wenn app/|scripts/|utils/ geändert sind.
 - VS Code Tasks portabel (nutzen ${workspaceFolder}, ${config:python.interpreterPath}).
- - Eval-Profile: `eval/config/profiles.json` (z. B. "chai").
- - Synonyms-Overlay: Merge aus `eval/config/synonyms.json` + `eval/config/synonyms.local.json` (Overlay).
- - Kuratierung/Export: `scripts/curate_dataset_from_latest.py`; robust dank `EVAL_FILE_PATTERN=eval-*.json*` und `source_file`-Zuordnung im Export.
+  - Eval-Profile: `eval/config/profiles.json` (z. B. "chai").
+  - Synonyms-Overlay: Merge aus `eval/config/synonyms.json` + `eval/config/synonyms.local.json` (Overlay).
+  - Kuratierung/Export: `scripts/curate_dataset_from_latest.py`; robust dank `EVAL_FILE_PATTERN=eval-*.json*` und `source_file`-Zuordnung im Export.
 
 Arbeitsprinzipien:
 
@@ -74,27 +75,35 @@ Pipeline Kurzreferenz (PowerShell):
 - Eval (ASGI, quiet) eines Pakets (Beispiel chai):
   - Hinweis: In PowerShell keine spitzen Klammern verwenden; echte Pfade in Anführungszeichen setzen.
   - Beispiel:
+  
   ```powershell
   $env:QUICK_EVAL_LIMIT = '30'
   .\.venv\Scripts\python.exe scripts\run_eval.py --packages "eval/datasets/chai-ai_small_v1.jsonl" --asgi --eval-mode --skip-preflight --quiet
   ```
+  
 
 - Kuratieren → OpenAI-Chat + Train/Val:
+  
   ```powershell
   .\.venv\Scripts\python.exe scripts\curate_dataset_from_latest.py --format openai_chat
   ```
+  
 
 - Validate-only (OpenAI-Format):
+  
   ```powershell
   $train = (Get-ChildItem "eval/results/finetune" -Filter "*_train.jsonl" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
   $val   = $train -replace "_train.jsonl","_val.jsonl"
   .\.venv\Scripts\python.exe scripts\openai_finetune.py $train $val --validate-only
   ```
+  
 
 - LoRA Mini-Run (TinyLlama, 10 Schritte):
+  
   ```powershell
   .\.venv\Scripts\python.exe scripts\train_lora.py $train --output "outputs/lora-mini" --max-steps 10 --per-device-train-batch-size 1 --grad-accum 4 --lr 1e-4 --lora-r 8 --lora-alpha 16 --lora-dropout 0.05
   ```
+  
 
 Artefakte & Pfade:
 

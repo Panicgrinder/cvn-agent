@@ -1,5 +1,5 @@
 # CVN Agent
-
+  
 [![CI](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml)
 
 Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwendet.

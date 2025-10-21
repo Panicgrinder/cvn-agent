@@ -4,7 +4,7 @@ Dieser Leitfaden definiert eine einheitliche Struktur für Prüf- und Konsistenz
 
 Ordnerstruktur
 
-```
+```text
 eval/results/reports/<topic>/<YYYYMMDD_HHMM>/
   report.md      # Zusammenfassung/Ergebnisse
   params.txt     # Parameter/Scope der Prüfung

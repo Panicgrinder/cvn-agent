@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # CVN Agent – ToDo & Roadmap
 
 Kurzfristige Ziele (Heute)
@@ -317,7 +318,7 @@ Später
 
 - [ ] Evaluierung & Telemetrie
   - Ziel: Policy‑Coverage‑Tests; Metriken (Latenz p50/p95, Länge, RAG‑HitRate); strukturierte Logs.
-  - Akzeptanz: Berichte in eval/results/reports/metrics/<ts>; mind. 3 Kennzahlen.
+  - Akzeptanz: Berichte in `eval/results/reports/metrics/` mit Zeitstempel (z. B. `YYYYMMDD_HHMM`); mind. 3 Kennzahlen.
 
 ### Langfristig
 
