@@ -132,6 +132,17 @@ Kurzfristige Ziele (Heute)
   - "Tests: coverage scripts (≥60%)"
   - "Tests: coverage (fail-under)" (kombiniert, 80)
   
+Zusätzliche kurzfristige Abschlüsse (2025-10-21)
+
+- [x] CI Stabilisierung (Linux/Windows)
+  - `os.startfile` guard + plattformneutrale Open-Logik (webbrowser/open/xdg-open)
+  - `rich` optional (Console/Table/Progress Fallbacks in run_eval)
+  - `openai` optional in openai_ft_status (Nutzung prüft installierte Lib)
+  - `workflow_dispatch` für manuelle CI-Runs
+
+- [x] Synonym-Overlay erweitert (Empathie)
+  - `empathisch`: [einfühlsam, zugewandt, mitfühlend, verständnisvoll, empathie]
+  
 Hinweise:
 
 - Branch-Coverage ist in `.coveragerc` aktiviert; schwere/interactive Skripte sind ausgeschlossen.

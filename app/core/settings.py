@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 from typing import List, Any, cast
+from typing import Literal
+from pathlib import Path
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
@@ -72,12 +74,26 @@ class Settings(BaseSettings):
     # Inhalts-Policy/Regeln (optional)
     # Wenn aktiviert, werden optionale Hooks aus content_management verwendet (z.B. für "unrestricted mode").
     CONTENT_POLICY_ENABLED: bool = False
+    # Neue, feinere Policy-Flags
+    # Globaler Schalter für Richtlinien-Anwendung (Pre/Post). Standard: deaktiviert -> kein Verhaltensänderung.
+    POLICIES_ENABLED: bool = False
+    # Optionaler Pfad zu einer Policy-Datei (JSON) mit einfachen Regeln, z. B. {"forbidden_terms": [...], "rewrite_map": {"bad":"good"}}
+    POLICY_FILE: Optional[str] = None
+    # Wenn True, umgeht der "unrestricted"-Modus strikt alle Policies (Pre/Post)
+    POLICY_STRICT_UNRESTRICTED_BYPASS: bool = True
 
     # Session Memory (optional)
     # Wenn aktiviert und eine session_id in der Anfrage vorhanden ist, wird ein kurzer Verlauf pro Sitzung gespeichert.
     SESSION_MEMORY_ENABLED: bool = False
     SESSION_MEMORY_MAX_MESSAGES: int = 20
     SESSION_MEMORY_MAX_CHARS: int = 12000
+
+    # Neue, konfigurierbare Session Memory (Store + Budgets)
+    MEMORY_ENABLED: bool = True
+    MEMORY_STORE: Literal["inmemory", "jsonl"] = "inmemory"
+    MEMORY_MAX_TURNS: int = 20
+    MEMORY_MAX_CHARS: int = 8000
+    MEMORY_DIR: Path = Path(".data/memory")
 
     @staticmethod
     def _to_nonempty_str(obj: Any) -> Optional[str]:

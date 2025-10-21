@@ -122,6 +122,24 @@ Aus Eval-Ergebnissen Trainingspakete erzeugen:
 - Ablauf: nimmt die neueste `results_*.jsonl`, exportiert in `openai_chat` oder `alpaca`, erzeugt deduplizierte Train/Val-Dateien.
 - Ausgabe liegt unter `eval/results/finetune/`.
 
+## Finetune workflow
+
+Schneller Export und Vorbereitung von Trainingspaketen auf Basis der neuesten
+Evaluations-Ergebnisse (`eval/results/results_*.jsonl`). Zwei VS Code Tasks sind vorhanden:
+
+- Finetune: export (latest)
+   - Ermittelt die neueste `results_*.jsonl` und exportiert nach OpenAI-Chat-Format.
+   - Ausgabe: `${workspaceFolder}/eval/results/finetune/exports/openai_chat.jsonl`
+   - OS-spezifisch (Windows PowerShell vs. Linux/macOS Bash) hinterlegt.
+
+- Finetune: prepare (split)
+   - Erzeugt deduplizierte Splits:
+      - Train: `${workspaceFolder}/eval/results/finetune/train.jsonl`
+      - Val: `${workspaceFolder}/eval/results/finetune/val.jsonl`
+   - Schwellwert für Near-Duplicates: `0.92`
+
+Akzeptanz: Das Ausführen beider Tasks erzeugt valide JSONL-Dateien für Train/Val ohne JSON-Fehler.
+
 ## Fine-Tuning / LoRA Mini-Pipeline (3–7 Tage)
 
 - Skript: `scripts/fine_tune_pipeline.py`

@@ -84,6 +84,53 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "Finetune: export (latest)",
+			"type": "shell",
+			"windows": {
+				"command": "powershell",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"$latest = (Get-ChildItem -Path '${workspaceFolder}/eval/results' -Filter 'results_*.jsonl' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName; if (-not $latest) { Write-Error 'Keine results_*.jsonl gefunden unter eval/results'; exit 1 }; & ${config:python.interpreterPath} '${workspaceFolder}/scripts/export_finetune.py' --input $latest --format openai_chat --out '${workspaceFolder}/eval/results/finetune/exports/'"
+				]
+			},
+			"linux": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"LATEST=$(ls -1t '${workspaceFolder}'/eval/results/results_*.jsonl 2>/dev/null | head -n1); if [ -z \"$LATEST\" ]; then echo 'Keine results_*.jsonl gefunden unter eval/results' >&2; exit 1; fi; ${config:python.interpreterPath} '${workspaceFolder}/scripts/export_finetune.py' --input \"$LATEST\" --format openai_chat --out '${workspaceFolder}/eval/results/finetune/exports/'"
+				]
+			},
+			"osx": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"LATEST=$(ls -1t '${workspaceFolder}'/eval/results/results_*.jsonl 2>/dev/null | head -n1); if [ -z \"$LATEST\" ]; then echo 'Keine results_*.jsonl gefunden unter eval/results' >&2; exit 1; fi; ${config:python.interpreterPath} '${workspaceFolder}/scripts/export_finetune.py' --input \"$LATEST\" --format openai_chat --out '${workspaceFolder}/eval/results/finetune/exports/'"
+				]
+			}
+		},
+		{
+			"label": "Finetune: prepare (split)",
+			"type": "process",
+			"command": "${config:python.interpreterPath}",
+			"args": [
+				"${workspaceFolder}/scripts/prepare_finetune_pack.py",
+				"--input",
+				"${workspaceFolder}/eval/results/finetune/exports/openai_chat.jsonl",
+				"--train-out",
+				"${workspaceFolder}/eval/results/finetune/train.jsonl",
+				"--val-out",
+				"${workspaceFolder}/eval/results/finetune/val.jsonl",
+				"--near-dup-threshold",
+				"0.92"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
 			"label": "Type check: pyright",
 			"type": "process",
 			"command": "${config:python.interpreterPath}",
@@ -463,9 +510,7 @@
 				"--cov-report=term",
 				"--cov-branch"
 			],
-			"problemMatcher": [
-				"$pytest"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		}
 	],

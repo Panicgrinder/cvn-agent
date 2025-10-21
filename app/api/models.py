@@ -15,6 +15,10 @@ class ChatRequest(BaseModel):
     messages: List[Dict[str, str]]
     model: Optional[str] = None
     options: Optional[Dict[str, Any]] = None
+    # Optional: Profil-/Mandanten-ID für gezielte Policies oder Memories
+    profile_id: Optional[str] = None
+    # Optional: Session-ID für die Sitzungs-Memory
+    session_id: Optional[str] = None
     
 class ChatResponse(BaseModel):
     """

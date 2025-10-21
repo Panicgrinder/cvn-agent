@@ -48,3 +48,8 @@ Beispiel:
 2025-10-20 10:00 | Copilot | TODO/DONELOG aktualisiert; Konsistenzprüfung Runde 1 durchgeführt; Reports-Standard vorgeschlagen (eval/results/reports/<topic>/<ts> mit report.md und params.txt).
 2025-10-20 20:45 | Copilot | Demo→Fantasy-Umstellung konsolidiert (Code/Tests/Docs); Reporting-Skripte (Dependencies/Coverage/Consistency) ergänzt; CI-Workflow für Reports hinzugefügt; Legacy-Bereinigung: doppelten Re-Import in app/services/__init__.py entfernt, Rerun-Failed-Status in todo_gather vereinheitlicht, WORKSPACE_INDEX um Top-Level-Duplikat bereinigt.
 2025-10-20 21:10 | Copilot | Endpoints final bereinigt (app/api/endpoints/* entfernt), README/WORKSPACE_INDEX aktualisiert, TODO-Drift korrigiert; Reports-Skripte lokal erfolgreich ausgeführt (dependencies/coverage placeholder/consistency).
+2025-10-21 09:25 | Copilot | Pyright Linux-Fix: `scripts/open_context_notes.py` und `scripts/open_latest_summary.py` plattformneutral (webbrowser/open/xdg-open), `os.startfile` nur noch guarded; ungenutzte type: ignore entfernt.
+2025-10-21 09:28 | Copilot | `scripts/run_eval.py`: `rich` optional gemacht (Console/Table/Progress Fallbacks) und Typen für `progress.update` bereinigt; mypy/pyright grün.
+2025-10-21 09:31 | Copilot | `scripts/openai_ft_status.py`: Import von `openai` optional; Fehlerausgabe nur bei tatsächlicher Nutzung, Tests können `OpenAI` stubben.
+2025-10-21 09:34 | Copilot | Synonyme erweitert: Eintrag für „empathisch“ (einfühlsam, zugewandt, mitfühlend, verständnisvoll, empathie) ergänzt; `tests/test_chai_checks.py` besteht.
+2025-10-21 09:38 | Copilot | CI: `workflow_dispatch` zur CI hinzugefügt (manuelle Runs möglich); alle Checks grün (CI/build-test, Enforce DONELOG, Consistency & Reports).
