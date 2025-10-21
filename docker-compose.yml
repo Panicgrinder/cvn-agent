@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cvn-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434" # expose for local debugging (optional)
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:11434/api/version || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cvn-agent
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    environment:
+      # Point the app to the Ollama service by Docker DNS name
+      OLLAMA_HOST: http://ollama:11434
+      # Optional: other app settings can be passed here or via an env_file
+      # BACKEND_CORS_ORIGINS: "[\"http://localhost:3000\"]"
+    ports:
+      - "8000:8000"
+
+volumes:
+  ollama-data:
+    driver: local
