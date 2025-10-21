@@ -63,3 +63,4 @@ Beispiel:
 2025-10-21 20:57 | Panicgrinder | Tests: add pytest norecursedirs to ignore nested submodule; fix import mismatch and restore stable test runs (api, streaming, unit passing).
 2025-10-21 22:00 | Panicgrinder | Docs: add docs-only history purge plan and helper script; wording cleanup in DONELOG.
 2025-10-21 22:50 | Panicgrinder | Types: fix mypy errors in chat.py, content_management.py, and run_eval.py; no runtime behavior change.
+2025-10-21 23:36 | Panicgrinder | Docs: add BEHAVIOR.md (Projektverhalten) und WORKSPACE_INDEX.md aktualisiert.
