@@ -299,7 +299,7 @@ Später
     und Format-Checks per Pre-commit & CI.
 
 - Packaging & Deployability
-  - Ziel: Dockerfile/Compose (lokal/offline-freundlich), Healthchecks, Produktionshinweise.
+  - Ziel: Healthchecks, Produktionshinweise (ohne Docker/Compose).
 
 ### Mittelfristig
 
