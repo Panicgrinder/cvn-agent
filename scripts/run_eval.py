@@ -16,7 +16,6 @@ import time
 import argparse
 import logging
 from datetime import datetime
-from utils.time_utils import now_compact
 from typing import Dict, List, Any, Optional, Tuple, Union, cast
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
@@ -86,12 +85,14 @@ except Exception:
     Progress = _Progress
 import warnings
 
-# Füge das Hauptverzeichnis zum Python-Pfad hinzu
+# Füge das Hauptverzeichnis zum Python-Pfad hinzu (vor internen Imports!)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
-sys.path.insert(0, project_root)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-# Importiere die Utility-Funktionen
+# Importiere die Utility-Funktionen (nun mit korrekt gesetztem sys.path)
+from utils.time_utils import now_compact
 from utils.eval_utils import truncate, coerce_json_to_jsonl, load_synonyms
 from typing import Callable, Optional as _Optional, Any as _Any
 try:

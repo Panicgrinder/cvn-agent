@@ -1,0 +1,200 @@
+{"id": "eval-101", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-102", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-103", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-104", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-105", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-106", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-107", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-108", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-109", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-110", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-111", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-112", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-113", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-114", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-115", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-116", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-117", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-118", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-119", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-120", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-121", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-122", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-123", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-124", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-125", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-126", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-127", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-128", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-129", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-130", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-131", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-132", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-133", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-134", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-135", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-136", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-137", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-138", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-139", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-140", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-141", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-142", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-143", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-144", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-145", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-146", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-147", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-148", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-149", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-150", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-151", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-152", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-153", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-154", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-155", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-156", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-157", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-158", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-159", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-160", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-161", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-162", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-163", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-164", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-165", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-166", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-167", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-168", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-169", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-170", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-171", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-172", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-173", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-174", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-175", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-176", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-177", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-178", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-179", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-180", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-181", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-182", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-183", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-184", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-185", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-186", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-187", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-188", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-189", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-190", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-191", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-192", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-193", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-194", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-195", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-196", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-197", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-198", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-199", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-200", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-201", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-202", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-203", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-204", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-205", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-206", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-207", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-208", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-209", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-210", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-211", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-212", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-213", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-214", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-215", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-216", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-217", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-218", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-219", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-220", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-221", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-222", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-223", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-224", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-225", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-226", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-227", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-228", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-229", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-230", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-231", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-232", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-233", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-234", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-235", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-236", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-237", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-238", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-239", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-240", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-241", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-242", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-243", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-244", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-245", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-246", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-247", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-248", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-249", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-250", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-251", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-252", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-253", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-254", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-255", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-256", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-257", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-258", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-259", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-260", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-261", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-262", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-263", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-264", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-265", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-266", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-267", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-268", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-269", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-270", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-271", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-272", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-273", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-274", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-275", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-276", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-277", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-278", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-279", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-280", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-281", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Teamkommunikation"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-282", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Fehlersuche im Code"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-283", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Versionskontrolle (Git)"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-284", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Tests schreiben (pytest)"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-285", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Typprüfung (mypy, pyright)"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-286", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Dokumentation kurz halten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-287", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Prioritäten setzen"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-288", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Lernen und Üben"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-289", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Projektplanung"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-290", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Requirements klären"}], "checks": {"must_include": ["Risik", "Abwägung"]}}
+{"id": "eval-291", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Zieldefinition"}], "checks": {"must_include": ["kurz", "präzise"]}}
+{"id": "eval-292", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Feedback einholen"}], "checks": {"must_include": ["Plan", "Priorität"]}}
+{"id": "eval-293", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: Konflikte sachlich lösen"}], "checks": {"must_include": ["aufmuntern", "unterstützen"]}}
+{"id": "eval-294", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Release-Checkliste"}], "checks": {"must_include": ["neutral", "sachlich"]}}
+{"id": "eval-295", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Lesbarer Code"}], "checks": {"must_include": ["Schritt", "Ziel"]}}
+{"id": "eval-296", "messages": [{"role": "user", "content": "Fasse sachlich zusammen: Refactoring klein starten"}], "checks": {"must_include": ["Empathie", "nachfragen"]}}
+{"id": "eval-297", "messages": [{"role": "user", "content": "Nenne kurz drei Aspekte zu: Review-Kriterien"}], "checks": {"must_include": ["freundlich", "klar"]}}
+{"id": "eval-298", "messages": [{"role": "user", "content": "Erkläre neutral in einem Satz: CI-Status prüfen"}], "checks": {"must_include": ["Hinweis", "Beispiel"]}}
+{"id": "eval-299", "messages": [{"role": "user", "content": "Gib einen praktischen Tipp zu: Logs interpretieren"}], "checks": {"must_include": ["Übung", "Feedback"]}}
+{"id": "eval-300", "messages": [{"role": "user", "content": "Formuliere höflich und knapp: Zeitmanagement"}], "checks": {"must_include": ["Risik", "Abwägung"]}}

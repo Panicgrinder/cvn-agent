@@ -67,3 +67,4 @@ Beispiel:
 2025-10-22 00:41 | Panicgrinder | Eval: start overnight run (ASGI) tag=overnight-20251022; results will be summarized after completion.
 2025-10-22 00:53 | Panicgrinder | Eval: Teilrun 50/136 (ASGI) saved to results_20251022_0042_overnight-20251022.jsonl; report at docs/reports/overnight-20251022.md.
 2025-10-22 01:01 | Panicgrinder | Automation: add summarize_eval_results.py and VS Code task for overnight eval + auto report.
+2025-10-22 01:11 | Panicgrinder | Add generator script for new eval items and create dataset eval-101-300_generated_v1.0.jsonl (200 items)
