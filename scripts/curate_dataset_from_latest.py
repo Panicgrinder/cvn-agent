@@ -24,7 +24,6 @@ import argparse
 import glob
 import json
 import os
-from datetime import datetime
 from utils.time_utils import now_compact
 from typing import Any, Dict, Optional, List, cast
 

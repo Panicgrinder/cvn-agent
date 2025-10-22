@@ -15,7 +15,6 @@ import argparse
 import glob
 import os
 import sys
-from datetime import datetime
 from typing import Optional, List
 import subprocess
 
