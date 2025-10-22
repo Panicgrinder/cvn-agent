@@ -50,7 +50,7 @@ def test_policy_stream_post_eval_rewrite(monkeypatch):
     monkeypatch.setattr(chat_module.settings, "POLICIES_ENABLED", True, raising=False)
     monkeypatch.setattr(chat_module.settings, "EVAL_POST_REWRITE_ENABLED", True, raising=False)
 
-    req = ChatRequest(messages=[{"role": "user", "content": "hi"}], options={"temperature": 0.1}, eval_mode=True)
+    req = ChatRequest(messages=[{"role": "user", "content": "hi"}], options={"temperature": 0.1})
     agen = asyncio.run(chat_module.stream_chat_request(req, eval_mode=True))
 
     collected: List[str] = []
