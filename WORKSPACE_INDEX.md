@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # CVN Agent - Workspace Datei-Index
 
+Stand: 2025-10-22
+
 ## Vollständiger Index aller Dateien im Workspace (aktualisiert)
 
 ### Root-Verzeichnis
@@ -11,6 +13,7 @@
 - [`.env.example`](.env.example) - Template für Umgebungsvariablen
 - [`.gitignore`](.gitignore) - Git-Ignorier-Regeln
 - [`.markdownlint.json`](.markdownlint.json) - Markdownlint-Konfiguration
+- [`coverage.xml`](coverage.xml) - Coverage-Report (XML, generiert)
 - [`analysis_chat_routers.md`](analysis_chat_routers.md) - Analyse der Chat-Router
 - [`cleanup_recommendations.md`](cleanup_recommendations.md) - Aufräum-Empfehlungen
 - [`CONTEXT_ARCH.md`](docs/CONTEXT_ARCH.md) – Kontextfluss Developer ⇄ Copilot ⇄ GPT (Rollen, Beispiele, Privacy)
@@ -27,6 +30,8 @@
 - [`__pycache__/`](__pycache__/) - Python-Bytecode-Cache (generiert)
 - [`.mypy_cache/`](.mypy_cache/) - mypy-Cache (generiert)
 - [`.pytest_cache/`](.pytest_cache/) - Pytest-Cache (generiert)
+- [`.tmp-datasets/`](.tmp-datasets/) - Temporäre Artefakte (generiert)
+- [`.tmp-results/`](.tmp-results/) - Temporäre Artefakte (generiert)
 
 ### .vscode
 
@@ -57,6 +62,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates (zentral genutzt)
 - [`app/core/content_management.py`](app/core/content_management.py) - Inhaltsfilter (optional/geparkt)
+- [`app/core/memory.py`](app/core/memory.py) - Speicher-/Gedächtnis-Funktionen (geparkt)
 
 #### app/prompt
 
@@ -76,6 +82,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 - [`app/utils/convlog.py`](app/utils/convlog.py) - Konversations-Logging (geparkt)
 - [`app/utils/summarize.py`](app/utils/summarize.py) - Zusammenfassungs-Tools (geparkt)
+- [`app/utils/session_memory.py`](app/utils/session_memory.py) - Sitzungsbezogene Speicher-Helfer (geparkt)
 - [`app/utils/examples/`](app/utils/examples/) - Beispiele (geparkt)
 
 ### utils
@@ -85,6 +92,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`utils/eval_utils.py`](utils/eval_utils.py) - Eval-Helfer (truncate, coerce_json_to_jsonl, load_synonyms)
 - [`utils/eval_cache.py`](utils/eval_cache.py) - Einfacher JSONL-Cache für LLM-Summaries
 - [`utils/message_helpers.py`](utils/message_helpers.py) - Message/Historie Utilities
+- [`utils/time_utils.py`](utils/time_utils.py) - Zeit-/Timestamp-Helfer
 
 ### data
 
@@ -99,9 +107,11 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`docs/AGENT_BEHAVIOR.md`](docs/AGENT_BEHAVIOR.md) - System-Prompt, Richtlinien & System-Infos (zentral)
 - [`docs/DONELOG.txt`](docs/DONELOG.txt) - DONELOG – Abgeschlossene Arbeiten
   (Hinweis: `AGENT_PROMPT.md` und `BEHAVIOR.md` wurden konsolidiert → `AGENT_BEHAVIOR.md`)
+- [`docs/REPORTS.md`](docs/REPORTS.md) - Berichte/Reports Überblick
 - [`docs/training.md`](docs/training.md) - Kurzleitfaden Training/Finetuning (inkl. Reruns)
   - Hinweis: Reruns via `scripts/rerun_from_results.py` (Flags: `--all`, `--ids`)
   - Backup/Restore: Separates Backup-Repo mit privaten Releases; MANIFEST (SHA-256) und README mit Restore-Anleitung
+- [`docs/reports/`](docs/reports/) - Sammelordner für generierte/kuratierte Reports
 
 ### eval
 
@@ -125,6 +135,10 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`eval/datasets/chai-ai_small_v1.jsonl`](eval/datasets/chai-ai_small_v1.jsonl) - Chai-Smalltalk/Empathie-Dataset (aktuell)
 - [`eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip`](eval/datasets/eval-001-100_technik_erklaerungen_v1.0.zip)
   - Archiv (optional)
+- [`eval/datasets/combined_eval_001-100.jsonl`](eval/datasets/combined_eval_001-100.jsonl) - Kombiniertes 001-100 JSONL
+- [`eval/datasets/eval-101-300_generated_v1.0.jsonl`](eval/datasets/eval-101-300_generated_v1.0.jsonl) - Generierte Zusatzdaten
+- [`eval/datasets/eval-smoke.jsonl`](eval/datasets/eval-smoke.jsonl) - Smoke-Test Dataset
+- [`eval/datasets/gpt_samples.de.jsonl`](eval/datasets/gpt_samples.de.jsonl) - Beispielantworten (Deutsch)
 
 #### eval/config
 
@@ -134,6 +148,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`eval/config/synonyms.local.sample.json`](eval/config/synonyms.local.sample.json) - Beispiel für private Synonym-Overlays
 - [`eval/config/context.local.md`](eval/config/context.local.md) - Lokale Kontext-Notizen (privat)
 - [`eval/config/context.local.sample.md`](eval/config/context.local.sample.md) - Muster für lokale Kontext-Notizen
+- [`eval/config/synonyms.local.sanitized.json`](eval/config/synonyms.local.sanitized.json) - Sanitized/abgeleitete Synonyme
 
 #### eval/results
 
@@ -160,6 +175,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/run_eval.py`](scripts/run_eval.py) - Hauptevaluierungsskript
 - [`scripts/quick_eval.py`](scripts/quick_eval.py) - Schnelle Eval (ASGI)
 - [`scripts/eval_ui.py`](scripts/eval_ui.py) - Konsolen-UI für Evaluierung
+- [`scripts/eval_loader.py`](scripts/eval_loader.py) - Hilfsfunktionen zum Laden von Evaluationspaketen
 - [`scripts/audit_workspace.py`](scripts/audit_workspace.py) - Einfacher Workspace-Audit
 - [`scripts/dependency_check.py`](scripts/dependency_check.py) - Konsistenz-/Abhängigkeits-Checks (Eval/Config)
 - [`scripts/curate_dataset_from_latest.py`](scripts/curate_dataset_from_latest.py) - Kuratiert Trainingspakete aus results_*.jsonl
@@ -170,6 +186,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/train_lora.py`](scripts/train_lora.py) - LoRA-Training (TRL/PEFT)
 - [`scripts/fine_tune_pipeline.py`](scripts/fine_tune_pipeline.py) - Mini-Pipeline fürs Fine-Tuning/LoRA
 - [`scripts/rerun_from_results.py`](scripts/rerun_from_results.py) - Profile-aware Reruns auf Basis von results_*.jsonl (Flags: --all, --ids)
+- [`scripts/rerun_failed.py`](scripts/rerun_failed.py) - Reruns fehlgeschlagener Items
 - [`scripts/map_reduce_summary.py`](scripts/map_reduce_summary.py) - Heuristische Workspace-Zusammenfassung
 - [`scripts/map_reduce_summary_llm.py`](scripts/map_reduce_summary_llm.py) - LLM-gestützte Zusammenfassung via /chat
 - [`scripts/migrate_dataset_schemas.py`](scripts/migrate_dataset_schemas.py) - Migration alter Dataset-Schemata
@@ -178,15 +195,26 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/open_latest_summary.py`](scripts/open_latest_summary.py) - Öffnet neueste Gesamtzusammenfassung
 - [`scripts/open_context_notes.py`](scripts/open_context_notes.py) - Öffnet/legt lokale Kontextnotizen an
 - [`scripts/append_done.py`](scripts/append_done.py) - Hängt Eintrag an `docs/DONELOG.txt` an
+- [`scripts/fix_donelog_times.py`](scripts/fix_donelog_times.py) - Korrigiert Zeitstempel im DONELOG
 - [`scripts/cleanup_phase3.ps1`](scripts/cleanup_phase3.ps1) - Cleanup-Skript Phase 3
 - [`scripts/cleanup_phase4.ps1`](scripts/cleanup_phase4.ps1) - Cleanup-Skript Phase 4
+- [`scripts/history_purge_plan.ps1`](scripts/history_purge_plan.ps1) - Historienbereinigung (Plan)
+- [`scripts/run_tests.py`](scripts/run_tests.py) - Test-Launcher/Helper
+- [`scripts/smoke_asgi.py`](scripts/smoke_asgi.py) - Minimaler ASGI-Smoketest
+- [`scripts/syn_loader.py`](scripts/syn_loader.py) - Loader für Synonym-Overlays
+- [`scripts/summarize_eval_results.py`](scripts/summarize_eval_results.py) - Aggregiert Eval-Ergebnisse
 
 ### tests
 
 - [`tests/`](tests/) - Testsuite (Einheiten-/Integrations-Tests)
-  - [`tests/test_chai_checks.py`](tests/test_chai_checks.py) - Tests für Chai-Checks & Synonyme
-  - [`tests/test_context_notes.py`](tests/test_context_notes.py)
-  - [`tests/test_utils_context_and_summarize.py`](tests/test_utils_context_and_summarize.py)
+  - Auszug (nicht vollständig):
+    - [`tests/test_chai_checks.py`](tests/test_chai_checks.py) - Tests für Chai-Checks & Synonyme
+    - [`tests/test_context_notes.py`](tests/test_context_notes.py)
+    - [`tests/test_utils_context_and_summarize.py`](tests/test_utils_context_and_summarize.py)
+    - [`tests/test_app_chat_post_happy.py`](tests/test_app_chat_post_happy.py)
+    - [`tests/test_streaming_fallback_and_request_id.py`](tests/test_streaming_fallback_and_request_id.py)
+    - [`tests/test_prepare_finetune_pack_extras.py`](tests/test_prepare_finetune_pack_extras.py)
+    - Weitere Tests siehe Ordnerliste unter `tests/`.
 
 ### .github
 

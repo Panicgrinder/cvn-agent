@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-from types import SimpleNamespace
 from typing import Callable, List
 
 import pytest
@@ -41,7 +40,7 @@ def _make_fake_stream_client(chunks: list[str]):
 
 
 @pytest.mark.streaming
-def test_policy_stream_post_eval_rewrite(monkeypatch):
+def test_policy_stream_post_eval_rewrite(monkeypatch: pytest.MonkeyPatch):
     # Fake LLM stream producing one overly expressive chunk (RPG-ish)
     fake_factory: Callable[..., object] = lambda *a, **k: _make_fake_stream_client(["Ich: *nickt* Gerne helfe ich! :)"])  
     monkeypatch.setattr(chat_module.httpx, "AsyncClient", fake_factory)
