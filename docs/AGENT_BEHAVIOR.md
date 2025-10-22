@@ -44,6 +44,7 @@ Antworte immer auf Deutsch; halte Beispiele, Erklärungen und Fehlermeldungen au
 - Sicherheit & Privacy: Keine Leaks; offline/lokal bevorzugen; minimal nötige Rechte; keine unnötigen Netzaufrufe
 - Windows‑PowerShell‑Befehle; pro Zeile ein Kommando
 - Output‑Stil: Deutsch, kommentar auf user prompt, freundlich, konkret; Bullet‑Listen; wenig Deko
+ - Bei Unklarheiten/Unsicherheiten: Sofort nachfragen, bevor Arbeit in die falsche Richtung läuft oder sich verzögert.
 
 ## Prozessregeln & Pflichten
 
@@ -112,24 +113,36 @@ Artefakte & Pfade:
 
 ## Automatisch in den Kontext laden (Agent)
 
-Der Chat‑Agent kann Inhalte aus Dateien automatisch in den System‑/Kontextprompt einbetten.
+Der Chat‑Agent kann Inhalte aus Dateien und Verzeichnissen automatisch in den System‑/Kontextprompt einbetten.
 
-- Aktivierung über ENV:
+- Aktivierung über ENV (Datei‑ und Verzeichnis‑Support):
   - `CONTEXT_NOTES_ENABLED=true`
   - Optional: `CONTEXT_NOTES_MAX_CHARS=4000`
-- Pfade setzen (Beispiel PowerShell für die aktuelle Session):
+- Pfade/Ordner setzen (Beispiel PowerShell für die aktuelle Session):
 
   ```powershell
   $env:CONTEXT_NOTES_ENABLED = 'true'
-  $env:CONTEXT_NOTES_PATHS = '["docs/AGENT_BEHAVIOR.md","docs/TODO.md","docs/DONELOG.txt","eval/config/context.local.md"]'
+  # Dateien ODER Verzeichnisse möglich; Verzeichnisse werden (nicht rekursiv) gescannt.
+  $env:CONTEXT_NOTES_PATHS = '["eval/config/context.notes","docs/AGENT_BEHAVIOR.md","docs/TODO.md","docs/DONELOG.txt"]'
   ```
 
   Alternativ dauerhaft via `.env`:
 
   ```
   CONTEXT_NOTES_ENABLED=true
-  CONTEXT_NOTES_PATHS=["docs/AGENT_BEHAVIOR.md","docs/TODO.md","docs/DONELOG.txt","eval/config/context.local.md"]
+  CONTEXT_NOTES_PATHS=["eval/config/context.notes","docs/AGENT_BEHAVIOR.md","docs/TODO.md","docs/DONELOG.txt"]
   ```
+
+Hinweise:
+
+- Unterstützte Formate: .md, .txt, .json, .jsonl sowie .ref (Verweisdatei, enthält Pfad zur Zieldatei in der ersten Zeile).
+- Verzeichnisse: Es werden alle Dateien der ersten Ebene mit unterstützten Endungen geladen (alphabetisch). Keine Rekursion.
+- Beispiel „angeheftete“ Dokumente: Unter `eval/config/context.notes/` liegen `.ref`‑Dateien, die auf diese Zieldateien verweisen:
+  - `docs/AGENT_BEHAVIOR.md`
+  - `docs/TODO.md`
+  - `docs/DONELOG.txt`
+  - `docs/REPORTS.md`
+  - `WORKSPACE_INDEX.md`
 
 Hinweis: Standardmäßig sucht die App nach `eval/config/context.local.*`. Weitere Pfade wie dieses Dokument können per ENV ergänzt werden.
 
