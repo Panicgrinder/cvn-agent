@@ -43,7 +43,7 @@ Wo nachsehen
 - Skripte: `scripts/` (Eval/Export/Train/Reports) – nutze vorhandene CLI-Optionen.
 
 Wenn bereits vorhanden
-- Beim Aktualisieren dieser Datei: Inhalte aus `docs/AGENT_PROMPT.md` beachten (Progress-Cadence, DONELOG, Shell-Hinweise) und konsistent halten.
+- Beim Aktualisieren dieser Datei: Inhalte aus `docs/AGENT_BEHAVIOR.md` beachten (Progress-Cadence, DONELOG, Shell-Hinweise) und konsistent halten.
 
 Feedback
 - Fehlt dir etwas (weitere Marker, Tasks, Troubleshooting)? Kurz melden – ich passe die Anleitung an.

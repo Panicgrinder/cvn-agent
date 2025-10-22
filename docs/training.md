@@ -29,13 +29,13 @@ Dieser Leitfaden zeigt den minimalen End‑to‑End‑Ablauf mit vorhandenen Skr
 
 ## 5) LoRA Mini
 
-- `scripts/train_lora.py <train.jsonl> --output-dir outputs/lora-<tag> --steps 10`
+- `scripts/train_lora.py <train.jsonl> --output outputs/lora-<tag> --max-steps 10`
 
 ## Hinweise
 
 - Pfade/Konfiguration: `app/core/settings.py` (Eval‑Dirs, Patterns)
 - Synonyme/Checks: `eval/config/{synonyms.json,synonyms.local.json}`
-- Doku: `docs/CONTEXT_ARCH.md`, `docs/AGENT_PROMPT.md`, `docs/REPORTS.md`
+- Doku: `docs/CONTEXT_ARCH.md`, `docs/AGENT_BEHAVIOR.md`, `docs/REPORTS.md`
 - Optional: VS‑Code‑Tasks für die Schritte vorhanden.
 
 ### Reruns (Profile-aware)

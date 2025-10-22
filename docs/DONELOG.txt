@@ -68,3 +68,5 @@ Beispiel:
 2025-10-22 00:53 | Panicgrinder | Eval: Teilrun 50/136 (ASGI) saved to results_20251022_0042_overnight-20251022.jsonl; report at docs/reports/overnight-20251022.md.
 2025-10-22 01:01 | Panicgrinder | Automation: add summarize_eval_results.py and VS Code task for overnight eval + auto report.
 2025-10-22 01:11 | Panicgrinder | Add generator script for new eval items and create dataset eval-101-300_generated_v1.0.jsonl (200 items)
+2025-10-22 13:54 | Panicgrinder | Docs konsolidiert: AGENT_BEHAVIOR.md erstellt (Merge aus AGENT_PROMPT.md + BEHAVIOR.md); Settings CONTEXT_NOTES_PATHS um AGENT_BEHAVIOR/TODO/DONELOG erweitert; Referenzen & VS Code Task aktualisiert.
+2025-10-22 14:17 | Panicgrinder | Kontext: Digest in eval/config/context.local.md; Platzhalter-Logs für heute/gestern (data/logs/YYYY-MM-DD.jsonl) erstellt; Historie in docs/AGENT_BEHAVIOR.md präzisiert; TODO aktualisiert.

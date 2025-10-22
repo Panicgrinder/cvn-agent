@@ -96,9 +96,9 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`docs/customization.md`](docs/customization.md) - Anpassungs-Dokumentation für private Nutzung
 - [`docs/ARCHIVE_PLAN.md`](docs/ARCHIVE_PLAN.md) - Archiv-/Bereinigungs-Plan (Phasen)
 - [`docs/TODO.md`](docs/TODO.md) - ToDo & Roadmap für lokale Entwicklungsarbeit
-- [`docs/AGENT_PROMPT.md`](docs/AGENT_PROMPT.md) - Agent System-Prompt & Arbeitsprinzipien
+- [`docs/AGENT_BEHAVIOR.md`](docs/AGENT_BEHAVIOR.md) - System-Prompt, Richtlinien & System-Infos (zentral)
 - [`docs/DONELOG.txt`](docs/DONELOG.txt) - DONELOG – Abgeschlossene Arbeiten
-- [`docs/BEHAVIOR.md`](docs/BEHAVIOR.md) - Projektverhalten & Arbeitsrichtlinien (kompakt)
+  (Hinweis: `AGENT_PROMPT.md` und `BEHAVIOR.md` wurden konsolidiert → `AGENT_BEHAVIOR.md`)
 - [`docs/training.md`](docs/training.md) - Kurzleitfaden Training/Finetuning (inkl. Reruns)
   - Hinweis: Reruns via `scripts/rerun_from_results.py` (Flags: `--all`, `--ids`)
   - Backup/Restore: Separates Backup-Repo mit privaten Releases; MANIFEST (SHA-256) und README mit Restore-Anleitung

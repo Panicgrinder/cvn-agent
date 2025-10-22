@@ -133,7 +133,7 @@ Kurzfristige Ziele (Heute)
   - "Tests: coverage scripts (≥60%)"
   - "Tests: coverage (fail-under)" (kombiniert, 80)
   
-Zusätzliche kurzfristige Abschlüsse (2025-10-21)
+ Zusätzliche kurzfristige Abschlüsse (2025-10-21)
 
 - [x] CI Stabilisierung (Linux/Windows)
   - `os.startfile` guard + plattformneutrale Open-Logik (webbrowser/open/xdg-open)
@@ -143,6 +143,19 @@ Zusätzliche kurzfristige Abschlüsse (2025-10-21)
 
 - [x] Synonym-Overlay erweitert (Empathie)
   - `empathisch`: [einfühlsam, zugewandt, mitfühlend, verständnisvoll, empathie]
+
+Zusätzliche kurzfristige Abschlüsse (2025-10-22)
+
+- [x] Docs konsolidiert: `AGENT_PROMPT.md` + `BEHAVIOR.md` → `AGENT_BEHAVIOR.md`
+  - Inhalte zusammengeführt (System‑Prompt, Richtlinien, System‑Infos)
+  - Verweise aktualisiert (Index, Training, Copilot‑Instructions, VS Code Task)
+  - Hinweis aufgenommen, wie das Dokument via `CONTEXT_NOTES_*` in den Agent‑Kontext geladen wird
+  - Kontext-Notizen Defaults unverändert belassen; Aktivierung/Erweiterung per ENV dokumentiert
+
+- [x] Kontext-Setup & Logs (heute/gestern)
+  - `eval/config/context.local.md`: 2‑Tage‑Digest (heute+gestern) + klare Feststellung (Defaults unverändert; ENV nutzen)
+  - Platzhalter-Logs angelegt: `data/logs/2025-10-22.jsonl`, `data/logs/2025-10-21.jsonl` (gitignored)
+  - Hinweis in `AGENT_BEHAVIOR.md` Historie präzisiert
   
 Hinweise:
 
