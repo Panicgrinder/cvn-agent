@@ -374,13 +374,13 @@
 			"problemMatcher": []
 		},
 		{
-			"label": "Copy AGENT_PROMPT to clipboard",
+			"label": "Copy AGENT_BEHAVIOR to clipboard",
 			"type": "shell",
 			"command": "powershell",
 			"args": [
 				"-NoProfile",
 				"-Command",
-				"Get-Content -Raw '${workspaceFolder}/docs/AGENT_PROMPT.md' | Set-Clipboard"
+				"Get-Content -Raw '${workspaceFolder}/docs/AGENT_BEHAVIOR.md' | Set-Clipboard"
 			],
 			"problemMatcher": []
 		},

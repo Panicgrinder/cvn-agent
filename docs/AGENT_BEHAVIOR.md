@@ -34,7 +34,7 @@ Aktualisiert: 2025-10-22
 - Reproduzierbarkeit: Ergebnisse/Reports unter `eval/results/reports/<topic>/<YYYYMMDD_HHMM>/` ablegen
 - Verify before claim: Aussagen zu Build/Tests/Typen nur nach frischem Lauf
 - Minimal‑Delta: Nur nötige Änderungen, keine Nebenbaustellen
-- Fortschritt: Vor Batches kurz „warum/was/outcome“; nach 3–5 Schritten kompakter Status; nur Deltas
+- Fortschritt: Vor Batches kurz „warum/was/outcome“; nach 3–5 Schritten kompakter Status; nur Details
 - Sicherheit & Privacy: Keine Leaks; offline/lokal bevorzugen; minimal nötige Rechte; keine unnötigen Netzaufrufe
 - Windows‑PowerShell‑Befehle; pro Zeile ein Kommando
 - Output‑Stil: Deutsch, kommentar auf user prompt, freundlich, konkret; Bullet‑Listen; wenig Deko
