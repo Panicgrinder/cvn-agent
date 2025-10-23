@@ -1,19 +1,20 @@
-from __future__ import annotations
+"""
+DEPRECATED MODULE
+=================
 
-from typing import Literal
-from pydantic import BaseModel
+Dieses Modul ist veraltet. Bitte importiere Modelle ab sofort aus
+`app.api.models` statt aus `app.schemas`.
 
+Es bleibt als dünne Weiterleitung bestehen, um ältere Importe nicht sofort zu brechen.
+Künftige Versionen können diese Datei vollständig entfernen.
+"""
 
-class ChatMessage(BaseModel):
-    role: Literal["system", "user", "assistant"]
-    content: str
+from typing import Any
 
+# Laufzeit: einfache Weiterleitung (typisiert als Any, um Checker-Konflikte zu vermeiden)
+from app.api import models as _models
+ChatMessage: Any = _models.ChatMessage
+ChatRequest: Any = _models.ChatRequest
+ChatResponse: Any = _models.ChatResponse
 
-class ChatResponse(BaseModel):
-    response: str
-
-
-__all__ = [
-    "ChatMessage",
-    "ChatResponse",
-]
+__all__ = ["ChatMessage", "ChatRequest", "ChatResponse"]
