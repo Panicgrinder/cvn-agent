@@ -81,3 +81,4 @@ Beispiel:
 2025-10-23 10:00 | Copilot | Kontext-Notizen Budget erhöht (CONTEXT_NOTES_MAX_CHARS=12000); Standard-Pfade für pinned Notes aktiv; schnelle Tests grün.
 2025-10-23 10:20 | Copilot | Cleanup: `app/schemas.py` als Deprecation-Weiterleitung auf `app/api/models.py` umgestellt (keine direkten Importe gefunden); sichere Migration ohne Bruch.
 2025-10-23 10:35 | Copilot | Cleanup: `app/schemas.py` endgültig entfernt; Modelle liegen zentral in `app/api/models.py`. Kurzer Testlauf grün.
+2025-10-23 10:42 | Copilot | Cleanup-Review: `content_management` aktiv genutzt (behalten), `convlog` nur Beispiele (belassen), `summarize` in Tests/Beispielen (belassen), `session_memory` genutzt (belassen); TODO entsprechend aktualisiert.

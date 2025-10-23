@@ -172,12 +172,12 @@ API/Nahbereich:
 
 - [x] `app/schemas.py` — Legacy-Schema entfernt. Modelle liegen zentral unter `app/api/models.py`.
 - [x] `app/api/chat_helpers.py` — Geprüft: wird produktiv genutzt (z. B. `normalize_ollama_options` in `app/api/chat.py` und Tests). Behalten.
-- [ ] `app/core/content_management.py` — Nur nötig, wenn Content-Filter aktiv genutzt wird; sonst archivieren.
-- [ ] `app/utils/convlog.py` — Wird aktuell nur begrenzt genutzt; prüfen (jetzt `now_iso()` integriert).
-- [ ] `app/utils/summarize.py` — Obsolet? Nutzung prüfen; ggf. in Beispiele verschieben.
-- [ ] `app/utils/session_memory.py` — Feature-Stub; entweder verdrahten (Tests hinzufügen) oder parken/archivieren.
-- [ ] `app/utils/examples/**` — Beispielcode; nach `examples/` konsolidieren oder archivieren.
-- [ ] `examples/rpg/*` — Beispiel-RPG; separat dokumentieren/archivieren oder entfernen.
+- [x] `app/core/content_management.py` — Wird aktiv aus `app/api/chat.py` genutzt (optional via Flags, Pre/Post/Prompt‑Modifikationen). Behalten; später gezielt verdrahten/abdecken (Tests vorhanden, z. B. Post‑Hooks via Monkeypatch).
+- [x] `app/utils/convlog.py` — Aktuell nur in `app/utils/examples/*` referenziert. Als Beispiel/Utility belassen; ggf. später in `examples/` verschieben.
+- [x] `app/utils/summarize.py` — Wird von Tests und Beispielen genutzt; belassen.
+- [x] `app/utils/session_memory.py` — Wird in `app/api/chat.py` genutzt (optional via Settings). Belassen; Folgeaufgabe: Basis‑Tests/Trunkierung.
+- [x] `app/utils/examples/**` — Beispiele belassen; ggf. später konsolidieren.
+- [x] `examples/rpg/*` — Beispiel‑RPG belassen; später separat dokumentieren/archivieren.
 
 Skripte (CLI/Tools – teils „potenziell ungenutzt“ aus App-Perspektive):
 
