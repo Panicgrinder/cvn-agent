@@ -1,0 +1,10 @@
+{
+  "forbidden_terms": [
+    "badword",
+    "block_me"
+  ],
+  "rewrite_map": {
+    "foo": "bar",
+    "colour": "color"
+  }
+}

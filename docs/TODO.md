@@ -361,6 +361,10 @@ Später
   - Ziel: Mehr Ollama‑Optionen exponieren, klar dokumentieren; Defaults in Settings.
   - Akzeptanz: Doku + Validation‑Tests.
 
+- [ ] AGENT_BEHAVIOR.md: DONELOG Autoren‑Definition präzisieren
+  - Ziel: In `AGENT_BEHAVIOR.md` ergänzen, dass der Autor in `docs/DONELOG.txt` die Herkunft des Vorschlags widerspiegelt (z. B. „Panicgrinder“ für Benutzer‑/Owner‑Vorschläge; „Copilot“ für automatisch initiierte/umgesetzte Vorschläge).
+  - Akzeptanz: Abschnitt „Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)“ erweitern; ein kurzes Beispiel mit „Lizenzvorschlag kam vom Benutzer“ vs. „Tests erweitert von Copilot“ hinzufügen.
+
 Metriken
 
 - Eval-Erfolgsrate ↑ (gesamt/paketweise)

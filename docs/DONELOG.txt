@@ -83,3 +83,5 @@ Beispiel:
 2025-10-23 10:35 | Copilot | Cleanup: `app/schemas.py` endgültig entfernt; Modelle liegen zentral in `app/api/models.py`. Kurzer Testlauf grün.
 2025-10-23 10:42 | Copilot | Cleanup-Review: `content_management` aktiv genutzt (behalten), `convlog` nur Beispiele (belassen), `summarize` in Tests/Beispielen (belassen), `session_memory` genutzt (belassen); TODO entsprechend aktualisiert.
 2025-10-23 10:50 | Copilot | Lizenz hinzugefügt: MIT-Lizenz-Datei (`LICENSE`) und Hinweis in README.
+2025-10-23 11:05 | Copilot | Policy-Hooks: Datei-basierte Minimal-Tests für forbidden_terms/rewrite_map hinzugefügt; Nutzung über SETTINGS.POLICY_FILE verifiziert; schneller Teil-Lauf grün.
+2025-10-23 11:08 | Copilot | Doku: Abschnitt „Inhalts‑Policy & Hooks (optional)“ in AGENT_BEHAVIOR.md ergänzt (Aktivierung, POLICY_FILE, Struktur, Verweise auf Implementierung/Tests).

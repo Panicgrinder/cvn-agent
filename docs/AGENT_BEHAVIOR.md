@@ -149,6 +149,33 @@ Hinweise:
 
 Wenn aktiviert, lädt die App beim Chat die Inhalte (Text/JSON/JSONL) und injiziert sie in die System‑Nachricht (siehe `utils/context_notes.py`, `app/api/chat.py`).
 
+## Inhalts‑Policy & Hooks (optional)
+
+Die App unterstützt einfache Pre/Post‑Hooks zur Inhaltssteuerung (z. B. Umschreiben oder Blockieren verbotener Begriffe). Standardmäßig sind Policies aus, es gibt also keine Verhaltensänderung.
+
+- Aktivierung via ENV oder `.env`:
+
+  ```
+  POLICIES_ENABLED=true
+  POLICY_FILE="eval/config/policy.sample.json"
+  # Im "unrestricted"‑Modus strikt alle Policies umgehen (Default true):
+  POLICY_STRICT_UNRESTRICTED_BYPASS=true
+  ```
+
+- Policy‑Datei (JSON) Struktur:
+
+  ```json
+  {
+    "forbidden_terms": ["badword"],
+    "rewrite_map": { "foo": "bar" }
+  }
+  ```
+
+- Hooks & Implementierung:
+  - Pre‑Hook: `app/core/content_management.py::apply_pre(messages, mode)` prüft Nutzernachrichten und kann `allow|rewrite|block` zurückgeben.
+  - Post‑Hook: `apply_post(text, mode)` prüft/umschreibt Modell‑Antworten. Im `eval`‑Modus greifen zudem simple Stil‑Heuristiken (neutralize/compact, max Sätze/Zeichen).
+  - Tests: `tests/test_content_policy_file_basic.py` zeigt Datei‑basierte Regeln (Rewrite und Block) im Happy‑Path.
+
 ## Historie
 
 - 2025‑10‑22: Zusammenführung `AGENT_PROMPT.md` + `BEHAVIOR.md` → `AGENT_BEHAVIOR.md`; Kontext‑Notizen: Defaults unverändert gelassen, Aktivierung/Erweiterung per ENV dokumentiert.
