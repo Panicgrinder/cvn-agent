@@ -170,8 +170,8 @@ Ziel: Offensichtliche Altlasten/Beispiele sichten, entweder (a) einbinden, (b) n
 
 API/Nahbereich:
 
-- [ ] `app/schemas.py` — Legacy-Schema; Modelle liegen unter `app/api/models.py`. Prüfen, ob noch importiert; wahrscheinlich entfernen.
-- [ ] `app/api/chat_helpers.py` — Helfer aus früheren Versionen; prüfen, ob Referenzen existieren.
+- [x] `app/schemas.py` — Legacy-Schema entfernt. Modelle liegen zentral unter `app/api/models.py`.
+- [x] `app/api/chat_helpers.py` — Geprüft: wird produktiv genutzt (z. B. `normalize_ollama_options` in `app/api/chat.py` und Tests). Behalten.
 - [ ] `app/core/content_management.py` — Nur nötig, wenn Content-Filter aktiv genutzt wird; sonst archivieren.
 - [ ] `app/utils/convlog.py` — Wird aktuell nur begrenzt genutzt; prüfen (jetzt `now_iso()` integriert).
 - [ ] `app/utils/summarize.py` — Obsolet? Nutzung prüfen; ggf. in Beispiele verschieben.
