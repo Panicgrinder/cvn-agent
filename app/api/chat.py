@@ -311,8 +311,9 @@ async def stream_chat_request(
                             last_user = user_inputs[-1]["content"] if user_inputs else ""
                             await store.append(session_id, "user", last_user)
                             await store.append(session_id, "assistant", effective_text)
-                    except Exception:
-                        pass
+                    except Exception as mem_err:
+                        # Warnen, aber Stream nicht abbrechen
+                        logger.warning(f"Memory-Append fehlgeschlagen (stream): {mem_err}")
                 except Exception:
                     # Fail-open: keinerlei Meta/Delta zusätzl., keine Memory-Speicherung hier
                     pass
@@ -339,8 +340,8 @@ async def stream_chat_request(
                     user_inputs = [m for m in messages if m.get("role") == "user"]
                     last_user = user_inputs[-1]["content"] if user_inputs else ""
                     await store.append(session_id, "user", f"{last_user}\n<!-- aborted=true -->")
-            except Exception:
-                pass
+            except Exception as mem_err2:
+                logger.warning(f"Memory-Append (aborted) fehlgeschlagen: {mem_err2}")
         finally:
             duration_ms = int((time.time() - started) * 1000)
             if getattr(settings, "LOG_JSON", False):
@@ -604,8 +605,8 @@ async def process_chat_request(
                 last_user = user_inputs[-1]["content"] if user_inputs else ""
                 await store.append(session_id, "user", last_user)
                 await store.append(session_id, "assistant", generated_content)
-        except Exception:
-            pass
+        except Exception as mem_err3:
+            logger.warning(f"Memory-Append fehlgeschlagen: {mem_err3}")
 
         return ChatResponse(content=generated_content, model=settings.MODEL_NAME)
     except HTTPException:
@@ -641,8 +642,8 @@ async def process_chat_request(
                 user_inputs = [m for m in raw_msgs if m.get("role") == "user"]
                 last_user = user_inputs[-1]["content"] if user_inputs else ""
                 await store.append(session_id, "user", f"{last_user}\n<!-- aborted=true -->")
-        except Exception:
-            pass
+        except Exception as mem_err4:
+            logger.warning(f"Memory-Append (error path) fehlgeschlagen: {mem_err4}")
         if getattr(settings, "LOG_JSON", False):
             logger.exception(_json.dumps({"event": "model_error", "error": str(e), "request_id": request_id}, ensure_ascii=False))
         else:

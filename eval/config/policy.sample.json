@@ -1,10 +1,18 @@
 {
-  "forbidden_terms": [
-    "badword",
-    "block_me"
-  ],
-  "rewrite_map": {
-    "foo": "bar",
-    "colour": "color"
+  "default": {
+    "forbidden_terms": [
+      "badword",
+      "block_me"
+    ],
+    "rewrite_map": {
+      "colour": "color"
+    }
+  },
+  "profiles": {
+    "eval": {
+      "rewrite_map": {
+        "foo": "bar"
+      }
+    }
   }
 }

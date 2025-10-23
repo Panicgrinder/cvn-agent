@@ -52,6 +52,7 @@ Antworte immer auf Deutsch; halte Beispiele, Erklärungen und Fehlermeldungen au
   - `python scripts/append_done.py "Kurzbeschreibung"`
 - CI: schlägt ohne aktuellen DONELOG bei PRs/Push auf main fehl (PR‑Bypasslabel: `skip-donelog`)
 - Qualitätstore: Build, Lint/Type, Tests, ggf. Smoke. Nie mit kaputtem Build enden (bis zu 3 gezielte Fix‑Versuche)
+- DONELOG führt Autorenschaft; die Quelle kann Mensch oder Tool sein (z. B. „Benutzer“, „Copilot“, „GPT‑5“). Format: `YYYY-MM-DD HH:MM | <Autor> | <Änderung>`
 
 ## Checkliste vor Push/PR
 
@@ -175,6 +176,30 @@ Die App unterstützt einfache Pre/Post‑Hooks zur Inhaltssteuerung (z. B. Ums
   - Pre‑Hook: `app/core/content_management.py::apply_pre(messages, mode)` prüft Nutzernachrichten und kann `allow|rewrite|block` zurückgeben.
   - Post‑Hook: `apply_post(text, mode)` prüft/umschreibt Modell‑Antworten. Im `eval`‑Modus greifen zudem simple Stil‑Heuristiken (neutralize/compact, max Sätze/Zeichen).
   - Tests: `tests/test_content_policy_file_basic.py` zeigt Datei‑basierte Regeln (Rewrite und Block) im Happy‑Path.
+
+### Profiles & Merge Order
+
+- POLICY_FILE kann entweder flach sein oder Profile enthalten:
+
+  ```json
+  {
+    "default": { "forbidden_terms": [], "rewrite_map": {} },
+    "profiles": {
+      "eval": { "forbidden_terms": [], "rewrite_map": {} },
+      "<id>": { "rewrite_map": {"foo": "bar"} }
+    }
+  }
+  ```
+
+- Merge‑Reihenfolge:
+  - default wird zuerst angewendet
+  - anschließend (falls vorhanden) `profiles[profile_id]` gemerged
+  - `forbidden_terms` werden vereinigt (Union), `rewrite_map` überlagert (Overlay überschreibt Schlüssel)
+- Profilwahl:
+  - `profile_id` kann in der Anfrage gesetzt werden (ChatRequest.profile_id)
+  - `mode=eval` mappt implizit auf `profile_id="eval"`
+- Unrestricted‑Bypass:
+  - Bei `mode=unrestricted` und `POLICY_STRICT_UNRESTRICTED_BYPASS=true` werden Policies strikt übersprungen (`allow`).
 
 ## Historie
 

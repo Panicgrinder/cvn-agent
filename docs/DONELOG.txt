@@ -85,3 +85,8 @@ Beispiel:
 2025-10-23 10:50 | Copilot | Lizenz hinzugefügt: MIT-Lizenz-Datei (`LICENSE`) und Hinweis in README.
 2025-10-23 11:05 | Copilot | Policy-Hooks: Datei-basierte Minimal-Tests für forbidden_terms/rewrite_map hinzugefügt; Nutzung über SETTINGS.POLICY_FILE verifiziert; schneller Teil-Lauf grün.
 2025-10-23 11:08 | Copilot | Doku: Abschnitt „Inhalts‑Policy & Hooks (optional)“ in AGENT_BEHAVIOR.md ergänzt (Aktivierung, POLICY_FILE, Struktur, Verweise auf Implementierung/Tests).
+2025-10-23 11:30 | Copilot | Policy-Profile: Merge von default + profiles.<id> in content_management implementiert; Tests für Allow/Rewrite/Block/Profile-Merge/Bypass hinzugefügt; policy.sample.json erweitert.
+2025-10-23 11:34 | Copilot | Memory: Tests für Fenster/Trunkierung (InMemory/JSONL) ergänzt; Append-Fehler schlagen Stream nicht mehr fehl (WARN statt Crash).
+2025-10-23 11:36 | Copilot | LLM-Options: Smoke-Tests für erweiterte Optionen (num_ctx/stop/penalties) hinzugefügt; Pass-Through verifiziert.
+2025-10-23 11:38 | Copilot | Doku: Profiles & Merge Order in AGENT_BEHAVIOR.md ergänzt; WORKSPACE_INDEX aktualisiert (LICENSE, policy.sample.json, Beschreibungen).
+2025-10-23 11:40 | Copilot | DONELOG: Autorenschafts-Hinweis in AGENT_BEHAVIOR.md ergänzt (Quelle kann Mensch oder Tool sein; Format dokumentiert).

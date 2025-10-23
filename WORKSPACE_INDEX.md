@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # CVN Agent - Workspace Datei-Index
 
-Stand: 2025-10-22
+Stand: 2025-10-23
 
 ## Vollständiger Index aller Dateien im Workspace (aktualisiert)
 
@@ -21,6 +21,7 @@ Stand: 2025-10-22
 - [`pyrightconfig.json`](pyrightconfig.json) - Python-Typsystem-Konfiguration
 - [`pytest.ini`](pytest.ini) - Pytest-Konfiguration
 - [`README.md`](README.md) - Projekt-Dokumentation
+- [`LICENSE`](LICENSE) - MIT-Lizenz
 - [`requirements.txt`](requirements.txt) - Python-Abhängigkeiten (Laufzeit)
 - [`requirements-dev.txt`](requirements-dev.txt) - Dev-Abhängigkeiten (Lint/Tests)
 - [`requirements-train.txt`](requirements-train.txt) - Zusatzabhängigkeiten (Training)
@@ -61,7 +62,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`app/core/__init__.py`](app/core/__init__.py) - Core-Package-Initialisierung
 - [`app/core/settings.py`](app/core/settings.py) - Konfigurationseinstellungen
 - [`app/core/prompts.py`](app/core/prompts.py) - System-Prompt-Templates (zentral genutzt)
-- [`app/core/content_management.py`](app/core/content_management.py) - Inhaltsfilter (optional/geparkt)
+- [`app/core/content_management.py`](app/core/content_management.py) - Inhaltsfilter & Policy-Hooks (optional)
 - [`app/core/memory.py`](app/core/memory.py) - Speicher-/Gedächtnis-Funktionen (geparkt)
 
 #### app/prompt
@@ -144,6 +145,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 - [`eval/config/synonyms.json`](eval/config/synonyms.json) - Synonym-Mappings für Evaluierung
 - [`eval/config/profiles.json`](eval/config/profiles.json) - Profile/Overrides für Evaluierung (inkl. „chai“)
+- [`eval/config/policy.sample.json`](eval/config/policy.sample.json) - Beispiel-Policy (default + profiles)
 - [`eval/config/synonyms.local.json`](eval/config/synonyms.local.json) - Lokales Synonym-Overlay (freundlich/empathisch/einfühlsam/zuwenden)
 - [`eval/config/synonyms.local.sample.json`](eval/config/synonyms.local.sample.json) - Beispiel für private Synonym-Overlays
 - [`eval/config/context.local.md`](eval/config/context.local.md) - Lokale Kontext-Notizen (privat)
@@ -226,7 +228,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-10-21
+Letzte Aktualisierung: 2025-10-23
 
 Hinweise:
 

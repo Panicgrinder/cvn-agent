@@ -113,7 +113,7 @@ def create_unrestricted_prompt(scenario_type: str) -> str:
 # ---------------------------------------------------------------------------
 # Einfache Policy-Engine (optional)
 # ---------------------------------------------------------------------------
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Iterable, cast
 import re
 
 # Laufzeitimport, um zyklische Imports zu vermeiden
@@ -240,7 +240,28 @@ def _load_policy_file(path: str) -> Dict[str, Any]:
         return {}
 
 
-def _get_policies() -> Dict[str, Any]:
+def _merge_terms(base: Iterable[str], overlay: Iterable[str]) -> List[str]:
+    seen: Dict[str, None] = {}
+    out: List[str] = []
+    for term in list(base) + list(overlay):
+        try:
+            t = str(term)
+        except Exception:
+            continue
+        if t and t not in seen:
+            seen[t] = None
+            out.append(t)
+    return out
+
+
+def _merge_rewrite_map(base: Mapping[str, Any], overlay: Mapping[str, Any]) -> Dict[str, str]:
+    out: Dict[str, str] = {str(k): str(v) for k, v in dict(base).items()}
+    for k, v in dict(overlay).items():
+        out[str(k)] = str(v)
+    return out
+
+
+def _get_policies(*, mode: str = "default", profile_id: Optional[str] = None) -> Dict[str, Any]:
     # Standard: keine Regeln
     policies: Dict[str, Any] = {}
     if settings is None:
@@ -250,7 +271,35 @@ def _get_policies() -> Dict[str, Any]:
             path = getattr(settings, "POLICY_FILE", None)
             if isinstance(path, str) and path:
                 file_rules = _load_policy_file(path)
-                if isinstance(file_rules, dict):
+                if not isinstance(file_rules, dict):
+                    return {}
+                # Unterstützt zwei Formen:
+                # 1) Flach: { forbidden_terms, rewrite_map }
+                # 2) Mit Profilen: { default: {...}, profiles: {<id>: {...}} }
+                if "default" in file_rules or "profiles" in file_rules:
+                    base_raw = file_rules.get("default")
+                    profiles_raw = file_rules.get("profiles")
+                    base: Dict[str, Any] = cast(Dict[str, Any], base_raw) if isinstance(base_raw, dict) else {}
+                    profiles: Dict[str, Any] = cast(Dict[str, Any], profiles_raw) if isinstance(profiles_raw, dict) else {}
+                    # Profilauflösung: explizite profile_id vorrangig, sonst Mapping aus mode (eval->eval)
+                    pid: Optional[str] = profile_id or ("eval" if mode == "eval" else None)
+                    ov_raw = profiles.get(pid) if (pid and isinstance(profiles, dict)) else {}
+                    overlay: Dict[str, Any] = cast(Dict[str, Any], ov_raw) if isinstance(ov_raw, dict) else {}
+                    # Merge-Regeln: forbidden_terms vereinigen, rewrite_map overlay überschreibt
+                    fb_raw = base.get("forbidden_terms")
+                    fo_raw = overlay.get("forbidden_terms")
+                    fb_list: List[Any] = list(fb_raw) if isinstance(fb_raw, list) else []
+                    fo_list: List[Any] = list(fo_raw) if isinstance(fo_raw, list) else []
+                    forb_base: List[str] = [str(x) for x in fb_list]
+                    forb_overlay: List[str] = [str(x) for x in fo_list]
+                    rb_raw = base.get("rewrite_map")
+                    ro_raw = overlay.get("rewrite_map")
+                    rw_base: Dict[str, Any] = cast(Dict[str, Any], rb_raw) if isinstance(rb_raw, dict) else {}
+                    rw_overlay: Dict[str, Any] = cast(Dict[str, Any], ro_raw) if isinstance(ro_raw, dict) else {}
+                    policies["forbidden_terms"] = _merge_terms(forb_base, forb_overlay)
+                    policies["rewrite_map"] = _merge_rewrite_map(rw_base, rw_overlay)
+                else:
+                    # Flaches Schema
                     policies.update(file_rules)
     except Exception:
         # fail-open, keine Regeln
@@ -286,7 +335,7 @@ def apply_pre(
     if settings is None or not getattr(settings, "POLICIES_ENABLED", False):
         return PreResult(action="allow")
     try:
-        rules = _get_policies()
+        rules = _get_policies(mode=mode, profile_id=profile_id)
         forb: List[str] = [str(x) for x in rules.get("forbidden_terms", []) if isinstance(x, str)]
         rw_map: Dict[str, str] = {str(k): str(v) for k, v in dict(rules.get("rewrite_map", {})).items()}
         changed = False
@@ -352,7 +401,7 @@ def apply_post(
             pass
 
         # Standard-Policy (Rewrite-Map/Forbidden Terms)
-        rules = _get_policies()
+        rules = _get_policies(mode=mode, profile_id=profile_id)
         forb: List[str] = [str(x) for x in rules.get("forbidden_terms", []) if isinstance(x, str)]
         rw_map: Dict[str, str] = {str(k): str(v) for k, v in dict(rules.get("rewrite_map", {})).items()}
         out = text
