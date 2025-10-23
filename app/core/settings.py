@@ -64,12 +64,13 @@ class Settings(BaseSettings):
     CONTEXT_NOTES_ENABLED: bool = False
     # Mehrere mögliche Standardpfade; erster vorhandener wird verwendet, oder Inhalte werden zusammengeführt
     CONTEXT_NOTES_PATHS: List[str] = [
+        os.path.join("eval", "config", "context.notes"),  # pinned refs (ORDER/README ignoriert)
         os.path.join("eval", "config", "context.local.md"),
         os.path.join("eval", "config", "context.local.jsonl"),
         os.path.join("eval", "config", "context.local.json"),
         os.path.join("data", "context.local.md"),
     ]
-    CONTEXT_NOTES_MAX_CHARS: int = 4000
+    CONTEXT_NOTES_MAX_CHARS: int = 12000
 
     # Inhalts-Policy/Regeln (optional)
     # Wenn aktiviert, werden optionale Hooks aus content_management verwendet (z.B. für "unrestricted mode").

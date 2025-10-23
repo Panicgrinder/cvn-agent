@@ -1,0 +1,9 @@
+# Reihenfolge der angehefteten Referenzen (optional)
+# Nicht aufgeführte Dateien werden alphabetisch angehängt.
+# Tipp: .ref-Dateien können frei benannt werden; hier nach Belieben ordnen.
+
+AGENT_BEHAVIOR.ref
+DONELOG.ref
+REPORTS.ref
+TODO.ref
+WORKSPACE_INDEX.ref

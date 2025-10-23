@@ -68,6 +68,9 @@ Thumbs.db
 *.swo
 *~
 
+# Verhindere versehentliche verschachtelte Kopien des Repos
+/cvn-agent/
+
 # Historische/Duplikat-Dateien (Phase 2: zur Entfernung vorgesehen)
 # Historische/Top-Level Duplikate vermeiden
 eval/eval-21-40_demo_v1.0.json

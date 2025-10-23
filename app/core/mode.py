@@ -60,7 +60,7 @@ class SessionModeStore:
 
 # Singleton-Store Konfiguration aus Settings ableiten (fail‑open Defaults)
 try:
-    from app.core.settings import settings as _settings  # type: ignore
+    from app.core.settings import settings as _settings
     _ttl = getattr(_settings, "AUTO_MODE_MEMORY_TTL_MIN", 120)
     _max = getattr(_settings, "AUTO_MODE_MEMORY_MAX", 1000)
 except Exception:

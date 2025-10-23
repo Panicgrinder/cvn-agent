@@ -75,3 +75,7 @@ Beispiel:
 2025-10-22 18:56 | Panicgrinder | docs/prompts: Sprache dauerhaft auf Deutsch gesetzt (AGENT_BEHAVIOR.md, DEFAULT_SYSTEM_PROMPT, context.local.md). Tests/Typen grün.
 2025-10-22 19:19 | Panicgrinder | lint: Pyright-Warnungen reduziert  unbenutzte Imports in Scripts entfernt (curate_dataset_from_latest, eval_ui, export_finetune, fine_tune_pipeline, generate_eval_dataset, map_reduce_summary(_llm), reports/*, rerun_from_results, todo_gather). Tests/Typen grün.
 2025-10-22 23:52 | Panicgrinder | Context notes: directory + .ref support; added eval/config/context.notes with 5 pinned refs; updated AGENT_BEHAVIOR.md
+2025-10-23 00:22 | Panicgrinder | Context notes: directory order via ORDER file; ignore README/ORDER meta; collapse excessive blank lines in loader; docs+tests updated
+2025-10-23 01:13 | Panicgrinder | Tests: docs obsolete absent  AGENT_PROMPT.md darf fehlen; Mypy: unused ignore in app/core/mode.py entfernt
+2025-10-23 10:00 | Copilot | Kontext-Notizen Defaults erweitert (eval/config/context.notes in CONTEXT_NOTES_PATHS); eval_loader Diagnostics um schema_issues ergänzt; Tests/Typen unverändert.
+2025-10-23 10:00 | Copilot | Kontext-Notizen Budget erhöht (CONTEXT_NOTES_MAX_CHARS=12000); Standard-Pfade für pinned Notes aktiv; schnelle Tests grün.

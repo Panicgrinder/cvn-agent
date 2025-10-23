@@ -16,8 +16,8 @@ class FileDiag:
     loaded_count: int = 0
     skipped_count: int = 0
     generated_id_count: int = 0
-    parse_errors: List[str] = None  # type: ignore[assignment]
-    schema_issues: List[str] = None  # type: ignore[assignment]
+    parse_errors: List[str] = None  # type: ignore[assignment]+
+    schema_issues: List[str] = None  # type: ignore[assignment]+
 
     def __post_init__(self) -> None:
         if self.parse_errors is None:

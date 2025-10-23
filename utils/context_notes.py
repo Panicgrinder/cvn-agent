@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Optional, Iterable
+from typing import List, Optional, Iterable, Dict
 
 def _read_text(path: str) -> str:
     with open(path, "r", encoding="utf-8") as f:
@@ -42,18 +42,83 @@ def _iter_paths(paths: List[str]) -> Iterable[Path]:
     - Unterstützt Verzeichnisse: nimmt Dateien mit ALLOWED_EXTS (nicht rekursiv) auf
     - .ref Dateien: werden im Loader speziell behandelt (verweisen auf andere Dateien)
     - Reihenfolge: wie angegeben; für Verzeichnisse alphabetisch nach Dateiname
+      bzw. explizit über eine ORDER-Datei steuerbar
     """
     for p in paths:
         pp = Path(p)
         if not pp.exists():
             continue
         if pp.is_dir():
-            # Nur erste Ebene, alphabetisch
-            for child in sorted(pp.iterdir(), key=lambda x: x.name.lower()):
+            # Ordner-Inhalt: optional per ORDER-Datei steuern, sonst alphabetisch
+            order_files = [
+                pp / "ORDER.txt",
+                pp / "order.txt",
+                pp / ".order",
+            ]
+            order: Optional[List[str]] = None
+            for of in order_files:
+                if of.exists() and of.is_file():
+                    try:
+                        lines = of.read_text(encoding="utf-8").splitlines()
+                        # Filtern: Kommentare/Leerzeilen
+                        order = [
+                            ln.strip() for ln in lines
+                            if ln.strip() and not ln.strip().startswith("#")
+                        ] or None
+                    except Exception:
+                        order = None
+                    break
+
+            # Kandidaten sammeln (erste Ebene, erlaubte Endungen)
+            candidates: Dict[str, Path] = {}
+            for child in pp.iterdir():
                 if child.is_file() and child.suffix.lower() in ALLOWED_EXTS:
-                    yield child
+                    name_lower = child.name.lower()
+                    # Meta-Dateien in Context-Ordnern ignorieren
+                    if name_lower in {"order.txt", ".order"} or name_lower.startswith("order."):
+                        continue
+                    if name_lower.startswith("readme."):
+                        continue
+                    candidates[name_lower] = child
+
+            emitted: Dict[str, bool] = {}
+            if order:
+                # Zuerst laut ORDER-Datei (case-insensitive Matching auf Dateinamen)
+                for name in order:
+                    key = name.lower()
+                    if key in candidates and key not in emitted:
+                        yield candidates[key]
+                        emitted[key] = True
+
+            # Rest alphabetisch (nicht bereits emittiert)
+            for key in sorted(candidates.keys()):
+                if key not in emitted:
+                    yield candidates[key]
         elif pp.is_file():
             yield pp
+
+
+def _normalize_text(txt: str) -> str:
+    """Reduziert übermäßige Leerzeilen und trimmt Whitespace am Rand.
+
+    - Mehr als zwei aufeinanderfolgende Zeilenumbrüche -> auf genau zwei reduzieren
+    - Leitende und abschließende Leerzeichen entfernen
+    """
+    # Vereinheitliche Zeilenumbrüche (bewahrt CRLF beim Lesen durch Python, aber normalisiert intern)
+    s = txt.replace("\r\n", "\n").replace("\r", "\n")
+    out_chars: List[str] = []
+    nl_count = 0
+    for ch in s:
+        if ch == "\n":
+            nl_count += 1
+            # Maximal zwei Newlines hintereinander behalten
+            if nl_count <= 2:
+                out_chars.append("\n")
+        else:
+            nl_count = 0
+            out_chars.append(ch)
+    res = "".join(out_chars)
+    return res.strip()
 
 
 def _resolve_ref(path: Path) -> Optional[Path]:
@@ -106,7 +171,7 @@ def load_context_notes(paths: List[str], max_chars: int = 4000) -> Optional[str]
                 txt = _read_text(str(target))
 
             if txt:
-                chunks.append(txt.strip())
+                chunks.append(_normalize_text(txt))
         except Exception:
             # still übergehen, damit ein defekter Pfad die App nicht stoppt
             continue

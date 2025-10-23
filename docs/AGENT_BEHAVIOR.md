@@ -137,6 +137,7 @@ Hinweise:
 
 - Unterstützte Formate: .md, .txt, .json, .jsonl sowie .ref (Verweisdatei, enthält Pfad zur Zieldatei in der ersten Zeile).
 - Verzeichnisse: Es werden alle Dateien der ersten Ebene mit unterstützten Endungen geladen (alphabetisch). Keine Rekursion.
+- Verzeichnisse: Es werden alle Dateien der ersten Ebene mit unterstützten Endungen geladen. Standard: alphabetisch. Optional kann die Reihenfolge per `ORDER.txt` (oder `order.txt`/`.order`) im Ordner festgelegt werden; Zeilen = Dateinamen (Kommentare mit `#` und Leerzeilen werden ignoriert); nicht aufgeführte Dateien folgen alphabetisch. Meta‑Dateien wie `ORDER.*` und `README.*` werden nicht in den Prompt injiziert.
 - Beispiel „angeheftete“ Dokumente: Unter `eval/config/context.notes/` liegen `.ref`‑Dateien, die auf diese Zieldateien verweisen:
   - `docs/AGENT_BEHAVIOR.md`
   - `docs/TODO.md`
@@ -144,7 +145,7 @@ Hinweise:
   - `docs/REPORTS.md`
   - `WORKSPACE_INDEX.md`
 
-Hinweis: Standardmäßig sucht die App nach `eval/config/context.local.*`. Weitere Pfade wie dieses Dokument können per ENV ergänzt werden.
+ Hinweis: Standardmäßig sucht die App nach `eval/config/context.local.*`. Weitere Pfade wie dieses Dokument können per ENV ergänzt werden. Beim Laden werden übermäßige Leerzeilen reduziert, um Tokens zu sparen (Inhalte bleiben erhalten).
 
 Wenn aktiviert, lädt die App beim Chat die Inhalte (Text/JSON/JSONL) und injiziert sie in die System‑Nachricht (siehe `utils/context_notes.py`, `app/api/chat.py`).
 
