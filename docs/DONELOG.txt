@@ -90,3 +90,4 @@ Beispiel:
 2025-10-23 11:36 | Copilot | LLM-Options: Smoke-Tests für erweiterte Optionen (num_ctx/stop/penalties) hinzugefügt; Pass-Through verifiziert.
 2025-10-23 11:38 | Copilot | Doku: Profiles & Merge Order in AGENT_BEHAVIOR.md ergänzt; WORKSPACE_INDEX aktualisiert (LICENSE, policy.sample.json, Beschreibungen).
 2025-10-23 11:40 | Copilot | DONELOG: Autorenschafts-Hinweis in AGENT_BEHAVIOR.md ergänzt (Quelle kann Mensch oder Tool sein; Format dokumentiert).
+2025-10-23 11:46 | Copilot | ChatOptions: Pydantic-Optionschema eingeführt; ChatRequest.options akzeptiert Dict oder ChatOptions; chat.py passt Mapping/Dump an; Tests hinzugefügt.

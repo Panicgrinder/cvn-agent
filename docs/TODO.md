@@ -240,17 +240,18 @@ Hinweise:
 
 ### Kurzfristig (nächste Iterationen)
 
-- [ ] Policy‑Hook & Content‑Management verdrahten
+- [x] Policy‑Hook & Content‑Management verdrahten
   - Ziel: `core/content_management.py` im Chat‑Flow aktivieren (Pre‑/Post‑Prompt),
     Policies aus ENV/policy.json, Modus‑Schalter (eval/unrestricted/profile).
   - Akzeptanz: Hook in `process_chat_request` und `stream_chat_request`; Log/Audit pro Eingriff;
     Tests: Rewrite/Allow‑All/Block.
 
-- [ ] Session‑Memory (Basis)
+- [x] Session‑Memory (Basis)
   - Ziel: `session_id` unterstützen, In‑Memory Store + Trunkierungs‑Heuristik (Token/Chars).
   - Akzeptanz: Einbettung relevanter Turns in Messages; Settings für Limits; Tests: Happy‑Path, Trunkierung, Fallback.
 
-- [ ] Erweiterte LLM‑Options
+- [x] Erweiterte LLM‑Options
+  - Schema/Validierung in `ChatRequest.options` ergänzt (`ChatOptions`), Pass‑Through bis zum Client; Smoke‑Tests hinzugefügt.
   - Ziel: num_ctx, repeat_penalty, presence/frequency_penalty etc. via `ChatRequest.options` validiert durchreichen.
   - Akzeptanz: Pydantic‑Schema/Validation, Payload‑Durchreichung, Smoke‑Tests.
 

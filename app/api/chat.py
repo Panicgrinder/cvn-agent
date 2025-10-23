@@ -96,7 +96,15 @@ async def stream_chat_request(
         # top-level session_id oder options.session_id
         sid_top = getattr(request, "session_id", None)
         opts_any0 = getattr(request, "options", None)
-        opts0: Dict[str, Any] = dict(cast(Mapping[str, Any], opts_any0)) if isinstance(opts_any0, Mapping) else {}
+        # Unterstütze Dict, Mapping oder Pydantic-Modelle mit model_dump()
+        opts0: Dict[str, Any] = {}
+        if isinstance(opts_any0, Mapping):
+            opts0 = dict(cast(Mapping[str, Any], opts_any0))
+        elif hasattr(opts_any0, "model_dump") and callable(getattr(opts_any0, "model_dump")):
+            try:
+                opts0 = dict(getattr(opts_any0, "model_dump")())
+            except Exception:
+                opts0 = {}
         _sid_val0 = opts0.get("session_id")
         sid_opt = _sid_val0 if isinstance(_sid_val0, str) else None
         sid_val = sid_top or sid_opt
@@ -149,7 +157,17 @@ async def stream_chat_request(
     # Optionen normalisieren
     from typing import Dict as _Dict, Any as _Any
     req_model = getattr(request, "model", None)
-    raw_opts: _Dict[str, _Any] = getattr(request, "options", None) or {}
+    raw_any = getattr(request, "options", None)
+    raw_opts: _Dict[str, _Any]
+    if isinstance(raw_any, Mapping):
+        raw_opts = dict(cast(Mapping[str, Any], raw_any))
+    elif hasattr(raw_any, "model_dump") and callable(getattr(raw_any, "model_dump")):
+        try:
+            raw_opts = dict(getattr(raw_any, "model_dump")())
+        except Exception:
+            raw_opts = {}
+    else:
+        raw_opts = dict(raw_any or {})
     norm_opts, base_host = normalize_ollama_options(raw_opts, eval_mode=eval_mode)
 
     # Session Memory: optional bestehenden Verlauf voranstellen
@@ -438,10 +456,15 @@ async def process_chat_request(
             from typing import Dict as _Dict, Any as _Any
             opts_any = getattr(request, "options", None)
             opts0: _Dict[str, _Any] = {}
-            # Sichere Übernahme, nur wenn Mapping-artig
+            # Sichere Übernahme, Mapping oder Pydantic-Modelle
             if isinstance(opts_any, Mapping):
                 try:
                     opts0 = dict(cast(Mapping[str, _Any], opts_any))
+                except Exception:
+                    opts0 = {}
+            elif hasattr(opts_any, "model_dump") and callable(getattr(opts_any, "model_dump")):
+                try:
+                    opts0 = dict(getattr(opts_any, "model_dump")())
                 except Exception:
                     opts0 = {}
             sid_opt = opts0.get("session_id")
@@ -486,7 +509,17 @@ async def process_chat_request(
         # Options/Overrides
         from typing import Dict as _Dict, Any as _Any
         req_model = getattr(request, "model", None)
-        raw_opts2: _Dict[str, _Any] = getattr(request, "options", None) or {}
+        raw_any2 = getattr(request, "options", None)
+        raw_opts2: _Dict[str, _Any]
+        if isinstance(raw_any2, Mapping):
+            raw_opts2 = dict(cast(Mapping[str, Any], raw_any2))
+        elif hasattr(raw_any2, "model_dump") and callable(getattr(raw_any2, "model_dump")):
+            try:
+                raw_opts2 = dict(getattr(raw_any2, "model_dump")())
+            except Exception:
+                raw_opts2 = {}
+        else:
+            raw_opts2 = dict(raw_any2 or {})
         norm_opts2, base_host = normalize_ollama_options(raw_opts2, eval_mode=eval_mode)
 
         # Session Memory (optional): bisherigen Verlauf voranstellen
