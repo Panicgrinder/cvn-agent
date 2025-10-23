@@ -2,6 +2,10 @@
   
 [![CI](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Panicgrinder/cvn-agent/actions/workflows/ci.yml)
 
+## Lizenz
+
+Dieses Projekt steht unter der MIT-Lizenz. Siehe die Datei `LICENSE` im Repository-Wurzelverzeichnis.
+
 Ein FastAPI-Backend für einen Conversational Agent, der Ollama als LLM verwendet.
 
 ## Neuigkeiten (2025-10-20)
