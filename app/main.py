@@ -162,12 +162,12 @@ async def request_context_mw(request: Request, call_next):
         # HTTPException in eine reguläre Antwort umwandeln, damit TestClient/Clients eine Response erhalten
         if isinstance(exc, HTTPException):
             # Merge evtl. vorhandene Exception-Header mit unserer Request-ID
-            from typing import Any as _Any, Mapping as _Mapping
+            from typing import Any as _Any, Mapping as _Mapping, cast as _typing_cast
             raw_headers: _Any = getattr(exc, "headers", None)
             headers: Dict[str, str] = {settings.REQUEST_ID_HEADER: str(rid)}
             try:
                 if isinstance(raw_headers, dict):
-                    m: _Mapping[_Any, _Any] = raw_headers
+                    m: _Mapping[object, object] = _typing_cast(_Mapping[object, object], raw_headers)
                     for key_obj, val_obj in m.items():
                         k: str = str(key_obj)
                         v: str = str(val_obj)

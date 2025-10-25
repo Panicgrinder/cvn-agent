@@ -67,8 +67,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 #### app/prompt
 
-- [`app/prompt/system.txt`](app/prompt/system.txt) - Optionales Template (nicht produktiv
-  referenziert; zentrale Quelle ist `app/core/prompts.py`)
+- (entfernt) `app/prompt/system.txt` – Altlast gelöscht; zentrale Quelle ist `app/core/prompts.py`.
 
 #### app/routers (legacy/geparkt)
 
@@ -228,11 +227,11 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-10-23
+Letzte Aktualisierung: 2025-10-24
 
 Hinweise:
 
 - Prompts: Zentrale Quelle ist [`app/core/prompts.py`](app/core/prompts.py).
-  `app/prompt/system.txt` ist nur ein optionales Template und wird im Code nicht geladen.
+  `app/prompt/system.txt` wurde entfernt (Altlast, nicht produktiv genutzt).
 - Eval-Daten bitte ausschließlich unter [`eval/datasets/...`](eval/datasets/) pflegen. Zusätzliche
   Dateien im Ordner `eval/` sind dokumentiert.

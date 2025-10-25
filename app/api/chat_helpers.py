@@ -3,7 +3,7 @@ Hilfsfunktionen für den Chat-Endpunkt.
 """
 
 import functools
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 from .models import ChatMessage
 from app.core.prompts import DEFAULT_SYSTEM_PROMPT
@@ -60,7 +60,8 @@ def _coerce_int(val: Any) -> Optional[int]:
 def _coerce_str_list(val: Any) -> Optional[List[str]]:
     if isinstance(val, list):
         out: List[str] = []
-        for x in val:
+        # Elemente explizit als Any behandeln, damit str() typklar ist
+        for x in cast(List[Any], val):
             try:
                 out.append(str(x))
             except Exception:

@@ -283,13 +283,13 @@ def _get_policies(*, mode: str = "default", profile_id: Optional[str] = None) ->
                     profiles: Dict[str, Any] = cast(Dict[str, Any], profiles_raw) if isinstance(profiles_raw, dict) else {}
                     # Profilauflösung: explizite profile_id vorrangig, sonst Mapping aus mode (eval->eval)
                     pid: Optional[str] = profile_id or ("eval" if mode == "eval" else None)
-                    ov_raw = profiles.get(pid) if (pid and isinstance(profiles, dict)) else {}
+                    ov_raw: Any = profiles.get(pid) if (pid and isinstance(profiles, dict)) else {}
                     overlay: Dict[str, Any] = cast(Dict[str, Any], ov_raw) if isinstance(ov_raw, dict) else {}
                     # Merge-Regeln: forbidden_terms vereinigen, rewrite_map overlay überschreibt
                     fb_raw = base.get("forbidden_terms")
                     fo_raw = overlay.get("forbidden_terms")
-                    fb_list: List[Any] = list(fb_raw) if isinstance(fb_raw, list) else []
-                    fo_list: List[Any] = list(fo_raw) if isinstance(fo_raw, list) else []
+                    fb_list: List[Any] = cast(List[Any], fb_raw) if isinstance(fb_raw, list) else []
+                    fo_list: List[Any] = cast(List[Any], fo_raw) if isinstance(fo_raw, list) else []
                     forb_base: List[str] = [str(x) for x in fb_list]
                     forb_overlay: List[str] = [str(x) for x in fo_list]
                     rb_raw = base.get("rewrite_map")

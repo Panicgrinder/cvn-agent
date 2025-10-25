@@ -8,7 +8,14 @@ Struktur:
 - `config/`: Konfiguration (z. B. `synonyms.json` für Keyword-Prüfungen)
 - `results/`: Ausgabedateien der Evaluierung (generiert, `results_*.jsonl`)
 
-Hinweis: Private, lokale Synonyme können in `config/synonyms.local.json` gepflegt werden (git-ignoriert). Diese werden automatisch mit `config/synonyms.json` gemerged. Eine Vorlage liegt als `config/synonyms.local.sample.json` bei.
+ Hinweis: Private, lokale Synonyme können in `config/synonyms.local.json` gepflegt werden (git-ignoriert). Diese werden automatisch mit `config/synonyms.json` gemerged. Eine Vorlage liegt als `config/synonyms.local.sample.json` bei.
+
+## Profile & Synonyme
+
+- Profile: `config/profiles.json` definiert z. B. das `eval`-Profil (konservative Sampling-Defaults, Checks). Über Skripte/Tasks kann `--profile eval` gesetzt werden.
+- Synonyme: `config/synonyms.json` bildet Basis; `config/synonyms.local.json` (gitignored) wird automatisch darübergelegt (Merge). Beispiel: `config/synonyms.local.sample.json`.
+
+ Hinweis: Einige VS Code Tasks nutzen bereits Profil/Checks-Presets (z. B. „Eval: run (ASGI, quiet)“).
 
 ## Format der Datasets (JSON/JSONL)
 

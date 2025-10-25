@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Dict, List, Optional, Tuple, Literal
+from typing import Any, Dict, List, Optional, Tuple, Literal
 
 Mode = Literal["rpg", "general"]
 
 
-def detect_requested_mode_from_messages(messages: List[dict]) -> Optional[Mode]:
+def detect_requested_mode_from_messages(messages: List[Dict[str, Any]]) -> Optional[Mode]:
     """Heuristik: erkennt gewünschten Modus anhand der User‑Nachrichten.
 
     - RPG: Schlüsselwörter/Formatindikatoren (novapolis, chronistin, /roll, szene:, konsequenz:, optionen:)
@@ -74,7 +74,7 @@ def resolve_mode(
     session_id: Optional[str],
     eval_mode: bool,
     unrestricted_mode: bool,
-    messages: List[dict],
+    messages: List[Dict[str, Any]],
     default_mode: Mode,
     persist: bool = True,
 ) -> Mode:

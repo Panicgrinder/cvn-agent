@@ -181,16 +181,23 @@ API/Nahbereich:
 
 Skripte (CLI/Tools – teils „potenziell ungenutzt“ aus App-Perspektive):
 
-- [ ] `scripts/customize_prompts.py`, `scripts/estimate_tokens.py`, `scripts/open_context_notes.py` — behalten oder als „optional tools“ markieren; README-Hinweis ergänzen.
-- [ ] `scripts/openai_finetune.py`, `scripts/openai_ft_status.py`, `scripts/train_lora.py`, `scripts/fine_tune_pipeline.py` — CLI-Only; behalten, aber in Doku referenzieren; ggf. mit `--help`-Tests absichern.
-- [ ] `scripts/reports/generate_*` — jetzt repariert; behalten. Optional: Task/README ergänzen (siehe unten).
-- [ ] `scripts/audit_workspace.py` — behalten (liefert diese Liste); README-Querverweis setzen.
+- [x] `scripts/customize_prompts.py`, `scripts/estimate_tokens.py`, `scripts/open_context_notes.py` — behalten oder als „optional tools“ markieren; README-Hinweis ergänzen.
+  - Status: Done — README-Abschnitt „Optionale CLI-Tools“ ergänzt; Tools aufgeführt; `--help` verfügbar.
+- [x] `scripts/openai_finetune.py`, `scripts/openai_ft_status.py`, `scripts/train_lora.py`, `scripts/fine_tune_pipeline.py` — CLI-Only; behalten, aber in Doku referenzieren; ggf. mit `--help`-Tests absichern.
+  - Status: Done — In README „Optionale CLI-Tools“ verlinkt; vorhandene Smokes/Tests abdecken Grundpfade (fine_tune_pipeline, openai_ft_status).
+- [x] `scripts/reports/generate_*` — jetzt repariert; behalten. Optional: Task/README ergänzen (siehe unten).
+  - Status: Done — README „Neuigkeiten“ beschreibt Reports; Generatoren gelistet; CI lädt Artefakte hoch.
+- [x] `scripts/audit_workspace.py` — behalten (liefert diese Liste); README-Querverweis setzen.
+  - Status: Done — In README „Optionale CLI-Tools“ erwähnt.
 
 Nicht‑Python‑Artefakte (Referenzen vorhanden, aber Pflege prüfen):
 
-- [ ] `eval/config/profiles.json` — aktuell; Doku konsolidieren.
-- [ ] `eval/config/synonyms.json` (+ `synonyms.local.json`) — gepflegt; README aktualisieren.
-- [ ] `app/prompt/system.txt` — Altlast; zentrale Prompts sind `app/core/prompts.py`. Entfernen, wenn nicht mehr referenziert.
+- [x] `eval/config/profiles.json` — aktuell; Doku konsolidieren.
+  - Status: Done — `eval/README.md` Abschnitt „Profile & Synonyme“ ergänzt.
+- [x] `eval/config/synonyms.json` (+ `synonyms.local.json`) — gepflegt; README aktualisieren.
+  - Status: Done — `eval/README.md` (Overlay erklärt) und README Synonym-Hinweis vorhanden.
+- [x] `app/prompt/system.txt` — Altlast; zentrale Prompts sind `app/core/prompts.py`. Entfernen, wenn nicht mehr referenziert.
+  - Status: Done — Datei entfernt; `WORKSPACE_INDEX.md` und `docs/DONELOG.txt` aktualisiert.
 
 Hinweise:
 
@@ -317,10 +324,18 @@ Später
 
 ### Mittelfristig
 
-- [ ] Tool‑Use/Function‑Calling (Basis)
+- [~] Tool‑Use/Function‑Calling (Basis)
   - Ziel: 2–3 sichere Tools (Rechnen, lokale Datei‑Sandbox, einfache Korpus‑Suche) per ReAct‑Prompting,
     Policy‑basiert freischaltbar; Protokollierung.
-  - Akzeptanz: Tool‑Katalog/Whitelist, Aufrufe protokolliert, Tests: mind. 1 Tool E2E (Stub), Policy Off/On.
+  - Fortschritt: Basis‑Scaffold umgesetzt
+    - Settings: `TOOLS_ENABLED` (bool), `TOOLS_WHITELIST` (Liste) hinzugefügt.
+    - Registry: `app/tools/registry.py` mit `register_tool/list_tools/is_allowed/call_tool`.
+    - Built‑in Tool: `calc_add` (Addition mit Float‑Coercion).
+    - Tests: `tests/test_tools_basic.py` (unit) prüft Deny by default, Allow per Whitelist, Unknown Tool.
+  - Nächste Schritte:
+    - Logging/Protokollierung der Tool‑Aufrufe (RID, Dauer, Args‑Redaktion) ergänzen.
+    - Optional: Weitere Tools (z. B. `safe_eval_math`, `sandbox_ls` mit strikten Pfaden) + Policy‑Bindung.
+    - Chat‑Integration (ReAct‑Stil) hinter Flag verdrahten.
 
 - [ ] RAG (lokal)
   - Ziel: FAISS oder Qdrant; Indexer für Markdown/Text; Query‑Augmentation; konfigurierbar offline.

@@ -101,13 +101,44 @@ http://127.0.0.1:8000/docs
 
 Konfiguration per `.env` (siehe Beispiele in `app/core/settings.py`). Wichtige Felder:
 
-- OLLAMA_HOST, MODEL_NAME, TEMPERATURE
-- BACKEND_CORS_ORIGINS: JSON- oder Komma-Liste
-- REQUEST_TIMEOUT (Sek.), REQUEST_MAX_INPUT_CHARS, REQUEST_MAX_TOKENS
-- RATE_LIMIT_ENABLED (bool), RATE_LIMIT_REQUESTS_PER_MINUTE, RATE_LIMIT_BURST
 
 Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters begrenzt (in-memory, best-effort).
 
+### Policies aktivieren (optional)
+
+Die Inhalts‑Policies sind standardmäßig aus. Zur Aktivierung in `.env` oder Umgebungsvariablen setzen:
+
+```
+POLICIES_ENABLED=true
+POLICY_FILE="eval/config/policy.sample.json"
+# Im "unrestricted"‑Modus strikt alle Policies umgehen:
+POLICY_STRICT_UNRESTRICTED_BYPASS=true
+```
+
+Hinweise:
+
+- Policy‑Datei kann „default“ und „profiles“ enthalten. Merge‑Reihenfolge: `default` → `profiles[profile_id]`;
+   `forbidden_terms` werden vereinigt, `rewrite_map` überlagert die Schlüssel.
+- `mode=eval` mappt implizit auf `profile_id="eval"`.
+- Details und Tests siehe `docs/AGENT_BEHAVIOR.md` und `tests/test_content_policy_profiles.py`.
+ 
+## Optionale CLI-Tools
+
+Für erweiterte Workflows stehen optionale Skripte zur Verfügung (nicht Teil des API-Pflichtpfads):
+
+- `scripts/customize_prompts.py` – Prompts/Policies/Profiles zusammenstellen; Export in Dateien
+- `scripts/estimate_tokens.py` – Grobe Token-/Längenabschätzung für Eingaben
+- `scripts/open_context_notes.py` – Kontextnotizen aus `settings` öffnen (lokal)
+- `scripts/audit_workspace.py` – Konsistenz-/Altlasten-Scan; Hinweise und Pfadprüfungen
+- `scripts/openai_finetune.py` – OpenAI-kompatible Finetune-Packs validieren/Triggern
+- `scripts/openai_ft_status.py` – Finetune-Status abfragen
+- `scripts/train_lora.py` – LoRA-Miniläufe (TinyLlama etc.)
+- `scripts/fine_tune_pipeline.py` – End-to-End Pipeline (Export→Prepare→Train)
+
+Tipps:
+
+- Viele Schritte sind als VS Code Tasks vorhanden (Suche nach „Finetune“, „Eval“, „Summary“).
+- Alle Skripte akzeptieren `--help` mit Kurzbeschreibung und Argumenten.
 ## Datenmodelle (Quelle)
 
 Die zentralen Pydantic-Modelle für Requests/Responses liegen in `app/api/models.py`.

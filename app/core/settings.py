@@ -62,12 +62,13 @@ class Settings(BaseSettings):
 
     # Kontext-Notizen (lokal, optional)
     CONTEXT_NOTES_ENABLED: bool = False
-    # Mehrere mögliche Standardpfade; erster vorhandener wird verwendet, oder Inhalte werden zusammengeführt
+    # Standardpfade (Priorität: lokale Dateien zuerst, dann angeheftete Referenzen)
+    # Begründung: Tests und erwartetes Verhalten priorisieren explizite lokale Notizen vor Sammel-Refs.
     CONTEXT_NOTES_PATHS: List[str] = [
-        os.path.join("eval", "config", "context.notes"),  # pinned refs (ORDER/README ignoriert)
         os.path.join("eval", "config", "context.local.md"),
         os.path.join("eval", "config", "context.local.jsonl"),
         os.path.join("eval", "config", "context.local.json"),
+        os.path.join("eval", "config", "context.notes"),  # pinned refs (ORDER/README ignoriert)
         os.path.join("data", "context.local.md"),
     ]
     CONTEXT_NOTES_MAX_CHARS: int = 12000
@@ -109,6 +110,10 @@ class Settings(BaseSettings):
     MEMORY_MAX_TURNS: int = 20
     MEMORY_MAX_CHARS: int = 8000
     MEMORY_DIR: Path = Path(".data/memory")
+
+    # Tool-Use (Basis, optional)
+    TOOLS_ENABLED: bool = False
+    TOOLS_WHITELIST: List[str] = []
 
     @staticmethod
     def _to_nonempty_str(obj: Any) -> Optional[str]:

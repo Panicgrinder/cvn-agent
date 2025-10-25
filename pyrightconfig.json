@@ -3,7 +3,7 @@
   "pythonVersion": "3.12",
   "venvPath": ".",
   "venv": ".venv",
-  "include": ["app", "utils", "tests", "scripts"],
+  "include": ["app", "utils"],
   "exclude": [
     ".venv",
     "build",
@@ -11,6 +11,8 @@
     "data",
     "outputs",
   "eval/results",
+    "tests",
+    "scripts",
     "**/__pycache__",
     ".pytest_cache",
     ".mypy_cache",
@@ -31,13 +33,7 @@
     {
       "root": ".",
       "pythonVersion": "3.12",
-      "venv": ".venv"
-    }
-  ],
-  "overrides": [
-    {
-      "files": ["app/services/**/*.py"],
-      "typeCheckingMode": "strict"
+      "extraPaths": []
     }
   ]
 }

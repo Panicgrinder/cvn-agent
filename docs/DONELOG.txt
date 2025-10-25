@@ -91,3 +91,7 @@ Beispiel:
 2025-10-23 11:38 | Copilot | Doku: Profiles & Merge Order in AGENT_BEHAVIOR.md ergänzt; WORKSPACE_INDEX aktualisiert (LICENSE, policy.sample.json, Beschreibungen).
 2025-10-23 11:40 | Copilot | DONELOG: Autorenschafts-Hinweis in AGENT_BEHAVIOR.md ergänzt (Quelle kann Mensch oder Tool sein; Format dokumentiert).
 2025-10-23 11:46 | Copilot | ChatOptions: Pydantic-Optionschema eingeführt; ChatRequest.options akzeptiert Dict oder ChatOptions; chat.py passt Mapping/Dump an; Tests hinzugefügt.
+2025-10-24 11:20 | Panicgrinder | Cleanup: app/prompt/system.txt (Altlast) entfernt; WORKSPACE_INDEX und README geprüft.
+2025-10-24 11:28 | Copilot | Pyright-Warnungen im App-Code bereinigt (casts/Typen in chat_helpers, content_management, mode, main); Pyright-Config auf app+utils fokussiert.
+2025-10-25 09:10 | Copilot | Mittelfristig: Tool‑Use Basis angelegt (Settings: TOOLS_ENABLED/WHITELIST; Registry; calc_add Tool; Unit‑Tests). TODO.md aktualisiert.
+2025-10-25 14:02 | Panicgrinder | Kontext-Notizen: Priorität auf lokale Dateien (context.local.*) vor angehefteten Refs (context.notes) gesetzt; Pyright-Konfiguration bereinigt (ungueltige Keys entfernt, Tests/Scripts vorerst ausgeschlossen). Tests & Typen grün.
