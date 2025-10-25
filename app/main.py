@@ -8,7 +8,7 @@ import time
 from typing import Dict, Any
 
 from .core.settings import settings
-from .api.models import ChatRequest, ChatResponse
+from .api.models import ChatRequest, ChatResponse, ChatMessage
 from .api.chat import process_chat_request, stream_chat_request
 import os as _os
 import platform as _platform
@@ -194,13 +194,21 @@ async def chat(request: ChatRequest, req: Request):
         Die Chat-Antwort mit der generierten Nachricht
     """
     try:
-        # Extrahiere Parameter aus den Rohdaten
-        request_data = await req.json()
-        eval_mode = request_data.get("eval_mode", False)
-        unrestricted_mode = request_data.get("unrestricted_mode", False)
+        # Extrahiere Parameter aus den Rohdaten (typisiert)
+        _raw = await req.json()
+        from typing import Dict as _Dict, Any as _Any, cast as _typing_cast
+        request_data: _Dict[str, _Any] = _typing_cast(_Dict[str, _Any], _raw if isinstance(_raw, dict) else {})
+        eval_mode = bool(request_data.get("eval_mode", False))
+        unrestricted_mode = bool(request_data.get("unrestricted_mode", False))
 
-        # Eingabelängenprüfung (robust gegen fehlende Felder)
-        total_chars = sum(len(str(m.get("content", ""))) for m in request.messages)
+        # Eingabelängenprüfung (robust gegen gemischte Typen in messages)
+        total_chars = 0
+        for m in request.messages:
+            if isinstance(m, ChatMessage):
+                total_chars += len(m.content or "")
+            else:
+                mm = _typing_cast(_Dict[str, str], m)
+                total_chars += len(str(mm.get("content", "")))
         if total_chars > settings.REQUEST_MAX_INPUT_CHARS:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
