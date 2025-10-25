@@ -29,7 +29,7 @@ Kurzfristige Ziele (Heute)
   - Status: Done (zwei Tests hinzugefügt, beide grün).
 
 - [x] Pyright-Upgrade & Typwarnungen bereinigt
-  - Status: Done (Pyright 1.1.406; 0 Fehler, 0 Warnungen; Tests grün; verbleibende Test-Warnungen gefixt)
+  - Status: Done (Pyright 1.1.406; 0 Fehler, 0 Warnungen im App-Bereich; Tests grün; tests/ & scripts/ vorerst aus Pyright-Analyse ausgeschlossen – schrittweise Reaktivierung geplant)
 
 - [x] Markdownlint-Konfiguration & Tasks
   - Status: Done (`.markdownlint.json` hinzugefügt; VS Code Tasks für Lint/Fix; README/TODO/Customization bereinigt)
@@ -156,6 +156,15 @@ Zusätzliche kurzfristige Abschlüsse (2025-10-22)
   - `eval/config/context.local.md`: 2‑Tage‑Digest (heute+gestern) + klare Feststellung (Defaults unverändert; ENV nutzen)
   - Platzhalter-Logs angelegt: `data/logs/2025-10-22.jsonl`, `data/logs/2025-10-21.jsonl` (gitignored)
   - Hinweis in `AGENT_BEHAVIOR.md` Historie präzisiert
+
+Kurz-Update (2025-10-25)
+
+- [x] Kontext‑Notizen: lokale Dateien priorisiert
+  - Änderung: `CONTEXT_NOTES_PATHS` so angepasst, dass `context.local.*` vor `context.notes/` eingelesen wird.
+  - Ergebnis: Tests wieder grün; Injektion enthält lokale Notizen zuverlässig (vor Trunkierung).
+- [x] Pyright‑Konfiguration bereinigt
+  - Änderung: Ungültige Keys entfernt; Analysebereich auf `app/` und `utils/` fokussiert.
+  - Ergebnis: 0 Fehler/0 Warnungen im App‑Scope; Nacharbeit: tests/ & scripts/ später wieder einbeziehen und Warnungen abbauen.
   
 Hinweise:
 
@@ -377,9 +386,9 @@ Später
   - Ziel: Mehr Ollama‑Optionen exponieren, klar dokumentieren; Defaults in Settings.
   - Akzeptanz: Doku + Validation‑Tests.
 
-- [ ] AGENT_BEHAVIOR.md: DONELOG Autoren‑Definition präzisieren
+- [x] AGENT_BEHAVIOR.md: DONELOG Autoren‑Definition präzisieren
   - Ziel: In `AGENT_BEHAVIOR.md` ergänzen, dass der Autor in `docs/DONELOG.txt` die Herkunft des Vorschlags widerspiegelt (z. B. „Panicgrinder“ für Benutzer‑/Owner‑Vorschläge; „Copilot“ für automatisch initiierte/umgesetzte Vorschläge).
-  - Akzeptanz: Abschnitt „Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)“ erweitern; ein kurzes Beispiel mit „Lizenzvorschlag kam vom Benutzer“ vs. „Tests erweitert von Copilot“ hinzufügen.
+  - Akzeptanz: Abschnitt „Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)“ erweitert; konkrete Beispiele hinzugefügt.
 
 Metriken
 

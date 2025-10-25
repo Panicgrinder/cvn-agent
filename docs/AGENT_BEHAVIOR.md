@@ -53,6 +53,10 @@ Antworte immer auf Deutsch; halte Beispiele, Erklärungen und Fehlermeldungen au
 - CI: schlägt ohne aktuellen DONELOG bei PRs/Push auf main fehl (PR‑Bypasslabel: `skip-donelog`)
 - Qualitätstore: Build, Lint/Type, Tests, ggf. Smoke. Nie mit kaputtem Build enden (bis zu 3 gezielte Fix‑Versuche)
 - DONELOG führt Autorenschaft; die Quelle kann Mensch oder Tool sein (z. B. „Benutzer“, „Copilot“, „GPT‑5“). Format: `YYYY-MM-DD HH:MM | <Autor> | <Änderung>`
+  - Leitlinie: Der Autor spiegelt die Herkunft des Vorschlags bzw. der Umsetzung wider.
+    - Beispiel: „Panicgrinder“ (oder „Benutzer“) für Anforderungen/Vorschläge, die explizit vom Benutzer kamen (z. B. „MIT‑Lizenz hinzufügen“).
+    - Beispiel: „Copilot“ (oder „Agent“) für Arbeiten, die proaktiv/automatisiert vom Agent umgesetzt wurden (z. B. „Tests erweitert“, „Pyright‑Konfiguration bereinigt“).
+  - Ziel: Nachvollziehbarkeit, wer die Initiative hatte, ohne personenbezogene Details zu speichern.
 
 ## Checkliste vor Push/PR
 
