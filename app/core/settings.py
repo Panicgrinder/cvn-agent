@@ -29,6 +29,19 @@ class Settings(BaseSettings):
     OLLAMA_HOST: str = "http://localhost:11434"
     MODEL_NAME: str = "llama3.1:8b"
     TEMPERATURE: float = 0.7
+    # Sampling-Defaults (wirken als Basis, wenn vom Request nicht überschrieben)
+    TOP_P: float = 0.9
+    TOP_K: int = 40
+    MIN_P: float = 0.0           # 0.0 deaktiviert min_p; Werte 0..1
+    TYPICAL_P: float = 1.0       # 1.0 entspricht deaktiviert
+    TFS_Z: float = 1.0           # 1.0 entspricht deaktiviert
+    MIROSTAT: int = 0            # 0=aus, 1/2=an (Algorithmusvariante)
+    MIROSTAT_TAU: float = 5.0
+    MIROSTAT_ETA: float = 0.1
+    PENALIZE_NEWLINE: bool = False
+    REPEAT_PENALTY: float = 1.1
+    REPEAT_LAST_N: int = 64
+    NUM_CTX_DEFAULT: Optional[int] = None  # Wenn gesetzt, als Default an Modell übergeben
     
     # Evaluierungseinstellungen
     EVAL_DIRECTORY: str = "eval"

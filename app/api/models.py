@@ -27,6 +27,15 @@ class ChatOptions(BaseModel):
     repeat_last_n: Optional[int] = None
     # stop: Liste von Stop-Token; zur Kompatibilität erlauben wir auch einzelne Strings
     stop: Optional[Union[List[str], str]] = None
+    # Weitere Sampling-/Steuerungsoptionen (Ollama/llama.cpp)
+    top_k: Optional[int] = None
+    min_p: Optional[float] = None
+    typical_p: Optional[float] = None
+    tfs_z: Optional[float] = None
+    mirostat: Optional[int] = None  # 0,1,2
+    mirostat_tau: Optional[float] = None
+    mirostat_eta: Optional[float] = None
+    penalize_newline: Optional[bool] = None
 
 class ChatMessage(BaseModel):
     """

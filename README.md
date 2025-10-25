@@ -104,6 +104,44 @@ Konfiguration per `.env` (siehe Beispiele in `app/core/settings.py`). Wichtige F
 
 Hinweis: Bei aktiviertem Rate Limiting wird pro IP innerhalb eines 60s-Fensters begrenzt (in-memory, best-effort).
 
+### LLM-Optionen (Ollama) – Defaults & Overrides
+
+Der Agent unterstützt eine Reihe von Sampling-/Decoding-Optionen. Defaults sind zentral in `app/core/settings.py` hinterlegt und können via `.env` überschrieben werden. Pro Request lassen sich Optionen in `ChatRequest.options` setzen; diese überschreiben die Defaults.
+
+Unterstützte Optionen (Auswahl):
+
+- Temperatur/Sampling: `temperature`, `top_p`, `top_k`, `min_p`, `typical_p`, `tfs_z`
+- Länge/Kontext: `num_predict` (Alias: `max_tokens`), `num_ctx`
+- Penalties: `repeat_penalty`, `repeat_last_n`, `presence_penalty`, `frequency_penalty`, `penalize_newline`
+- Steuerung/Seed: `seed`, `stop` (String oder Liste), `host` (Ollama Base-URL)
+- Mirostat: `mirostat` (0/1/2), `mirostat_tau`, `mirostat_eta`
+
+Zentrale Defaults (aus Settings; Beispielwerte):
+
+```
+TEMPERATURE=0.7
+TOP_P=0.9
+TOP_K=40
+MIN_P=0.0
+TYPICAL_P=1.0
+TFS_Z=1.0
+MIROSTAT=0
+MIROSTAT_TAU=5.0
+MIROSTAT_ETA=0.1
+PENALIZE_NEWLINE=false
+REPEAT_PENALTY=1.1
+REPEAT_LAST_N=64
+REQUEST_MAX_TOKENS=512
+# Optional: NUM_CTX_DEFAULT (wenn gesetzt, wird übernommen)
+# NUM_CTX_DEFAULT=4096
+```
+
+Hinweise:
+
+- `eval_mode` deckelt `temperature` automatisch auf maximal 0.25.
+- `stop` akzeptiert entweder eine Liste von Strings oder einen einzelnen String (wird intern zu einer Liste gewandelt).
+- Wertebereiche werden konservativ geprüft/geklammert (z. B. `top_p`, `min_p`, `typical_p`, `tfs_z` in [0,1]; `mirostat` ∈ {0,1,2}).
+
 ### Policies aktivieren (optional)
 
 Die Inhalts‑Policies sind standardmäßig aus. Zur Aktivierung in `.env` oder Umgebungsvariablen setzen:
