@@ -378,9 +378,10 @@ Später
   - Ziel: `ChatRequest.messages` konsistent auf `ChatMessage` heben; Abwärtskompatibilität wahren.
   - Akzeptanz: Pydantic‑Konvertierung + Tests (dict/obj beide möglich).
 
-- [ ] Streaming‑Meta/Fehler-Modell
+- [x] Streaming‑Meta/Fehler-Modell
   - Ziel: Ersten SSE‑Meta‑Event (Params/Mode/RID) senden; Fehler zusätzlich protokollieren.
-  - Akzeptanz: Tests prüfen Meta‑Event + Error‑Event.
+  - Status: Done — Erster `event: meta` mit `{params: {mode, request_id, model, options}}` wird zu Beginn des Streams gesendet; bestehendes Policy‑Meta/Delta am Ende bleibt erhalten.
+  - Akzeptanz: Tests prüfen Meta‑Event + Error‑Event (neu: `tests/test_streaming_initial_meta.py`; bestehende Error‑/Policy‑Tests grün).
 
 - [ ] Settings/Options erweitern
   - Ziel: Mehr Ollama‑Optionen exponieren, klar dokumentieren; Defaults in Settings.

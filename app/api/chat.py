@@ -222,6 +222,21 @@ async def stream_chat_request(
     async def _gen():
         started = time.time()
         try:
+            # Frühes Meta-Event mit Parametern/Modus senden
+            try:
+                from typing import Dict as _Dict, Any as _Any
+                mode0 = "unrestricted" if unrestricted_mode else ("eval" if eval_mode else "default")
+                _opts: _Any = ollama_payload.get("options", {})
+                params: _Dict[str, _Any] = {
+                    "mode": mode0,
+                    "request_id": request_id,
+                    "model": ollama_payload.get("model"),
+                    "options": _opts,
+                }
+                yield f"event: meta\ndata: {_json.dumps({'params': params}, ensure_ascii=False)}\n\n"
+            except Exception:
+                # Fail-open: Meta-Event ist optional
+                pass
             async def _do_stream(_client: httpx.AsyncClient):
                 final_text_parts: List[str] = []
                 async with _client.stream("POST", ollama_url, json=ollama_payload, headers=headers) as resp:
