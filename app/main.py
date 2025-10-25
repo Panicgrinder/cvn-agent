@@ -9,6 +9,7 @@ from typing import Dict, Any
 
 from .core.settings import settings
 from .api.models import ChatRequest, ChatResponse, ChatMessage
+from typing import Mapping as _Mapping, Union as _Union
 from .api.chat import process_chat_request, stream_chat_request
 import os as _os
 import platform as _platform
@@ -181,6 +182,16 @@ async def request_context_mw(request: Request, call_next):
             )
         raise
 
+def _get_content_from_message(m: _Union[ChatMessage, _Mapping[str, str]]) -> str:
+    """Extrahiert den Content unabhängig davon, ob die Message ein ChatMessage oder ein Dict ist."""
+    if isinstance(m, ChatMessage):
+        return m.content or ""
+    try:
+        return str(m.get("content", ""))
+    except Exception:
+        return ""
+
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, req: Request):
     """
@@ -204,11 +215,7 @@ async def chat(request: ChatRequest, req: Request):
         # Eingabelängenprüfung (robust gegen gemischte Typen in messages)
         total_chars = 0
         for m in request.messages:
-            if isinstance(m, ChatMessage):
-                total_chars += len(m.content or "")
-            else:
-                mm = _typing_cast(_Dict[str, str], m)
-                total_chars += len(str(mm.get("content", "")))
+            total_chars += len(_get_content_from_message(m))
         if total_chars > settings.REQUEST_MAX_INPUT_CHARS:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
