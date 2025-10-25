@@ -6,6 +6,7 @@ Arbeitskontext
 Schnellziele (bei Codeänderungen)
 - CI grün halten: Tests (pytest), Typen (Pyright/Mypy). CI prüft DONELOG (`docs/DONELOG.txt`).
 - Nicht-triviale Änderungen → DONELOG via `scripts/append_done.py`.
+- Nach jedem Edit: Tests/Typen sequenziell ausführen und abwarten (Standard: `pytest -q` → `pyright -p pyrightconfig.json` → `mypy -c mypy.ini .`). Keine Vorab-Statusmeldungen.
 
 PR-Checkliste (kurz)
 - Tests lokal: `pytest -q` (oder Teilmengen, siehe Marker unten).
@@ -44,6 +45,7 @@ Wo nachsehen
 
 Wenn bereits vorhanden
 - Beim Aktualisieren dieser Datei: Inhalte aus `docs/AGENT_BEHAVIOR.md` beachten (Progress-Cadence, DONELOG, Shell-Hinweise) und konsistent halten.
+	- Zusätzlich: „Warten bis Checks abgeschlossen sind“ strikt beherzigen und im Zweifelsfall den VS Code Task „All checks: tests+pyright+mypy“ nutzen.
 
 Feedback
 - Fehlt dir etwas (weitere Marker, Tasks, Troubleshooting)? Kurz melden – ich passe die Anleitung an.

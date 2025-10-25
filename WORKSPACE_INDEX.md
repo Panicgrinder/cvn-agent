@@ -93,6 +93,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`utils/eval_cache.py`](utils/eval_cache.py) - Einfacher JSONL-Cache für LLM-Summaries
 - [`utils/message_helpers.py`](utils/message_helpers.py) - Message/Historie Utilities
 - [`utils/time_utils.py`](utils/time_utils.py) - Zeit-/Timestamp-Helfer
+- [`utils/rag.py`](utils/rag.py) - Leichtgewichtiger TF‑IDF RAG‑Retriever (Index/Save/Load/Retrieve)
 
 ### data
 
@@ -204,6 +205,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 - [`scripts/smoke_asgi.py`](scripts/smoke_asgi.py) - Minimaler ASGI-Smoketest
 - [`scripts/syn_loader.py`](scripts/syn_loader.py) - Loader für Synonym-Overlays
 - [`scripts/summarize_eval_results.py`](scripts/summarize_eval_results.py) - Aggregiert Eval-Ergebnisse
+- [`scripts/rag_indexer.py`](scripts/rag_indexer.py) - Baut TF‑IDF RAG‑Index aus .md/.txt und speichert JSON
 
 ### tests
 
@@ -227,7 +229,7 @@ Hinweis Datenmodelle: Quelle ist [`app/api/models.py`](app/api/models.py).
 
 Repository-Hinweis: Standard-Branch ist `main`.
 
-Letzte Aktualisierung: 2025-10-24
+Letzte Aktualisierung: 2025-10-25
 
 Hinweise:
 

@@ -115,6 +115,11 @@ class Settings(BaseSettings):
     TOOLS_ENABLED: bool = False
     TOOLS_WHITELIST: List[str] = []
 
+    # RAG (lokal, optional)
+    RAG_ENABLED: bool = False
+    RAG_INDEX_PATH: str = str(Path("eval/results/rag/index.json"))
+    RAG_TOP_K: int = 3
+
     @staticmethod
     def _to_nonempty_str(obj: Any) -> Optional[str]:
         s = str(obj).strip()

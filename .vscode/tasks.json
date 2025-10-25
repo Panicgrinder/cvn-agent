@@ -5,6 +5,22 @@
 	},
 	"tasks": [
 		{
+			"label": "All checks: tests+pyright+mypy",
+			"type": "shell",
+			"command": "echo Running all checks sequentially...",
+			"dependsOn": [
+				"Tests: pytest -q",
+				"Type check: pyright",
+				"Type check: mypy"
+			],
+			"dependsOrder": "sequence",
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Tests: pytest -q",
 			"type": "process",
 			"command": "${config:python.interpreterPath}",

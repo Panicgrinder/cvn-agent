@@ -39,6 +39,7 @@ Antworte immer auf Deutsch; halte Beispiele, Erklärungen und Fehlermeldungen au
 - DONELOG‑Pflicht bei nicht‑trivialen Änderungen (vgl. `docs/DONELOG.txt`)
 - Reproduzierbarkeit: Ergebnisse/Reports unter `eval/results/reports/<topic>/<YYYYMMDD_HHMM>/` ablegen
 - Verify before claim: Aussagen zu Build/Tests/Typen nur nach frischem Lauf
+- Strikt warten: Nach jeder Codeänderung werden Tests und Typprüfungen (pytest → pyright → mypy) gestartet und es wird erst berichtet/weitergearbeitet, wenn alle Läufe abgeschlossen sind. Keine Vorab‑Statusmeldungen.
 - Minimal‑Delta: Nur nötige Änderungen, keine Nebenbaustellen
 - Fortschritt: Vor Batches kurz „warum/was/outcome“; nach 3–5 Schritten kompakter Status; nur Details
 - Sicherheit & Privacy: Keine Leaks; offline/lokal bevorzugen; minimal nötige Rechte; keine unnötigen Netzaufrufe
@@ -52,6 +53,11 @@ Antworte immer auf Deutsch; halte Beispiele, Erklärungen und Fehlermeldungen au
   - `python scripts/append_done.py "Kurzbeschreibung"`
 - CI: schlägt ohne aktuellen DONELOG bei PRs/Push auf main fehl (PR‑Bypasslabel: `skip-donelog`)
 - Qualitätstore: Build, Lint/Type, Tests, ggf. Smoke. Nie mit kaputtem Build enden (bis zu 3 gezielte Fix‑Versuche)
+- Gate‑Reihenfolge (Standard):
+  1) `pytest -q`
+  2) `pyright -p pyrightconfig.json`
+  3) `mypy -c mypy.ini .`
+  Diese drei Schritte werden nach Änderungen sequenziell ausgeführt. Ergebnisse abwarten, erst dann Status kommunizieren.
 - DONELOG führt Autorenschaft; die Quelle kann Mensch oder Tool sein (z. B. „Benutzer“, „Copilot“, „GPT‑5“). Format: `YYYY-MM-DD HH:MM | <Autor> | <Änderung>`
   - Leitlinie: Der Autor spiegelt die Herkunft des Vorschlags bzw. der Umsetzung wider.
     - Beispiel: „Panicgrinder“ (oder „Benutzer“) für Anforderungen/Vorschläge, die explizit vom Benutzer kamen (z. B. „MIT‑Lizenz hinzufügen“).
