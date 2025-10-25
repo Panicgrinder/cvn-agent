@@ -165,16 +165,7 @@ Kurz-Update (2025-10-25)
 - [x] Pyright‑Konfiguration bereinigt
   - Änderung: Ungültige Keys entfernt; Analysebereich auf `app/` und `utils/` fokussiert.
   - Ergebnis: 0 Fehler/0 Warnungen im App‑Scope; Nacharbeit: tests/ & scripts/ später wieder einbeziehen und Warnungen abbauen.
- - [x] Pyright‑Warnungen im RAG‑Code entfernt
-   - Änderung: `utils/rag.py` (from_dict) strikt typisiert (`Dict[str, object]`, `Mapping`‑Casts, sichere Konvertierungen).
-   - Ergebnis: Pyright jetzt 0 Warnungen gesamt.
- - [x] RAG‑Guards getestet (None‑Index)
-   - Änderung: Neue Tests `tests/test_rag_guards.py` für Stream/Non‑Stream Guards (kein Index vorhanden → kein Fehler, kein Retrieve‑Call).
-   - Ergebnis: Suite grün, Verhalten unverändert.
- - [ ] RAG: Unit‑Tests für `retrieve`/`save_load`
-   - Ziel: Deterministische Mini‑Indizes; Ranking/Top‑K prüfen; JSON‑Roundtrip (`save_index`/`load_index`).
- - [ ] Doku: RAG‑Nutzung & Indexer
-   - Ziel: README/TODO ergänzen (Flag `RAG_ENABLED`, `RAG_INDEX_PATH`, CLI `scripts/rag_indexer.py`, empfohlene Tasks).
+ - Hinweis: RAG‑Fortschritt siehe Abschnitt „RAG (lokal, optional)“ unten.
   
 Hinweise:
 
@@ -450,10 +441,14 @@ Regel: Abgeschlossene Arbeiten dokumentieren (DONELOG)
     - Tests: mindestens ein Tool End‑to‑End (Stub/Offline), Policy Off/On.
 
 - [ ] RAG (lokal, optional)
-  - Ziel: Einfaches Retrieval (FAISS oder Qdrant), Indizierung für Markdown/Text, Query‑Augmentation.
-  - Akzeptanzkriterien:
-    - Indexer‑Script + Retrieval‑Hook; konfigurierbar und offline lauffähig.
-    - Tests: deterministischer kleiner Index, Treffer/Kein‑Treffer Fälle.
+  - Ziel: Einfaches Retrieval (zunächst TF‑IDF; perspektivisch FAISS/Qdrant), Indizierung für Markdown/Text, Query‑Augmentation.
+  - Aktueller Stand:
+    - [x] Leichtgewichtiges TF‑IDF‑Retrieval implementiert (`utils/rag.py`); optional via Settings (`RAG_ENABLED`, `RAG_INDEX_PATH`, `RAG_TOP_K`).
+    - [x] Pyright‑Warnungen im RAG‑Code entfernt (strikte Typisierung in `from_dict`; 0 Warnungen).
+    - [x] Guards für fehlenden Index getestet (`tests/test_rag_guards.py`) – Stream/Non‑Stream funktionieren ohne Index (fail‑open).
+  - Nächste Schritte:
+    - [ ] Unit‑Tests für Retrieval/Ranking und Save/Load‑Roundtrip (`retrieve`, `save_index`/`load_index`).
+    - [ ] Doku: RAG‑Nutzung & Indexer (Flags, Pfade, CLI `scripts/rag_indexer.py`, empfohlene Tasks).
 
 - [ ] Profile/Personas
   - Ziel: Profile als JSON (Prompts/Policies/Options), Auswahl via Header/Token/Session.
