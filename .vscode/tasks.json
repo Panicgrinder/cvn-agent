@@ -36,6 +36,34 @@
 			"problemMatcher": []
 		},
 		{
+			"label": "RAG: build local TF-IDF index",
+			"type": "shell",
+			"windows": {
+				"command": "powershell",
+				"args": [
+					"-NoProfile",
+					"-Command",
+					"$inputs = \"${input:ragIndexerInputs}\".Split(';') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }; & ${config:python.interpreterPath} '${workspaceFolder}/scripts/rag_indexer.py' --input @inputs --out \"${input:ragIndexerOut}\""
+				]
+			},
+			"linux": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"IFS=';'; read -ra IN <<< \"${input:ragIndexerInputs}\"; ${config:python.interpreterPath} '${workspaceFolder}/scripts/rag_indexer.py' --input ${IN[@]} --out \"${input:ragIndexerOut}\""
+				]
+			},
+			"osx": {
+				"command": "bash",
+				"args": [
+					"-lc",
+					"IFS=';'; read -ra IN <<< \"${input:ragIndexerInputs}\"; ${config:python.interpreterPath} '${workspaceFolder}/scripts/rag_indexer.py' --input ${IN[@]} --out \"${input:ragIndexerOut}\""
+				]
+			},
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
 			"label": "Tests: coverage app (≥85%)",
 			"type": "process",
 			"command": "${config:python.interpreterPath}",
@@ -741,6 +769,18 @@
 				""
 			],
 			"default": ""
+		},
+		{
+			"id": "ragIndexerInputs",
+			"type": "promptString",
+			"description": "Semikolon-getrennte Liste von Verzeichnissen/Dateien (.md/.txt) für den RAG-Indexer",
+			"default": "${workspaceFolder}/docs;${workspaceFolder}/eval/config;${workspaceFolder}/README.md"
+		},
+		{
+			"id": "ragIndexerOut",
+			"type": "promptString",
+			"description": "Zielpfad für den generierten Index (JSON)",
+			"default": "${workspaceFolder}/eval/results/rag/index.json"
 		}
 	]
 }
