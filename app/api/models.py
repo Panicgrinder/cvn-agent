@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List, Dict, Optional, Any, Union
+from pydantic import BaseModel, field_validator
+from typing import List, Dict, Optional, Any, Union, cast
 
 
 class ChatOptions(BaseModel):
@@ -39,7 +39,8 @@ class ChatRequest(BaseModel):
     """
     Modell für eine Chat-Anfrage.
     """
-    messages: List[Dict[str, str]]
+    # Akzeptiert ChatMessage-Objekte und/oder Dicts (rückwärtskompatibel)
+    messages: List[Union[ChatMessage, Dict[str, str]]]
     model: Optional[str] = None
     # Akzeptiert entweder ein freies Dict (rückwärtskompatibel) oder ChatOptions (validiert)
     options: Optional[Union[Dict[str, Any], ChatOptions]] = None
@@ -47,6 +48,38 @@ class ChatRequest(BaseModel):
     profile_id: Optional[str] = None
     # Optional: Session-ID für die Sitzungs-Memory
     session_id: Optional[str] = None
+
+    @field_validator("messages", mode="before")
+    @classmethod
+    def _coerce_messages(cls, v: Any) -> Any:
+        """
+        Erlaubt gemischte Eingaben (Dicts/Objekte) und normalisiert auf ChatMessage/Dict.
+        - Wenn ein Element bereits ChatMessage ist: belassen
+        - Wenn ein Dict mit role/content: akzeptieren
+        - Sonst: best-effort Extraktion über Attribute
+        """
+        try:
+            from typing import Any as _Any, List as _List, Union as _Union, Dict as _Dict
+            if isinstance(v, (list, tuple)):
+                seq: _List[_Any] = list(cast(_List[_Any], v))
+            else:
+                return cast(Any, v)
+        except Exception:
+            return cast(Any, v)
+        out: _List[_Union[ChatMessage, _Dict[str, str]]] = []
+        for m in seq:
+            if isinstance(m, ChatMessage):
+                out.append(m)
+            elif isinstance(m, dict):
+                mm = cast(Dict[Any, Any], m)
+                role = str(mm.get("role", "user"))
+                content = str(mm.get("content", ""))
+                out.append({"role": role, "content": content})
+            else:
+                role = str(getattr(m, "role", "user"))
+                content = str(getattr(m, "content", ""))
+                out.append({"role": role, "content": content})
+        return out
     
 class ChatResponse(BaseModel):
     """

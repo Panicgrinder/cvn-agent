@@ -96,3 +96,4 @@ Beispiel:
 2025-10-25 09:10 | Copilot | Mittelfristig: Tool‑Use Basis angelegt (Settings: TOOLS_ENABLED/WHITELIST; Registry; calc_add Tool; Unit‑Tests). TODO.md aktualisiert.
 2025-10-25 14:02 | Panicgrinder | Kontext-Notizen: Priorität auf lokale Dateien (context.local.*) vor angehefteten Refs (context.notes) gesetzt; Pyright-Konfiguration bereinigt (ungueltige Keys entfernt, Tests/Scripts vorerst ausgeschlossen). Tests & Typen grün.
 2025-10-25 14:22 | Panicgrinder | Streaming: Initiales Meta-Event (params: mode, request_id, model, options) am Stream-Beginn hinzugefügt; Test ergänzt (tests/test_streaming_initial_meta.py); TODO.md aktualisiert. Suite & Typen grün.
+2025-10-25 18:51 | Panicgrinder | API: Einheitliches Message-Schema  ChatRequest.messages akzeptiert ChatMessage oder dict; Validator hinzugefügt; Tests ergänzt (tests/test_messages_schema.py). CI-Gates grün.

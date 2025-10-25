@@ -374,9 +374,9 @@ Später
 
 ### Kleine Auffälligkeiten / Verbesserungen
 
-- [ ] Einheitliches Message‑Schema
-  - Ziel: `ChatRequest.messages` konsistent auf `ChatMessage` heben; Abwärtskompatibilität wahren.
-  - Akzeptanz: Pydantic‑Konvertierung + Tests (dict/obj beide möglich).
+- [x] Einheitliches Message‑Schema
+  - Ziel: `ChatRequest.messages` akzeptiert `ChatMessage` und dicts; Validator normalisiert Einträge.
+  - Status: Done — Pydantic‑Validator ergänzt; Tests hinzugefügt (`tests/test_messages_schema.py`); Flow bleibt rückwärtskompatibel.
 
 - [x] Streaming‑Meta/Fehler-Modell
   - Ziel: Ersten SSE‑Meta‑Event (Params/Mode/RID) senden; Fehler zusätzlich protokollieren.
