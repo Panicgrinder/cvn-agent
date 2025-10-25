@@ -139,6 +139,31 @@ Tipps:
 
 - Viele Schritte sind als VS Code Tasks vorhanden (Suche nach „Finetune“, „Eval“, „Summary“).
 - Alle Skripte akzeptieren `--help` mit Kurzbeschreibung und Argumenten.
+
+## Lokales RAG (optional)
+
+Der Agent kann optional Kontext‑Snippets aus einem lokalen Text‑Korpus (Markdown/TXT) via leichtgewichtigem TF‑IDF‑Retriever injizieren.
+
+- Flags (in `.env` oder als Umgebungsvariablen):
+   - `RAG_ENABLED=true` – RAG aktivieren
+   - `RAG_INDEX_PATH=eval/results/rag/index.json` – Pfad zur Index‑Datei
+   - `RAG_TOP_K=3` – Anzahl der Snippets
+
+- Indexer‑CLI: `scripts/rag_indexer.py`
+   - Baut einen JSON‑Index über `.md`/`.txt` Dateien (nicht rekursiv für Ordner‑Top‑Level)
+   - Beispiel (PowerShell):
+
+      ```powershell
+      .\.venv\Scripts\python.exe scripts\rag_indexer.py --input docs eval\config --out eval\results\rag\index.json
+      ```
+
+- Verwendung im Server:
+   - Server liest `RAG_INDEX_PATH` beim Request ein (best‑effort). Wenn der Index fehlt, läuft der Chat normal weiter (fail‑open).
+   - Snippets werden als zusätzliche System‑Nachricht `[RAG]` injiziert.
+
+- Task‑Hinweise:
+   - Es gibt aktuell keinen dedizierten VS Code Task für den Indexer; der obige Aufruf funktioniert plattformneutral über den aktiven Interpreter.
+   - Optional kann ein eigener Task ergänzt werden, der `scripts/rag_indexer.py` mit gewünschten `--input`/`--out` Werten ausführt.
 ## Datenmodelle (Quelle)
 
 Die zentralen Pydantic-Modelle für Requests/Responses liegen in `app/api/models.py`.

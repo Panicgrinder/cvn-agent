@@ -106,3 +106,4 @@ Beispiel:
 2025-10-25 22:16 | Panicgrinder | Tests ergänzt: RAG-Guards (stream/non-stream) sichern None-Index-Pfade ab; chat.py Typisierungen für RAG-Imports/idx präzisiert; Pyright jetzt 0 Warnungen; Verhalten unverändert.
 2025-10-25 22:20 | Panicgrinder | Outstanding Änderungen synchronisiert (Tasks, AGENT_BEHAVIOR, Settings, WORKSPACE_INDEX); rag_indexer Script hinzugefügt. Keine Verhaltensänderung.
 2025-10-25 22:31 | Panicgrinder | TODO um RAG-Sektion konsolidiert (Fortschritt+Next Steps an passender Stelle); Unit-Tests für TF-IDF (retrieve Ranking, save/load Roundtrip) ergänzt; Gates grün.
+2025-10-25 22:37 | Panicgrinder | README: kurzer Abschnitt 'Lokales RAG' ergänzt (Flags, Indexer-CLI, Beispiel, Task-Hinweise); keine Codeänderungen; Gates grün.
