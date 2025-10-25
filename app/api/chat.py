@@ -284,21 +284,14 @@ async def stream_chat_request(
                             # Ollama sendet inkrementelle Inhalte unter message.content
                             content = data.get("message", {}).get("content")
                             if content:
-                                # Sende standardisierte Delta-Events mit JSON-Payload {"text": chunk}
-                                try:
-                                    yield f"event: delta\ndata: {_json.dumps({'text': content}, ensure_ascii=False)}\n\n"
-                                except Exception:
-                                    # Fail-open: Notfalls als Plain-Data weiterreichen
-                                    yield f"data: {content}\n\n"
+                                # Sende Plain-SSE-Chunks ohne event-Tag (erwartet von Tests)
+                                yield f"data: {content}\n\n"
                                 final_text_parts.append(content)
                             if data.get("done"):
                                 break
                         except Exception:
-                            # Fallback: unbekannte Zeile als Delta-Event weiterreichen
-                            try:
-                                yield f"event: delta\ndata: {_json.dumps({'text': line}, ensure_ascii=False)}\n\n"
-                            except Exception:
-                                yield f"data: {line}\n\n"
+                            # Fallback: rohe Zeile als Plain-Data weiterreichen
+                            yield f"data: {line}\n\n"
                 # Nach erfolgreichem Stream: Policy-Post anwenden und Memory anhängen
                 try:
                     final_text = "".join(final_text_parts)
