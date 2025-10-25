@@ -2,7 +2,9 @@ import httpx
 import logging
 import time
 import json as _json
-from typing import Dict, Any, List, Optional, Mapping, cast
+from typing import Dict, Any, List, Optional, Mapping, cast, TYPE_CHECKING
+if TYPE_CHECKING:  # nur für Typprüfung, zur Laufzeit nicht benötigt
+    from utils.rag import TfIdfIndex as _TfIdfIndex
 from fastapi import HTTPException, status
 
 from ..core.settings import settings
@@ -88,6 +90,39 @@ async def stream_chat_request(
             messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
     except Exception:
         # Fehler beim Laden der Notizen ignorieren
+        pass
+
+    # Optional: RAG-Snippets injizieren (leichter TF-IDF Retriever)
+    try:
+        if bool(getattr(settings, "RAG_ENABLED", False)):
+            from utils.rag import load_index, retrieve  # leichte, lokale Utility
+            rag_path = str(getattr(settings, "RAG_INDEX_PATH", "eval/results/rag/index.json"))
+            try:
+                idx: Optional["_TfIdfIndex"] = load_index(rag_path)
+                # Letzte Benutzerfrage als Query nehmen
+                user_texts = [m.get("content", "") for m in messages if m.get("role") == "user"]
+                query = user_texts[-1] if user_texts else ""
+                if query and idx is not None:
+                    from typing import List as _List, Dict as _Dict, Any as _Any, cast as _cast
+                    top_k = int(getattr(settings, "RAG_TOP_K", 3))
+                    _hits_any: object = retrieve(idx, query, top_k=top_k)
+                    hits = _cast(_List[_Dict[str, _Any]], _hits_any)
+                    if hits:
+                        # Kompakte Einbettung als System-Notiz
+                        def _clip(s: str, n: int = 400) -> str:
+                            return s if len(s) <= n else (s[:n] + "…")
+                        snippet_text = "\n\n".join(
+                            f"- {h.get('source', '?')}: {_clip(str(h.get('text', '')))}" for h in hits
+                        )
+                        messages.insert(1, {"role": "system", "content": f"[RAG]\n{snippet_text}"})
+            except FileNotFoundError:
+                # Kein Index vorhanden -> stiller Fallback
+                pass
+            except Exception:
+                # RAG ist optional, daher fail-open
+                pass
+    except Exception:
+        # Import- oder sonstige Fehler ignorieren (RAG ist best-effort)
         pass
 
     # Session-ID normalisieren
@@ -461,6 +496,34 @@ async def process_chat_request(
                 notes = None
             if (enabled or notes) and notes:
                 messages.insert(1, {"role": "system", "content": f"[Kontext-Notizen]\n{notes}"})
+        except Exception:
+            pass
+
+        # Optional: RAG-Snippets injizieren (leichter TF-IDF Retriever)
+        try:
+            if bool(getattr(settings, "RAG_ENABLED", False)):
+                from utils.rag import load_index, retrieve
+                rag_path = str(getattr(settings, "RAG_INDEX_PATH", "eval/results/rag/index.json"))
+                try:
+                    idx: Optional["_TfIdfIndex"] = load_index(rag_path)
+                    user_texts2 = [m.get("content", "") for m in messages if m.get("role") == "user"]
+                    query2 = user_texts2[-1] if user_texts2 else ""
+                    if query2 and idx is not None:
+                        from typing import List as _List, Dict as _Dict, Any as _Any, cast as _cast
+                        top_k2 = int(getattr(settings, "RAG_TOP_K", 3))
+                        _hits2_any: object = retrieve(idx, query2, top_k=top_k2)
+                        hits2 = _cast(_List[_Dict[str, _Any]], _hits2_any)
+                        if hits2:
+                            def _clip2(s: str, n: int = 400) -> str:
+                                return s if len(s) <= n else (s[:n] + "…")
+                            snippet_text2 = "\n\n".join(
+                                f"- {h.get('source', '?')}: {_clip2(str(h.get('text', '')))}" for h in hits2
+                            )
+                            messages.insert(1, {"role": "system", "content": f"[RAG]\n{snippet_text2}"})
+                except FileNotFoundError:
+                    pass
+                except Exception:
+                    pass
         except Exception:
             pass
 
