@@ -104,3 +104,4 @@ Beispiel:
 2025-10-25 21:13 | Panicgrinder | Kleine Korrekturen
 2025-10-25 22:07 | Panicgrinder | Pyright-Warnungen in utils/rag.py entfernt: explizite Typisierungen in from_dict (Dict[str, object], Mapping-Casts); keine Verhaltensänderung.
 2025-10-25 22:16 | Panicgrinder | Tests ergänzt: RAG-Guards (stream/non-stream) sichern None-Index-Pfade ab; chat.py Typisierungen für RAG-Imports/idx präzisiert; Pyright jetzt 0 Warnungen; Verhalten unverändert.
+2025-10-25 22:20 | Panicgrinder | Outstanding Änderungen synchronisiert (Tasks, AGENT_BEHAVIOR, Settings, WORKSPACE_INDEX); rag_indexer Script hinzugefügt. Keine Verhaltensänderung.

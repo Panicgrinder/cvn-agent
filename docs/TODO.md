@@ -165,6 +165,16 @@ Kurz-Update (2025-10-25)
 - [x] Pyright‑Konfiguration bereinigt
   - Änderung: Ungültige Keys entfernt; Analysebereich auf `app/` und `utils/` fokussiert.
   - Ergebnis: 0 Fehler/0 Warnungen im App‑Scope; Nacharbeit: tests/ & scripts/ später wieder einbeziehen und Warnungen abbauen.
+ - [x] Pyright‑Warnungen im RAG‑Code entfernt
+   - Änderung: `utils/rag.py` (from_dict) strikt typisiert (`Dict[str, object]`, `Mapping`‑Casts, sichere Konvertierungen).
+   - Ergebnis: Pyright jetzt 0 Warnungen gesamt.
+ - [x] RAG‑Guards getestet (None‑Index)
+   - Änderung: Neue Tests `tests/test_rag_guards.py` für Stream/Non‑Stream Guards (kein Index vorhanden → kein Fehler, kein Retrieve‑Call).
+   - Ergebnis: Suite grün, Verhalten unverändert.
+ - [ ] RAG: Unit‑Tests für `retrieve`/`save_load`
+   - Ziel: Deterministische Mini‑Indizes; Ranking/Top‑K prüfen; JSON‑Roundtrip (`save_index`/`load_index`).
+ - [ ] Doku: RAG‑Nutzung & Indexer
+   - Ziel: README/TODO ergänzen (Flag `RAG_ENABLED`, `RAG_INDEX_PATH`, CLI `scripts/rag_indexer.py`, empfohlene Tasks).
   
 Hinweise:
 
